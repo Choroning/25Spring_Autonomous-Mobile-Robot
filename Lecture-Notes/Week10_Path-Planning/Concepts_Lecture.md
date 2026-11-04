@@ -77,23 +77,23 @@ The collection of variables describing the state of a robot or vehicle is called
 
 If the rear wheels of a car are assumed to roll without slipping sideways, the velocity of the rear-axle center always points along the heading $\theta$ of the body. That is, the sideways component of the body's velocity is zero.
 
-$$
+```math
 \dot{x} \sin\theta - \dot{y} \cos\theta = 0
-$$
+```
 
 The simplest motion model satisfying this is the bicycle model. With front-wheel steering angle $\delta$, distance between the front and rear axles (wheelbase) $L$, and speed $v$, it reads as follows (the detailed derivation of the bicycle model is covered in Week 12).
 
-$$
+```math
 \dot{x} = v \cos\theta, \qquad \dot{y} = v \sin\theta, \qquad \dot{\theta} = \frac{v}{L} \tan\delta
-$$
+```
 
-Substituting the first two equations gives $\dot{x}\sin\theta - \dot{y}\cos\theta = v\cos\theta\sin\theta - v\sin\theta\cos\theta = 0$, so the constraint is satisfied. The configuration has three variables ($x, y, \theta$) but only two inputs ($v, \delta$) can be manipulated, so the vehicle cannot move directly sideways. Still, combining forward and reverse motion with steering lets it reach a desired configuration, as in parallel parking. This is what it means that the reachable configurations are not reduced while the directions of motion are restricted.
+Substituting the first two equations gives $\dot{x}\sin\theta - \dot{y}\cos\theta = v\cos\theta\sin\theta - v\sin\theta\cos\theta = 0$, so the constraint is satisfied. The configuration has three variables ($`x, y, \theta`$) but only two inputs ($`v, \delta`$) can be manipulated, so the vehicle cannot move directly sideways. Still, combining forward and reverse motion with steering lets it reach a desired configuration, as in parallel parking. This is what it means that the reachable configurations are not reduced while the directions of motion are restricted.
 
 The steering angle has a limit $\delta_{\max}$, so the radius of the circle the vehicle drives has a lower bound. When turning with speed $v$ and angular velocity $\dot{\theta}$, the turning radius is $R = v / \dot{\theta} = L / \tan\delta$, so the **minimum turning radius** is as follows.
 
-$$
+```math
 R_{\min} = \frac{L}{\tan\delta_{\max}}
-$$
+```
 
 For example, with $L = 2.7$ m and $\delta_{\max} = 30°$, $R_{\min} = 2.7 / \tan 30° = 2.7 / 0.5774 \approx 4.68$ m. If a path on a grid turns 90° at one cell, the vehicle would have to turn with radius 0 on the spot, so it cannot follow that path as it is. Hybrid A\* in Section 4 is a method for solving this problem.
 
@@ -183,9 +183,9 @@ The left of Figure 4 is a grid with a long vertical wall (gray) between the star
 
 The **A\* algorithm** is a tree search algorithm that finds the shortest path from a given start to a destination [4]. Starting from the start point, it examines adjacent regions one after another and finds the cheapest path from the start to the goal. The cost $F$ of each node $n$ is the sum of two costs.
 
-$$
+```math
 F(n) = G(n) + H(n)
-$$
+```
 
 | Symbol | Name | Meaning |
 |:-----|:-----|:-----|
@@ -298,7 +298,7 @@ A cell one step toward the goal (up or right) has $H$ reduced by 1, so $F$ stays
 The process divides into the following phases.
 
 1. **Exploring the dead end (steps 2-7).** B6, B5, B4, C5, C6, and D6 all have $F = 10$ and look like good ways to the goal. By the tie-breaking rule, cells with smaller $H$ are expanded first, so the search first enters the upper-left space. This space, however, is closed off by the wall and leads no further toward the goal. In step 7, D7, newly opened from D6, has $G = 4$ and $F = 12$, so the cost increases.
-2. **Returning to an earlier region (step 8).** Now the cell with the smallest $F$ in the open list is C7 ($F = 10$), placed there in step 1. This behavior of A\* is exactly giving up a path that can go no further or whose cost increases, returning to an earlier region, and exploring another path of the next priority. From C7, D7 can be reached with $G = 1 + 1 = 2$, so the $G$ of D7 is updated from 4 to 2 and its parent from D6 to C7.
+2. **Returning to an earlier region (step 8).** Now the cell with the smallest $F$ in the open list is C7 ($`F = 10`$), placed there in step 1. This behavior of A\* is exactly giving up a path that can go no further or whose cost increases, returning to an earlier region, and exploring another path of the next priority. From C7, D7 can be reached with $G = 1 + 1 = 2$, so the $G$ of D7 is updated from 4 to 2 and its parent from D6 to C7.
 3. **Proceeding to the goal (steps 9-17).** From then on, the search follows cells with $F = 10$ to the right along row 7 and then up column F to the goal G2. The $G = 10$ when the goal is extracted is the cost of the shortest path.
 
 The final state is as follows (bold marks expanded cells, ■ marks obstacles).
@@ -346,9 +346,9 @@ This time diagonal movement is allowed. Straight moves cost 10 and diagonal move
 - **Map:** An 11×6 grid (columns A-K, rows 1-6). The black cells D2 and D3-H3 form a wall shaped like an upside-down L, and the goal cell E2 lies inside above the wall. The start cell is H5, below the wall.
 - **Heuristic:** The **octile distance**, the least cost of moving in eight directions when obstacles are ignored. With column difference $d_x$ and row difference $d_y$, it is cheapest to move diagonally for the shorter of the two and straight for the rest.
 
-$$
+```math
 H = 14 \min(d_x, d_y) + 10 \left( \max(d_x, d_y) - \min(d_x, d_y) \right)
-$$
+```
 
 For example, from the start cell H5 to E2, $d_x = 3$ and $d_y = 3$, so $H = 14 \times 3 = 42$. G4, to the upper left of the start, has $G = 14$ (one diagonal move), $d_x = 2$, $d_y = 2$, so $H = 28$ and $F = 42$. I5, to the right, has $G = 10$, $d_x = 4$, $d_y = 3$, so $H = 14 \times 3 + 10 \times 1 = 52$ and $F = 62$. All eight cells in Figure 11 are computed this way.
 
@@ -406,7 +406,7 @@ The final state and path are as follows.
 
 The path is H5 → H4 → I3 → H2 → G2 → F2 → E2, with cost $10 + 14 + 14 + 10 + 10 + 10 = 68$. The way around the left end of the wall, H5 → G4 → F4 → E4 → D4 → C3 → C2 → D1 → E2, costs 96, so going around the right is shorter.
 
-> **Caution:** The step that updates the cost of a cell already in the open list is easy to skip. For example, D5 is first opened diagonally from E4 in step 6 with $G = 34 + 14 = 48$ and $F = 82$, but when E5 ($G = 30$) is expanded in step 8, D5 can be reached by a straight move at $30 + 10 = 40$, so it must be corrected to $G = 40$ and $F = 74$. In the same way, J5 decreases from 28 to 20 in step 11. Skipping the update makes the cost of paths through that cell appear larger than it is, so when the shortest path passes through that cell, the search misses it. If the search is carried out to the end without the update, D5 remains at 48+34=82 and J5 at 28+62=90 in the final state.
+> **Caution:** The step that updates the cost of a cell already in the open list is easy to skip. For example, D5 is first opened diagonally from E4 in step 6 with $G = 34 + 14 = 48$ and $F = 82$, but when E5 ($`G = 30`$) is expanded in step 8, D5 can be reached by a straight move at $30 + 10 = 40$, so it must be corrected to $G = 40$ and $F = 74$. In the same way, J5 decreases from 28 to 20 in step 11. Skipping the update makes the cost of paths through that cell appear larger than it is, so when the shortest path passes through that cell, the search misses it. If the search is carried out to the end without the update, D5 remains at 48+34=82 and J5 at 28+62=90 in the final state.
 
 > **Caution:** The moves H4 → I3 and I3 → H2 in this path cut diagonally past the corner of the obstacle H3. If diagonal moves that cut across obstacle corners are forbidden (the rule that both side cells must be free for a diagonal move), the path becomes H5 → I4 → I3 → I2 → H2 → G2 → F2 → E2 with cost 74. A real vehicle has width, so the search is run on a map in which obstacles are inflated by half the vehicle width, so that paths grazing corners do not arise.
 
@@ -420,7 +420,7 @@ For A\* to guarantee the shortest path, the heuristic must satisfy the following
 
 **With an admissible heuristic, A\* finds the shortest path,** provided that closed nodes are reopened when a cheaper path is found or that the consistency below holds. Let $C^{\ast}$ be the shortest cost. If the goal has not yet been extracted, some node $n$ on a shortest path is in the open list, and since it was reached along the shortest path, $G(n) = g^{\ast}(n)$. Hence $F(n) = g^{\ast}(n) + h(n) \le g^{\ast}(n) + h^{\ast}(n) = C^{\ast}$. If the goal were extracted first via a path costing more than $C^{\ast}$, its $F$ at that moment would exceed $C^{\ast}$, so $n$ with $F(n) \le C^{\ast}$ should have been extracted first, a contradiction. Therefore the cost when the goal is extracted is $C^{\ast}$.
 
-**With a consistent heuristic, expanded nodes never need to be reopened.** Consistency means that $F$ does not decrease along a path ($F(m) = G(n) + c(n, m) + h(m) \ge G(n) + h(n) = F(n)$). Nodes are therefore expanded in order of increasing $F$, and the $G$ of a node when it is first expanded is already minimal. This is why the pseudocode of Section 3.2 may skip nodes in the closed list. A consistent heuristic is always admissible.
+**With a consistent heuristic, expanded nodes never need to be reopened.** Consistency means that $F$ does not decrease along a path ($`F(m) = G(n) + c(n, m) + h(m) \ge G(n) + h(n) = F(n)`$). Nodes are therefore expanded in order of increasing $F$, and the $G$ of a node when it is first expanded is already minimal. This is why the pseudocode of Section 3.2 may skip nodes in the closed list. A consistent heuristic is always admissible.
 
 Typical heuristics for each movement model are as follows. Straight moves cost 1 and diagonal moves cost $\sqrt{2}$, and $d_x$ and $d_y$ are the column and row differences to the goal.
 
@@ -452,7 +452,7 @@ Among admissible heuristics, the closer to the actual cost (the larger the value
 - A\* finds the shortest path while expanding few cells. The Chebyshev distance is smaller than the octile distance (a less accurate estimate), so the number of expansions grew from 18 to 20.
 - Using the Manhattan distance on an eight-directional grid can give values larger than the actual cost (one diagonal step costs 14 but is estimated as 20), so it is not admissible. In this example the number of expansions decreased and the shortest path was found by chance, but in general it can produce paths that are not shortest.
 
-The method that uses $F = G + w H$ with the heuristic multiplied by a weight greater than 1 ($w > 1$) is called **weighted A\*** [5]. The search is drawn more strongly toward the goal and expands fewer nodes, but only a weaker guarantee remains: the cost of the path found does not exceed $w$ times the shortest cost. In autonomous driving, which must replan in real time, designs that give up a little optimality for speed like this are common, and Hybrid A\* in Section 4 is one of them.
+The method that uses $F = G + w H$ with the heuristic multiplied by a weight greater than 1 ($`w > 1`$) is called **weighted A\*** [5]. The search is drawn more strongly toward the goal and expands fewer nodes, but only a weaker guarantee remains: the cost of the path found does not exceed $w$ times the shortest cost. In autonomous driving, which must replan in real time, designs that give up a little optimality for speed like this are common, and Hybrid A\* in Section 4 is one of them.
 
 ### 3.7 A\* on Road Networks
 
@@ -482,13 +482,13 @@ The name Hybrid A\* comes from using a discrete grid and continuous vehicle stat
 - **Motion primitives:** When expanding a node, instead of jumping to neighboring cells, the vehicle is moved a fixed distance with a few steering angles (for example, maximum left, zero, maximum right), and the results become candidate nodes. These are arcs following the bicycle model of Section 1.2, so the way to each candidate is always drivable.
 - **Pruning with a discrete grid:** Continuous states are infinitely many, so only one state is kept per cell of a 3D grid dividing $(x, y, \theta)$ at fixed intervals. If a candidate falls into a cell that already holds another state, only the one with the smaller cost is kept.
 
-Moving an arc length $s$ with steering angle $\delta$ gives a turning radius $R = L / \tan\delta$ and changes the heading by $\Delta\theta = s / R$. If the initial state is $(x, y, \theta)$, the state of the candidate node is as follows (if $\delta = 0$, the vehicle goes straight to $(x + s\cos\theta, \; y + s\sin\theta, \; \theta)$).
+Moving an arc length $s$ with steering angle $\delta$ gives a turning radius $R = L / \tan\delta$ and changes the heading by $\Delta\theta = s / R$. If the initial state is $(x, y, \theta)$, the state of the candidate node is as follows (if $\delta = 0$, the vehicle goes straight to $`(x + s\cos\theta, \; y + s\sin\theta, \; \theta)`$).
 
-$$
+```math
 x' = x + R\left( \sin(\theta + \Delta\theta) - \sin\theta \right), \qquad
 y' = y - R\left( \cos(\theta + \Delta\theta) - \cos\theta \right), \qquad
 \theta' = \theta + \Delta\theta
-$$
+```
 
 > **Note:** Because only one state is kept per cell, a path reachable only through a discarded state may be missed. Unlike grid A\*, Hybrid A\* therefore does not guarantee the shortest path. Instead, the path found can be followed by the vehicle, and Dolgov et al. report that in practice it is close to optimal [8]. As the heuristic they also used the larger of the shortest distance considering only the vehicle's turning constraints and ignoring obstacles (the length of a Reeds-Shepp curve [9]) and the shortest distance considering only obstacles and ignoring turning constraints (the distance computed by Dijkstra on a grid), and they ended the search immediately whenever a Reeds-Shepp curve to the goal could be connected during the search.
 
@@ -500,9 +500,9 @@ $$
 
 In Figure 15, the small circles at the ends of the five dashed branches in front of the vehicle are candidate nodes generated with different steering angles, and they enter the open list. The cost function is the same as A\*, $F(n) = G(n) + H(n)$, and the actual travel cost is as follows.
 
-$$
+```math
 G(n) = (\text{actual distance traveled from the start node to the current node } n) \times K_{\delta}
-$$
+```
 
 $K_{\delta}$ is a tuning factor that gives priority to straight driving, with $K_{\delta} = 1$ for straight motion and $K_{\delta} > 1$ for curved motion. Charging steered motion more for the same distance makes the search choose smooth paths that do not steer unless necessary. Making $K_{\delta}$ larger for larger steering avoids sharp turns more. Actual implementations also penalize moves that switch between forward and reverse (`reverse_weight` in Section 5).
 
@@ -514,9 +514,9 @@ $K_{\delta}$ is a tuning factor that gives priority to straight driving, with $K
 
 The heuristic cost is a weighted sum of three terms.
 
-$$
+```math
 H(n) = \alpha_h \cdot h_1(\text{Vehicle2Goal}) + \beta_h \cdot h_2(\text{Vehicle2Waypoint}) + \gamma_h \cdot h_3(\text{Vehicle2Obstacle})
-$$
+```
 
 $\alpha_h$, $\beta_h$, and $\gamma_h$ are tuning factors for the heuristic terms. The red dashed arrows in Figure 16 are the distances each term measures.
 
@@ -592,7 +592,7 @@ Computing all five candidates gives the following.
 The results are interpreted as follows.
 
 - **The straight candidate (3) is the shortest but is not chosen.** Its $G = 3.0$ is the smallest, but driving straight on hits the obstacle 6 m ahead, so it receives a penalty of $h_3 = 20 / 6 = 3.333$ and has the largest $F$.
-- **The gentle left candidate (2) is chosen.** The goal and the waypoint both lie to the upper left, so the left candidates have small $H$. (1) turns more toward the goal, but the penalty for large steering ($K_{\delta} = 1.2$) makes its $G$ larger by 0.3, so it costs more than (2).
+- **The gentle left candidate (2) is chosen.** The goal and the waypoint both lie to the upper left, so the left candidates have small $H$. (1) turns more toward the goal, but the penalty for large steering ($`K_{\delta} = 1.2`$) makes its $G$ larger by 0.3, so it costs more than (2).
 - **The tuning factors change the result.** For example, setting $K_{\delta}$ to 1 for every steering angle gives $F = 3.0 + 32.311 = 35.311$ for (1) and $F = 3.0 + 32.324 = 35.324$ for (2), so (1), which turns more sharply, is chosen. Changing the factors yields different paths in the same situation, so the factors must be tuned to the desired driving character.
 
 ### 4.6 Path Smoothing and Subsequent Steps
@@ -601,7 +601,7 @@ The results are interpreted as follows.
 
 *Figure 20. Discrete steering angles of the five candidates (left), and the stepwise and smoothed steering angles of a path built from them (right)*
 
-The candidates of Hybrid A\* are generated with only a few fixed steering angles ($-2\alpha$, $-\alpha$, $0$, $\alpha$, $2\alpha$). The left graph of Figure 20 shows that the steering angles corresponding to candidates 1-5 are divided into steps, and the right graph is the steering angle needed at each point of a path built this way. The black solid line (Discrete Path) is a staircase in which the steering angle changes abruptly at each segment. A vehicle cannot change its steering angle instantaneously, so such a discrete path is hard to follow. **Path smoothing** is therefore needed to refine the path so that the steering angle, that is, the curvature of the path, changes continuously, as in the red dashed line (Smoothing Path). Dolgov et al. smoothed the path by reducing, with gradient-based optimization, a cost function whose terms are the distance to obstacles, the smoothness of the path, and the curvature limit [8].
+The candidates of Hybrid A\* are generated with only a few fixed steering angles ($-2\alpha$, $-\alpha$, $0$, $\alpha$, $`2\alpha`$). The left graph of Figure 20 shows that the steering angles corresponding to candidates 1-5 are divided into steps, and the right graph is the steering angle needed at each point of a path built this way. The black solid line (Discrete Path) is a staircase in which the steering angle changes abruptly at each segment. A vehicle cannot change its steering angle instantaneously, so such a discrete path is hard to follow. **Path smoothing** is therefore needed to refine the path so that the steering angle, that is, the curvature of the path, changes continuously, as in the red dashed line (Smoothing Path). Dolgov et al. smoothed the path by reducing, with gradient-based optimization, a cost function whose terms are the distance to obstacles, the smoothness of the path, and the curvature limit [8].
 
 The result of smoothing, the velocity profile from the radius of curvature, and swerves and nudges for obstacle avoidance are covered in Week 11, Sections 1.2-1.4.
 
@@ -656,8 +656,8 @@ The main parameters and default values of the Hybrid A\* implementation shared b
 | `theta_size` | 48 | Number of bins dividing the heading $\theta$. One state is kept every $360° / 48 = 7.5°$ |
 | `use_back` | true | Whether reverse motion primitives are also used as candidates |
 | `reverse_weight` | 2.00 | Penalty multiplied onto the cost of moves that switch between forward and reverse |
-| `distance_heuristic_weight` | 1.0 | Weight multiplied onto the Euclidean distance heuristic to the goal (corresponding to $\alpha_h$) |
-| `use_potential_heuristic`, `potential_weight` | true, 10.0 | Adds the costmap's obstacle cost multiplied by a weight to the cost (the same role as the obstacle term $h_3$) |
+| `distance_heuristic_weight` | 1.0 | Weight multiplied onto the Euclidean distance heuristic to the goal (corresponding to $`\alpha_h`$) |
+| `use_potential_heuristic`, `potential_weight` | true, 10.0 | Adds the costmap's obstacle cost multiplied by a weight to the cost (the same role as the obstacle term $`h_3`$) |
 | `robot_length`, `robot_width` | 4.5 m, 1.75 m | Vehicle size used for collision checking |
 | `time_limit` | 5000 ms | The search stops if no path is found within this time |
 

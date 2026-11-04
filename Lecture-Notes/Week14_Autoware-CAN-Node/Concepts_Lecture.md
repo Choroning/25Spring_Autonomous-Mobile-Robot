@@ -797,17 +797,21 @@ static void* senderCaller(void *unused)
 
 **Steering angle conversion.** `steering_angle` is the steering angle of the front wheels (rad), but the vehicle's steering controller takes the rotation angle of the steering wheel (°) as its command. The ratio between the angle the steering wheel is turned and the angle the wheels turn is called the **steering ratio**, and the code sets the steering ratio of this vehicle to `steer_gain = 16.5`.
 
-$$\theta_{\text{sw}} = \delta \times \frac{180}{\pi} \times 16.5$$
+```math
+\theta_{\text{sw}} = \delta \times \frac{180}{\pi} \times 16.5
+```
 
 Here $\delta$ is the steering angle of the wheels (rad), $\theta_{\text{sw}}$ is the steering wheel angle (°), and $180/\pi \approx 57.2958$ is the factor that converts radians to degrees. The code uses 3.14159 for $\pi$. For example, with $\delta = 0.1$ rad the wheels turn by $0.1 \times 57.2958 \approx 5.73°$, and the steering wheel must turn by $5.73 \times 16.5 \approx 94.54°$.
 
 **Low-pass filter.** If the steering command changes abruptly, the steering wheel jerks, which spoils ride comfort and strains the actuator. The code therefore does not use the computed steering wheel angle `steer_raw` directly but smooths it with a **low-pass filter**. Writing the filter with $x[n]$ = `steer_raw` and $y[n]$ = `steer_smooth` gives the following.
 
-$$y[n] = y[n-1] - \beta \left( y[n-1] - x[n] \right) = (1 - \beta)\, y[n-1] + \beta\, x[n]$$
+```math
+y[n] = y[n-1] - \beta \left( y[n-1] - x[n] \right) = (1 - \beta)\, y[n-1] + \beta\, x[n]
+```
 
-The output mixes 95% of the previous output with 5% of the new input ($\beta = 0.05$). This equation is an **exponential moving average**, which gives exponentially decreasing weights to past values, and it is a first-order low-pass filter that attenuates fast-changing components (high frequencies) and passes slowly changing components (low frequencies) [15]. The smaller $\beta$ is, the smoother but slower the output becomes.
+The output mixes 95% of the previous output with 5% of the new input ($`\beta = 0.05`$). This equation is an **exponential moving average**, which gives exponentially decreasing weights to past values, and it is a first-order low-pass filter that attenuates fast-changing components (high frequencies) and passes slowly changing components (low frequencies) [15]. The smaller $\beta$ is, the smoother but slower the output becomes.
 
-Starting from $y = 0$, if the input suddenly changes to $X$ and stays there, the output approaches it as $y[n] = X \left( 1 - (1 - \beta)^{n+1} \right)$. With $X = 94.54°$, the first iteration gives $0.05 \times 94.54 \approx 4.73°$ and the second $0.95 \times 4.73 + 0.05 \times 94.54 \approx 9.22°$. The number of iterations for the output to reach $1 - e^{-1} \approx 63\%$ of the target follows from $(0.95)^{n} = e^{-1}$, giving $n = -1/\ln 0.95 \approx 19.5$, and since one iteration takes about 20 ms, this takes about 0.39 s. In other words, the steering wheel reaches about 2/3 of the target angle only about 0.4 seconds after the command changes.
+Starting from $y = 0$, if the input suddenly changes to $X$ and stays there, the output approaches it as $y[n] = X \left( 1 - (1 - \beta)^{n+1} \right)$. With $X = 94.54°$, the first iteration gives $0.05 \times 94.54 \approx 4.73°$ and the second $0.95 \times 4.73 + 0.05 \times 94.54 \approx 9.22°$. The number of iterations for the output to reach $`1 - e^{-1} \approx 63\%`$ of the target follows from $(0.95)^{n} = e^{-1}$, giving $n = -1/\ln 0.95 \approx 19.5$, and since one iteration takes about 20 ms, this takes about 0.39 s. In other words, the steering wheel reaches about 2/3 of the target angle only about 0.4 seconds after the command changes.
 
 **Limiting.** The filtered angle is limited to ±450°, because the steering wheel turns up to 450° (1.25 turns) to each side. This corresponds to $450 / 16.5 \approx 27.3°$, about 0.476 rad, at the wheels.
 
@@ -842,7 +846,9 @@ Starting from $y = 0$, if the input suddenly changes to $X$ and stays there, the
 
 **Encoding.** The protocol of the steering controller takes the steering wheel angle as a non-negative 16-bit integer. The code adds 540 (= 450 + 90) to the angle to remove negative values and multiplies by 10 to obtain an integer in units of 0.1°.
 
-$$\text{raw} = (\theta_{\text{sw}} + 540) \times 10$$
+```math
+\text{raw} = (\theta_{\text{sw}} + 540) \times 10
+```
 
 -450° becomes 900, 0° becomes 5400, and 450° becomes 9900, so the value lies between 900 and 9900 and fits easily in 16 bits (maximum 65535). The offset 540 and the scale 10 are defined by this vehicle's steering controller, and other vehicles require following their own specifications.
 

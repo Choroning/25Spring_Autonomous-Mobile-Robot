@@ -631,24 +631,30 @@ rosbag play --clock drive.bag                       # play back while publishing
 
 Both building a 3D map (Section 3.4) and localization (Section 3.6) rest on **scan matching**, or **registration**, which aligns two point clouds so that they overlap. Finding the rotation and translation that best overlap two point clouds gives the relative position and orientation between the sensors that measured them. Autoware uses the **NDT (normal distributions transform)** as its registration method [15], [16].
 
-NDT divides the reference point cloud (the map) into grid cells of equal size and summarizes the points in each cell as one **normal distribution**. The mean $\mathbf{q}$ and covariance $\Sigma$ of the points $\mathbf{x}_1, \ldots, \mathbf{x}_n$ in a cell are as follows (dividing by $n$, following the definition of Biber and Strasser).
+NDT divides the reference point cloud (the map) into grid cells of equal size and summarizes the points in each cell as one **normal distribution**. The mean $\mathbf{q}$ and covariance $\Sigma$ of the points $`\mathbf{x}_1, \ldots, \mathbf{x}_n`$ in a cell are as follows (dividing by $n$, following the definition of Biber and Strasser).
 
-$$\mathbf{q} = \frac{1}{n}\sum_{i=1}^{n}\mathbf{x}_i, \qquad \Sigma = \frac{1}{n}\sum_{i=1}^{n}(\mathbf{x}_i-\mathbf{q})(\mathbf{x}_i-\mathbf{q})^{\top}$$
+```math
+\mathbf{q} = \frac{1}{n}\sum_{i=1}^{n}\mathbf{x}_i, \qquad \Sigma = \frac{1}{n}\sum_{i=1}^{n}(\mathbf{x}_i-\mathbf{q})(\mathbf{x}_i-\mathbf{q})^{\top}
+```
 
 How well a newly measured point $\mathbf{x}'$ fits the distribution of this cell is measured by the following value. The closer the point is to the mean, the closer the value is to 1, and for the same distance from the mean, the value decreases less when the point deviates in a direction in which the points are widely spread (a direction of large variance).
 
-$$p(\mathbf{x}') = \exp\left(-\frac{(\mathbf{x}'-\mathbf{q})^{\top}\Sigma^{-1}(\mathbf{x}'-\mathbf{q})}{2}\right)$$
+```math
+p(\mathbf{x}') = \exp\left(-\frac{(\mathbf{x}'-\mathbf{q})^{\top}\Sigma^{-1}(\mathbf{x}'-\mathbf{q})}{2}\right)
+```
 
-Let $T(\mathbf{p}, \mathbf{x}_k)$ be each point $\mathbf{x}_k$ of the new point cloud moved by a candidate pose $\mathbf{p}$ (translations in $x, y$ and a rotation angle in 2D; translations and rotations about three axes in 3D), and let $\mathbf{q}_k, \Sigma_k$ be the mean and covariance of the cell into which that point falls; then the score of pose $\mathbf{p}$ is the sum of the values of all points.
+Let $`T(\mathbf{p}, \mathbf{x}_k)`$ be each point $`\mathbf{x}_k`$ of the new point cloud moved by a candidate pose $\mathbf{p}$ (translations in $x, y$ and a rotation angle in 2D; translations and rotations about three axes in 3D), and let $`\mathbf{q}_k, \Sigma_k`$ be the mean and covariance of the cell into which that point falls; then the score of pose $\mathbf{p}$ is the sum of the values of all points.
 
-$$\text{score}(\mathbf{p}) = \sum_{k} \exp\left(-\frac{(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)^{\top}\Sigma_k^{-1}(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)}{2}\right)$$
+```math
+\text{score}(\mathbf{p}) = \sum_{k} \exp\left(-\frac{(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)^{\top}\Sigma_k^{-1}(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)}{2}\right)
+```
 
 NDT finds the pose $\mathbf{p}$ that maximizes this score by optimization such as Newton's method. Instead of finding a partner for each individual point, it uses distributions precomputed per cell, so the computation is fast, and because the score changes smoothly with the pose, derivative-based optimization is possible.
 
 **Example.** In 2D, let a cell contain the map points $(0, 0), (2, 0), (0, 2), (2, 2)$.
 
-1. The mean is $\mathbf{q} = \frac{1}{4}(0+2+0+2,\ 0+0+2+2) = (1, 1)$.
-2. The deviations from the mean are $(-1, -1), (1, -1), (-1, 1), (1, 1)$. The outer products $\mathbf{d}\mathbf{d}^{\top}$ of the deviations $\mathbf{d}$ are, in order, $\begin{pmatrix}1&1\\1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&1\\1&1\end{pmatrix}$, and their sum is $\begin{pmatrix}4&0\\0&4\end{pmatrix}$, so $\Sigma = \frac{1}{4}\begin{pmatrix}4&0\\0&4\end{pmatrix} = I$ (the identity matrix).
+1. The mean is $`\mathbf{q} = \frac{1}{4}(0+2+0+2,\ 0+0+2+2) = (1, 1)`$.
+2. The deviations from the mean are $(-1, -1), (1, -1), (-1, 1), (1, 1)$. The outer products $\mathbf{d}\mathbf{d}^{\top}$ of the deviations $\mathbf{d}$ are, in order, $`\begin{pmatrix}1&1\\1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&1\\1&1\end{pmatrix}`$, and their sum is $`\begin{pmatrix}4&0\\0&4\end{pmatrix}`$, so $`\Sigma = \frac{1}{4}\begin{pmatrix}4&0\\0&4\end{pmatrix} = I`$ (the identity matrix).
 3. Since $\Sigma^{-1} = I$, $p(\mathbf{x}') = \exp(-\lVert\mathbf{x}'-\mathbf{q}\rVert^2/2)$. The point $(1, 1)$ gives $\exp(0) = 1$, the point $(2, 1)$ gives $\exp(-1/2) \approx 0.6065$, and the point $(3, 1)$ gives $\exp(-2) \approx 0.1353$. The value drops quickly with distance from the mean.
 4. Now let a new point cloud consist of two points at $(-0.5, 0)$ and $(0.5, 0)$ in sensor coordinates, and let it be fitted by a translation $\mathbf{t}$ only, without rotation. For simplicity, assume that every moved point is evaluated with the distribution of this cell regardless of the cell boundary.
 

@@ -90,11 +90,11 @@ The work that proposed Hybrid A\* uses the search result as the initial value an
 
 *Table 1. Terms that make up the cost function of path smoothing*
 
-For path points $\mathbf{x}_i$, the smoothness term defines the displacement $\Delta\mathbf{x}_i = \mathbf{x}_i - \mathbf{x}_{i-1}$ and adds the following value.
+For path points $`\mathbf{x}_i`$, the smoothness term defines the displacement $`\Delta\mathbf{x}_i = \mathbf{x}_i - \mathbf{x}_{i-1}`$ and adds the following value.
 
-$$
+```math
 J_s = \sum_i \left\lVert \Delta\mathbf{x}_{i+1} - \Delta\mathbf{x}_i \right\rVert^2
-$$
+```
 
 For example, a zigzag path made of the points (0, 0), (1, 0.4), (2, 0), (3, 0.4), (4, 0) has the displacements (1, 0.4), (1, −0.4), (1, 0.4), (1, −0.4), and the differences between neighboring displacements are (0, −0.8), (0, 0.8), (0, −0.8), so $J_s = 3 \times 0.8^2 = 1.92$. A straight path joining the same two end points has equal displacements everywhere, so $J_s = 0$. The optimization reduces this value while respecting the obstacle and curvature terms, so the path straightens out.
 
@@ -113,15 +113,15 @@ In Figure 3, the green dots are the path points placed from the start to the goa
 
 **Finding the radius of curvature.** The radius of the circle (circumscribed circle) through three neighboring path points $W_1$, $W_2$, $W_3$ is used as the radius of curvature at that location. With side lengths $a = \lvert W_2 W_3 \rvert$, $b = \lvert W_3 W_1 \rvert$, $c = \lvert W_1 W_2 \rvert$ and triangle area $S$, the radius is as follows. If the three points lie on a straight line, $S = 0$ and therefore $R = \infty$ (a straight segment).
 
-$$
+```math
 R = \frac{abc}{4S}
-$$
+```
 
 **Finding the maximum speed.** A vehicle driving at speed $V$ on a circle of radius $R$ experiences a lateral acceleration $a_y = V^2 / R$ toward the center of the circle. If this value is limited to $0.3g$ (about 2.94 m/s², since $g = 9.81$ m/s²) for ride comfort, then $V^2 / R \le 0.3 g$, and solving for $V$ gives the maximum speed of segment $i$.
 
-$$
+```math
 V_i = \sqrt{0.3 \cdot g \cdot R_i}
-$$
+```
 
 **Worked example.** Let the three points be $W_1 = (0, 0)$, $W_2 = (4, 1)$, $W_3 = (8, 0)$ m.
 
@@ -140,7 +140,7 @@ $$
 
 *Table 2. Maximum speed by radius of curvature (lateral acceleration limited to 0.3g)*
 
-Because the maximum speed is proportional to the square root of the radius, multiplying the radius by 4 only doubles the speed. On a straight segment ($R = \infty$) this formula gives no upper bound, so the road speed limit $V_{\max}$ is used; the actual profile is set as $V_i = \min\left(V_{\max}, \sqrt{0.3 g R_i}\right)$ and then adjusted so that the speed change between neighboring points does not exceed the acceleration limits. The twist_filter of Week 3, which reduces the target speed by a lateral acceleration limit, works on the same principle.
+Because the maximum speed is proportional to the square root of the radius, multiplying the radius by 4 only doubles the speed. On a straight segment ($`R = \infty`$) this formula gives no upper bound, so the road speed limit $V_{\max}$ is used; the actual profile is set as $V_i = \min\left(V_{\max}, \sqrt{0.3 g R_i}\right)$ and then adjusted so that the speed change between neighboring points does not exceed the acceleration limits. The twist_filter of Week 3, which reduces the target speed by a lateral acceleration limit, works on the same principle.
 
 ### 1.4 Obstacle Avoidance Paths: Swerves and Nudges
 
@@ -274,7 +274,7 @@ Angles and rotations are positive counterclockwise (to the left) when seen from 
 
 ### 2.1 Velocities at the Wheel Positions
 
-The force produced by a tire is determined by the difference between the direction the wheel faces and the direction in which the wheel actually moves. Therefore, the velocities at the front and rear wheel positions are found first. If the body is regarded as a rigid body, the velocity of a point $l_f$ ahead of the center of gravity is the velocity of the center of gravity plus the velocity caused by the rotation. When the body rotates counterclockwise with yaw rate $r$, a point in front gains an extra velocity $l_f r$ to the left ($+y$), and a point behind gains an extra velocity $l_r r$ to the right ($-y$).
+The force produced by a tire is determined by the difference between the direction the wheel faces and the direction in which the wheel actually moves. Therefore, the velocities at the front and rear wheel positions are found first. If the body is regarded as a rigid body, the velocity of a point $l_f$ ahead of the center of gravity is the velocity of the center of gravity plus the velocity caused by the rotation. When the body rotates counterclockwise with yaw rate $r$, a point in front gains an extra velocity $l_f r$ to the left ($`+y`$), and a point behind gains an extra velocity $l_r r$ to the right ($`-y`$).
 
 | Position | Velocity in the $x$ direction | Velocity in the $y$ direction |
 |:-----|:-----|:-----|
@@ -284,7 +284,7 @@ The force produced by a tire is determined by the difference between the directi
 
 *Table 5. Velocity components of the center of gravity and the wheel positions seen in the body frame*
 
-> **Note:** The velocities of two points P and Q on a rigid body satisfy $\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}$. In planar motion $\boldsymbol{\omega} = r\,\hat{\mathbf{z}}$, and if the front wheel is at $\overrightarrow{PQ} = l_f \hat{\mathbf{x}}$, then $\boldsymbol{\omega} \times \overrightarrow{PQ} = r l_f \hat{\mathbf{y}}$, so the rotation does not change the velocity in the $x$ direction and changes only the velocity in the $y$ direction by $l_f r$. For the rear wheel, $\overrightarrow{PQ} = -l_r \hat{\mathbf{x}}$, which gives $-l_r r \hat{\mathbf{y}}$.
+> **Note:** The velocities of two points P and Q on a rigid body satisfy $`\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}`$. In planar motion $`\boldsymbol{\omega} = r\,\hat{\mathbf{z}}`$, and if the front wheel is at $\overrightarrow{PQ} = l_f \hat{\mathbf{x}}$, then $\boldsymbol{\omega} \times \overrightarrow{PQ} = r l_f \hat{\mathbf{y}}$, so the rotation does not change the velocity in the $x$ direction and changes only the velocity in the $y$ direction by $l_f r$. For the rear wheel, $\overrightarrow{PQ} = -l_r \hat{\mathbf{x}}$, which gives $-l_r r \hat{\mathbf{y}}$.
 
 ### 2.2 Tire Slip Angle
 
@@ -292,9 +292,9 @@ The force produced by a tire is determined by the difference between the directi
 
 Let $\theta_f$ (front wheel) and $\theta_r$ (rear wheel) be the angles that the velocities at the wheel positions make with the body $x$ axis. The front wheel faces at $\delta$ and the rear wheel at 0 with respect to the $x$ axis, so the slip angles of the two wheels are as follows.
 
-$$
+```math
 \alpha_f = \delta - \theta_f, \qquad \alpha_r = 0 - \theta_r = -\theta_r
-$$
+```
 
 If a tire only rolls, the wheel moves only in the direction it faces, so $\alpha = 0$. During a turn a force toward the center of the circle is needed, and a rubber tire produces that force as its contact patch twists sideways (as a slip angle develops).
 
@@ -302,39 +302,39 @@ If a tire only rolls, the wheel moves only in the direction it faces, so $\alpha
 
 Write the velocity at the front wheel position with magnitude $V_f$ and direction $\theta_f = \delta - \alpha_f$, and set it equal to the components in Table 5.
 
-$$
+```math
 \underbrace{V_f \sin(\delta - \alpha_f)}_{y\text{-dir. wheel velocity}} = \underbrace{l_f r + V \sin\beta}_{y\text{-dir. chassis velocity}}, \qquad \underbrace{V_f \cos(\delta - \alpha_f)}_{x\text{-dir. wheel velocity}} = \underbrace{V \cos\beta}_{x\text{-dir. chassis velocity}}
-$$
+```
 
 Dividing the two equations eliminates $V_f$.
 
-$$
+```math
 \tan(\delta - \alpha_f) = \frac{l_f r + V \sin\beta}{V \cos\beta}
-$$
+```
 
 If $\beta \ll 1$, then $\sin\beta \approx \beta$ and $\cos\beta \approx 1$, and since the whole right-hand side is also small, $\tan(\delta - \alpha_f) \approx \delta - \alpha_f$. Therefore the following is obtained.
 
-$$
+```math
 \delta - \alpha_f \approx \beta + \frac{l_f r}{V} \quad \Longrightarrow \quad \alpha_f \approx \delta - \beta - \frac{l_f r}{V}
-$$
+```
 
-The slip angle of the front wheel is the steering angle minus the sideslip angle and the angle $l_f r / V$ caused by the rotation. Steering more increases $\alpha_f$ and the lateral force of the front wheel, and if the body is already rotating ($r > 0$), the slip angle is reduced by that amount.
+The slip angle of the front wheel is the steering angle minus the sideslip angle and the angle $l_f r / V$ caused by the rotation. Steering more increases $\alpha_f$ and the lateral force of the front wheel, and if the body is already rotating ($`r > 0`$), the slip angle is reduced by that amount.
 
 ### 2.4 Rear Tire Angle Relation
 
 The rear wheel is not steered, so its velocity direction is $\theta_r = -\alpha_r$. The components are matched in the same way.
 
-$$
+```math
 \underbrace{V_r \sin\alpha_r}_{y\text{-dir. wheel velocity}} = \underbrace{l_r r - V \sin\beta}_{y\text{-dir. chassis velocity}}, \qquad \underbrace{V_r \cos\alpha_r}_{x\text{-dir. wheel velocity}} = \underbrace{V \cos\beta}_{x\text{-dir. chassis velocity}}
-$$
+```
 
 The first equation is the $y$ velocity $V\sin\beta - l_r r$ of Table 5 multiplied by $-1$. This is because the velocity direction of the wheel is $-\alpha_r$. Dividing the two equations and using the small-angle approximation gives the following.
 
-$$
+```math
 \tan\alpha_r = \frac{l_r r - V \sin\beta}{V \cos\beta} \quad \Longrightarrow \quad \alpha_r \approx -\beta + \frac{l_r r}{V}
-$$
+```
 
-> **Note:** References differ in how they choose the sign of the slip angle. The $\beta_f$, $\beta_r$ in Figure 10 are measured from the direction the wheel faces to the velocity direction, so they differ from $\alpha_f$, $\alpha_r$ of Section 2.2 only in sign ($\beta_f = -\alpha_f = \beta + l_f r / V - \delta$, $\beta_r = -\alpha_r = \beta - l_r r / V$). For this reason, the same lateral force is also written with a negative sign, as in $Y_f = -C_f \beta_f$ [2]. The lecture material writes the front result as $\beta_f = \delta - \beta - l_f r / V$ following the convention of Section 2.2 but uses the convention of Figure 10, $Y_f = -C_f(\beta + l_f r / V - \delta)$, in the force relation of Section 3.1, which mixes the two conventions, and it writes the rear result as $\beta_r = -\beta - l_r r / V$, which is an error that fits neither convention. The correct rear result is $\alpha_r \approx -\beta + l_r r / V$ in the convention of Section 2.2 and $\beta_r \approx \beta - l_r r / V$ in the convention of Figure 10, and the force relation $Y_r = -C_r(\beta - l_r r / V)$ of the lecture material also agrees with this result.
+> **Note:** References differ in how they choose the sign of the slip angle. The $\beta_f$, $\beta_r$ in Figure 10 are measured from the direction the wheel faces to the velocity direction, so they differ from $\alpha_f$, $\alpha_r$ of Section 2.2 only in sign ($\beta_f = -\alpha_f = \beta + l_f r / V - \delta$, $`\beta_r = -\alpha_r = \beta - l_r r / V`$). For this reason, the same lateral force is also written with a negative sign, as in $Y_f = -C_f \beta_f$ [2]. The lecture material writes the front result as $\beta_f = \delta - \beta - l_f r / V$ following the convention of Section 2.2 but uses the convention of Figure 10, $Y_f = -C_f(\beta + l_f r / V - \delta)$, in the force relation of Section 3.1, which mixes the two conventions, and it writes the rear result as $\beta_r = -\beta - l_r r / V$, which is an error that fits neither convention. The correct rear result is $\alpha_r \approx -\beta + l_r r / V$ in the convention of Section 2.2 and $\beta_r \approx \beta - l_r r / V$ in the convention of Figure 10, and the force relation $Y_r = -C_r(\beta - l_r r / V)$ of the lecture material also agrees with this result.
 
 ### 2.5 Small-Angle Approximation and a Numerical Example
 
@@ -366,13 +366,13 @@ When the angles are within a few degrees, the error of the approximation is negl
 
 In the range of small slip angles, the lateral force of a tire is nearly proportional to the slip angle. This proportionality constant is called the **cornering stiffness** [3].
 
-> **Definition:** The **cornering stiffness** $C$ is the slope $C = \partial Y / \partial \alpha \,\vert_{\alpha = 0}$ at which the lateral force increases with the slip angle near zero slip angle, and its unit is N/rad. The model that expresses the lateral force as $Y = C\alpha$ with this slope is called the **linear tire model**.
+> **Definition:** The **cornering stiffness** $C$ is the slope $`C = \partial Y / \partial \alpha \,\vert_{\alpha = 0}`$ at which the lateral force increases with the slip angle near zero slip angle, and its unit is N/rad. The model that expresses the lateral force as $Y = C\alpha$ with this slope is called the **linear tire model**.
 
 Substituting the slip angles of Sections 2.3 and 2.4 gives the lateral forces of the front and rear axles.
 
-$$
+```math
 Y_f = C_f \alpha_f = -C_f\left(\beta + \frac{l_f r}{V} - \delta\right), \qquad Y_r = C_r \alpha_r = -C_r\left(\beta - \frac{l_r r}{V}\right)
-$$
+```
 
 In the example of Section 2.5 with $C_f = C_r = 70000$ N/rad, $Y_f = 70000 \times 0.037 = 2590$ N and $Y_r = 70000 \times 0.0114 = 798$ N. Both forces point to the left, so the vehicle is turning left.
 
@@ -384,15 +384,15 @@ Newton's laws of motion are applied to the lateral and yaw directions of the bod
 
 **Balance of lateral forces.** In the body frame, the velocity components of the center of gravity are $u = V\cos\beta$ (forward) and $v = V\sin\beta$ (to the left). Because the body frame itself rotates with yaw rate $r$, the lateral acceleration of the center of gravity is the rate of change of $v$ plus the rotational term $u r$, $a_y = \dot v + u r$ [3]. If the vehicle speed $V$ is constant and $\beta$ is small, then $v \approx V\beta$ and $u \approx V$, so $a_y \approx V\dot\beta + V r = V(\dot\beta + r)$. The body $y$ component of the front lateral force is $Y_f\cos\delta \approx Y_f$, which gives the following.
 
-$$
+```math
 mV\left(\frac{d\beta}{dt} + r\right) = Y_f + Y_r
-$$
+```
 
 **Balance of yaw moments.** The lateral force of the front axle creates a counterclockwise moment about the center of gravity with moment arm $l_f$, and the lateral force of the rear axle creates a clockwise moment with moment arm $l_r$.
 
-$$
+```math
 I\frac{dr}{dt} = l_f Y_f - l_r Y_r
-$$
+```
 
 > **Note:** The $ur$ term in $a_y = \dot v + u r$ appears because the velocity is measured in a rotating frame. When the vehicle corners steadily on a circle of radius $R$ at constant speed $V$, $\dot\beta = 0$ and $r = V/R$, so $a_y = V r = V^2/R$, which is the familiar centripetal acceleration.
 
@@ -402,31 +402,31 @@ The lateral forces of Section 3.1 are substituted into the two equations of Sect
 
 **Step 1: the lateral equation.** Expand the right-hand side.
 
-$$
+```math
 Y_f + Y_r = -(C_f + C_r)\beta + \frac{C_r l_r - C_f l_f}{V} r + C_f \delta
-$$
+```
 
 Move $mVr$ on the left-hand side to the right-hand side and divide both sides by $mV$.
 
-$$
+```math
 \dot\beta = -\frac{C_f + C_r}{mV}\beta + \left(-1 + \frac{C_r l_r - C_f l_f}{mV^2}\right) r + \frac{C_f}{mV}\delta
-$$
+```
 
 **Step 2: the yaw equation.** Expand the right-hand side.
 
-$$
+```math
 l_f Y_f - l_r Y_r = (C_r l_r - C_f l_f)\beta - \frac{C_f l_f^2 + C_r l_r^2}{V} r + C_f l_f \delta
-$$
+```
 
 Divide both sides by $I$.
 
-$$
+```math
 \dot r = \frac{C_r l_r - C_f l_f}{I}\beta - \frac{C_f l_f^2 + C_r l_r^2}{IV} r + \frac{C_f l_f}{I}\delta
-$$
+```
 
-**Step 3: matrix form.** With the state vector $\mathbf{x} = [\beta \;\; r]^T$ and the input $\delta$, the equations become the following.
+**Step 3: matrix form.** With the state vector $`\mathbf{x} = [\beta \;\; r]^T`$ and the input $\delta$, the equations become the following.
 
-$$
+```math
 \begin{bmatrix} \dot\beta \\ \dot r \end{bmatrix} =
 \begin{bmatrix}
 -\dfrac{C_f + C_r}{mV} & -1 + \dfrac{C_r l_r - C_f l_f}{mV^2} \\
@@ -435,7 +435,7 @@ $$
 \begin{bmatrix} \beta \\ r \end{bmatrix}
 +
 \begin{bmatrix} \dfrac{C_f}{mV} \\ \dfrac{C_f l_f}{I} \end{bmatrix} \delta
-$$
+```
 
 This equation is the **dynamic bicycle model**, which describes how the steering angle changes the sideslip angle and the yaw rate. Calling the two matrices $A$ and $B$ in order, $\dot{\mathbf{x}} = A\mathbf{x} + B\delta$. Because the matrix entries contain $1/V$ and $1/V^2$, the response of the same vehicle differs with speed.
 
@@ -447,7 +447,7 @@ The model of Section 3.3 holds under the following assumptions [3].
 
 1. **Constant vehicle speed:** The longitudinal speed $V$ is constant or changes more slowly than the lateral motion.
 2. **Small angles:** $\beta$, $\delta$, and the tire slip angles are small, so the trigonometric functions can be approximated to first order.
-3. **Linear tire model:** The lateral force is proportional to the slip angle ($Y = C\alpha$).
+3. **Linear tire model:** The lateral force is proportional to the slip angle ($`Y = C\alpha`$).
 4. **Single track:** The left and right wheels are combined into one, and roll, lateral load transfer, road slope, and aerodynamic forces are neglected.
 
 Because of assumptions 1 and 2, the model is accurate for small steering inputs in sections of constant vehicle speed. Also, because the matrix entries are proportional to $1/V$, the model cannot be used at low speeds where $V$ is close to 0, which is why Week 12 uses a kinematic model at low speeds.
@@ -456,9 +456,9 @@ Because of assumptions 1 and 2, the model is accurate for small steering inputs 
 
 When the steering angle $\delta$ is held constant, the vehicle eventually reaches **steady-state cornering**, where $\dot\beta = 0$ and $\dot r = 0$. The state is then obtained by solving $A\mathbf{x} + B\delta = 0$, and the yaw rate can be written as follows [2].
 
-$$
+```math
 r_{ss} = \frac{V}{l\,(1 + KV^2)}\,\delta, \qquad K = \frac{m\,(C_r l_r - C_f l_f)}{l^2 C_f C_r}
-$$
+```
 
 $K$ is called the **stability factor**. If $K = 0$, then $r_{ss} = V\delta / l$, which equals the small-steering-angle yaw rate of the kinematic model without tire slip (Section 3.8). If $K > 0$, the yaw rate for the same steering is smaller than the kinematic value, and its ratio to the kinematic value, $1/(1 + KV^2)$, shrinks as speed increases; this is called **understeer**. If $K < 0$, the yaw rate becomes larger, which is **oversteer**, and the vehicle becomes unstable at and above the speed where $1 + KV^2 = 0$.
 
@@ -482,7 +482,7 @@ Doubling the speed doubles the kinematic yaw rate, but the actual yaw rate incre
 
 The lateral velocity of the center of gravity $v = V\beta$ is sometimes used as a state instead of the sideslip angle. If $V$ is constant, then $\dot v = V\dot\beta$ and $\beta = v/V$, and substituting these into the equations of Section 3.3 gives the following.
 
-$$
+```math
 \begin{bmatrix} \dot r \\ \dot v \end{bmatrix} =
 \begin{bmatrix}
 -\dfrac{C_r l_r^2 + C_f l_f^2}{I V} & \dfrac{C_r l_r - C_f l_f}{I V} \\
@@ -491,7 +491,7 @@ $$
 \begin{bmatrix} r \\ v \end{bmatrix}
 +
 \begin{bmatrix} \dfrac{C_f l_f}{I} \\ \dfrac{C_f}{m} \end{bmatrix} \delta
-$$
+```
 
 For example, substituting $\beta = v/V$ into the $\beta$ term $\frac{C_r l_r - C_f l_f}{I}\beta$ of the $\dot r$ equation gives $\frac{C_r l_r - C_f l_f}{IV}v$. The two forms describe the same physics with different variables, so their eigenvalues (the speed and oscillation of the response) are the same. The parameter estimation model of Section 3.7 uses this form and outputs the yaw rate $r$ and the lateral acceleration $a_y = \dot v + V r$.
 
@@ -549,28 +549,28 @@ Because the dynamic model of Section 3.3 cannot be used at low speed, the contro
 
 ### 3.8 The Kinematic Model at Low Speed
 
-At low speed the lateral force $mV^2/R$ needed for cornering is small, so the tire slip angles can be regarded as zero. The velocities at the front and rear wheel positions then point in the directions the wheels face, which gives the **kinematic bicycle model**, describing the motion only by geometric relations without forces [3]. Let A be the front wheel, B the rear wheel, C the center of gravity, and $\delta_f$, $\delta_r$ the steering angles of the front and rear wheels (the $\delta$ of the previous sections is $\delta_f$ with $\delta_r = 0$). $\psi$ is the **heading angle** of the body seen in the global frame $(X, Y)$, O is the **instantaneous rolling center** where the line through A perpendicular to the front wheel velocity meets the line through B perpendicular to the rear wheel velocity, and $R = \lvert OC \rvert$ is the turning radius of the center of gravity.
+At low speed the lateral force $mV^2/R$ needed for cornering is small, so the tire slip angles can be regarded as zero. The velocities at the front and rear wheel positions then point in the directions the wheels face, which gives the **kinematic bicycle model**, describing the motion only by geometric relations without forces [3]. Let A be the front wheel, B the rear wheel, C the center of gravity, and $\delta_f$, $\delta_r$ the steering angles of the front and rear wheels (the $\delta$ of the previous sections is $\delta_f$ with $`\delta_r = 0`$). $\psi$ is the **heading angle** of the body seen in the global frame $(X, Y)$, O is the **instantaneous rolling center** where the line through A perpendicular to the front wheel velocity meets the line through B perpendicular to the rear wheel velocity, and $R = \lvert OC \rvert$ is the turning radius of the center of gravity.
 
 Applying the law of sines (the ratio of each side of a triangle to the sine of its opposite angle is constant) to the triangles OCA and OCB and rearranging gives the following two equations.
 
-$$
+```math
 \frac{\sin(\delta_f - \beta)}{l_f} = \frac{\sin\left(\frac{\pi}{2} - \delta_f\right)}{R} \;\Longrightarrow\; \tan\delta_f\cos\beta - \sin\beta = \frac{l_f}{R} \qquad \text{(Eq. 1)}
-$$
+```
 
-$$
+```math
 \frac{\sin(\beta - \delta_r)}{l_r} = \frac{\sin\left(\frac{\pi}{2} + \delta_r\right)}{R} \;\Longrightarrow\; \sin\beta - \tan\delta_r\cos\beta = \frac{l_r}{R} \qquad \text{(Eq. 2)}
-$$
+```
 
 Adding (Eq. 1) and (Eq. 2) gives $(\tan\delta_f - \tan\delta_r)\cos\beta = (l_f + l_r)/R$ (Eq. 3). At low speed, if the turning radius changes slowly, the whole body rotates about O, so the yaw rate is $\dot\psi = V/R$, and substituting (Eq. 3) expresses the yaw rate in terms of the steering angles. Multiplying (Eq. 2) by $l_f$ and (Eq. 1) by $l_r$ and subtracting eliminates $R$ and determines the sideslip angle. The velocity of the center of gravity points in the direction $\psi + \beta$ in the global frame, so the model is as follows.
 
-$$
+```math
 \begin{aligned}
 \dot X &= V\cos(\psi + \beta), \qquad \dot Y = V\sin(\psi + \beta) \\
 \dot\psi &= \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right), \qquad \beta = \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
 \end{aligned}
-$$
+```
 
-This model has no term divided by $V$, so it can be used even at the low speed just before stopping. If only the front wheel is steered ($\delta_r = 0$) and the steering angle is small, $\dot\psi \approx V\delta_f / l$, which is the case $K = 0$ of Section 3.5. The angles of each triangle, a worked example, and the extension that takes the vehicle width into account are treated in Section 1 of Week 12.
+This model has no term divided by $V$, so it can be used even at the low speed just before stopping. If only the front wheel is steered ($`\delta_r = 0`$) and the steering angle is small, $\dot\psi \approx V\delta_f / l$, which is the case $K = 0$ of Section 3.5. The angles of each triangle, a worked example, and the extension that takes the vehicle width into account are treated in Section 1 of Week 12.
 
 ---
 
@@ -639,7 +639,7 @@ This model has no term divided by $V$, so it can be used even at the low speed j
    <details>
    <summary>Answer</summary>
 
-   A velocity $l_f r$ in the $+y$ direction (to the left) is added at the front wheel, and $l_r r$ in the $-y$ direction (to the right) at the rear wheel. In the rigid-body velocity relation $\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}$, the cross product of $\boldsymbol{\omega} = r\hat{\mathbf{z}}$ with the front position $l_f \hat{\mathbf{x}}$ is $r l_f \hat{\mathbf{y}}$, and with the rear position $-l_r\hat{\mathbf{x}}$ it is $-r l_r \hat{\mathbf{y}}$.
+   A velocity $l_f r$ in the $+y$ direction (to the left) is added at the front wheel, and $l_r r$ in the $-y$ direction (to the right) at the rear wheel. In the rigid-body velocity relation $`\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}`$, the cross product of $\boldsymbol{\omega} = r\hat{\mathbf{z}}$ with the front position $l_f \hat{\mathbf{x}}$ is $r l_f \hat{\mathbf{y}}$, and with the rear position $-l_r\hat{\mathbf{x}}$ it is $-r l_r \hat{\mathbf{y}}$.
 
    </details>
 

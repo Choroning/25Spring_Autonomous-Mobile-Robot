@@ -74,55 +74,55 @@
 - **삼각형 OCA:** O에서의 각은 A의 속도 방향과 C의 속도 방향의 차이인 $\delta_f - \beta$이다(OA와 OC가 각각 두 속도에 수직이므로). A에서의 각은 차체 축(AC 방향)과 OA 사이의 각으로 $\pi/2 - \delta_f$이다. O의 대변은 $\lvert CA \rvert = l_f$, A의 대변은 $\lvert OC \rvert = R$이다.
 - **삼각형 OCB:** O에서의 각은 $\beta - \delta_r$, B에서의 각은 $\pi/2 + \delta_r$이다. O의 대변은 $\lvert CB \rvert = l_r$, B의 대변은 $R$이다.
 
-사인 법칙(삼각형의 변 $a$, $b$, $c$와 그 대각 $\theta_a$, $\theta_b$, $\theta_c$에 대해 $a / \sin\theta_a = b / \sin\theta_b = c / \sin\theta_c$)을 두 삼각형에 적용한다.
+사인 법칙(삼각형의 변 $a$, $b$, $c$와 그 대각 $\theta_a$, $\theta_b$, $\theta_c$에 대해 $`a / \sin\theta_a = b / \sin\theta_b = c / \sin\theta_c`$)을 두 삼각형에 적용한다.
 
-$$
+```math
 \frac{\sin(\delta_f - \beta)}{l_f} = \frac{\sin\left(\frac{\pi}{2} - \delta_f\right)}{R}, \qquad \frac{\sin(\beta - \delta_r)}{l_r} = \frac{\sin\left(\frac{\pi}{2} + \delta_r\right)}{R}
-$$
+```
 
 **앞바퀴 식 정리.** $\sin(\delta_f - \beta) = \sin\delta_f\cos\beta - \cos\delta_f\sin\beta$이고 $\sin(\pi/2 - \delta_f) = \cos\delta_f$이다. 양변에 $l_f / \cos\delta_f$를 곱한다.
 
-$$
+```math
 \tan\delta_f\cos\beta - \sin\beta = \frac{l_f}{R} \qquad \text{(식 1)}
-$$
+```
 
 **뒷바퀴 식 정리.** $\sin(\beta - \delta_r) = \sin\beta\cos\delta_r - \cos\beta\sin\delta_r$이고 $\sin(\pi/2 + \delta_r) = \cos\delta_r$이다. 양변에 $l_r / \cos\delta_r$를 곱한다.
 
-$$
+```math
 \sin\beta - \tan\delta_r\cos\beta = \frac{l_r}{R} \qquad \text{(식 2)}
-$$
+```
 
 ### 1.3 회전 반경, 요레이트, 차체 슬립각
 
 **회전 반경.** (식 1)과 (식 2)를 더하면 $\sin\beta$가 지워진다.
 
-$$
+```math
 (\tan\delta_f - \tan\delta_r)\cos\beta = \frac{l_f + l_r}{R} \qquad \text{(식 3)}
-$$
+```
 
 **요레이트.** 차량이 저속으로 달려 회전 반경이 천천히 변한다고 가정하면, 무게 중심은 O를 중심으로 반경 $R$의 원 위를 속도 $V$로 움직이고 차체 전체가 O를 중심으로 같은 각속도로 돈다. 따라서 헤딩각의 변화율은 원운동의 각속도와 같다.
 
-$$
+```math
 \dot\psi = \frac{V}{R}
-$$
+```
 
 (식 3)에서 $1/R = (\tan\delta_f - \tan\delta_r)\cos\beta / (l_f + l_r)$를 넣으면 요레이트가 조향각으로 표현된다.
 
-$$
+```math
 \dot\psi = \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right)
-$$
+```
 
 **차체 슬립각.** $R$을 지우기 위해 (식 2)에 $l_f$를, (식 1)에 $l_r$를 곱해 뺀다. 우변은 $l_f l_r/R - l_r l_f/R = 0$이다.
 
-$$
+```math
 l_f\sin\beta - l_f\tan\delta_r\cos\beta - l_r\tan\delta_f\cos\beta + l_r\sin\beta = 0
-$$
+```
 
 $\sin\beta$의 항과 $\cos\beta$의 항을 모으면 $(l_f + l_r)\sin\beta = (l_f\tan\delta_r + l_r\tan\delta_f)\cos\beta$이고, 양변을 $(l_f + l_r)\cos\beta$로 나누면 다음을 얻는다.
 
-$$
+```math
 \beta = \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
-$$
+```
 
 기구학 모델에서 차체 슬립각은 조향각과 무게 중심의 위치만으로 정해진다. 미분 방정식을 풀 필요가 없는 대수식이라는 점이 2.1절에서 중요해진다.
 
@@ -130,14 +130,14 @@ $$
 
 무게 중심의 속도는 차체 축에서 $\beta$만큼 돌아간 방향이고 차체 축은 $X$축에서 $\psi$만큼 돌아가 있으므로, 전역 좌표계에서 속도의 방향은 $\psi + \beta$이다. 따라서 기구학적 자전거 모델은 다음과 같다 [1].
 
-$$
+```math
 \begin{aligned}
 \dot X &= V\cos(\psi + \beta) \\
 \dot Y &= V\sin(\psi + \beta) \\
 \dot\psi &= \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right) \\
 \beta &= \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
 \end{aligned}
-$$
+```
 
 입력은 $V$, $\delta_f$, $\delta_r$이고 상태는 $X$, $Y$, $\psi$이다. 앞바퀴만 조향하면 $\delta_r = 0$이다.
 
@@ -155,9 +155,9 @@ $l_f = 1.2$ m, $l_r = 1.5$ m, $V = 5$ m/s, $\delta_f = 10°$, $\delta_r = 0$인 
 
 처음 헤딩각이 $\psi(0) = 0$이고 원점에서 출발하면, $t$초 뒤의 헤딩각은 $\psi(t) = \dot\psi t$이고 위치는 원 위의 점이다.
 
-$$
+```math
 X(t) = R\left[\sin(\psi(t) + \beta) - \sin\beta\right], \qquad Y(t) = R\left[\cos\beta - \cos(\psi(t) + \beta)\right]
-$$
+```
 
 $t = 2$ s이면 $\psi = 0.650$ rad이고 $X = 8.960$ m, $Y = 4.030$ m이다. 운동 방정식을 작은 시간 간격으로 수치 적분해도 같은 값이 나온다.
 
@@ -185,17 +185,17 @@ $t = 2$ s이면 $\psi = 0.650$ rad이고 $X = 8.960$ m, $Y = 4.030$ m이다. 운
 
 자전거 모델에서 슬립각이 작고 $\delta_r = 0$이면 $\cos\beta \approx 1$, $\tan\delta_f \approx \delta_f$이므로 다음 두 식이 성립한다.
 
-$$
+```math
 \dot\psi = \frac{V\delta_f}{l_f + l_r} = \frac{V\delta_f}{L}, \qquad \dot\psi = \frac{V}{R} \quad \Longrightarrow \quad \delta_f = \frac{L}{R}
-$$
+```
 
 이 관계를 좌우 바퀴에 각각 적용한다. 바깥쪽 바퀴는 반경 $R + l_w/2$, 안쪽 바퀴는 반경 $R - l_w/2$의 원을 도는 것으로 보고, 두 바퀴 조향각의 평균은 근사적으로 자전거 모델의 조향각과 같다.
 
-$$
+```math
 \delta_f = \frac{L}{R} \approx \frac{\delta_o + \delta_i}{2}, \qquad \delta_o = \frac{L}{R + \frac{l_w}{2}}, \qquad \delta_i = \frac{L}{R - \frac{l_w}{2}}
-$$
+```
 
-두 조향각의 차이는 $\delta_i - \delta_o = L l_w / (R^2 - l_w^2/4) \approx L l_w / R^2 = \delta_f^2\,l_w / L$로, 조향각의 제곱에 비례한다. 큰 반경의 완만한 선회에서는 차이가 작지만 주차처럼 작은 반경에서 크게 꺾을 때는 차이가 커진다.
+두 조향각의 차이는 $`\delta_i - \delta_o = L l_w / (R^2 - l_w^2/4) \approx L l_w / R^2 = \delta_f^2\,l_w / L`$로, 조향각의 제곱에 비례한다. 큰 반경의 완만한 선회에서는 차이가 작지만 주차처럼 작은 반경에서 크게 꺾을 때는 차이가 커진다.
 
 **계산 예.** $L = 2.7$ m, $l_w = 1.6$ m인 차량이 $R = 10$ m로 선회한다.
 
@@ -204,7 +204,7 @@ $$
 3. 안쪽 바퀴: $\delta_i = 2.7 / 9.2 = 0.2935$ rad(16.82°)이다.
 4. 차이: $\delta_i - \delta_o = 0.0435$ rad(2.49°)이고, 근사식 $\delta_f^2l_w / L = 0.27^2 \times 1.6 / 2.7 = 0.0432$ rad와 거의 같다.
 
-> **참고:** 위의 식은 각이 작다는 근사($\tan\delta \approx \delta$)를 쓴 것이다. 근사 없이 쓰면 $\tan\delta_o = L/(R + l_w/2)$, $\tan\delta_i = L/(R - l_w/2)$이고, 두 식에서 $R$을 지우면 $\cot\delta_o - \cot\delta_i = l_w / L$을 얻는다. 이를 **애커먼 조건(Ackermann condition)** 이라 하며, 위의 예에서 정확한 값은 $\delta_o = 14.04°$, $\delta_i = 16.36°$이고 $\cot\delta_o - \cot\delta_i = 4.000 - 3.407 = 0.593 = 1.6 / 2.7$이다.
+> **참고:** 위의 식은 각이 작다는 근사($`\tan\delta \approx \delta`$)를 쓴 것이다. 근사 없이 쓰면 $\tan\delta_o = L/(R + l_w/2)$, $\tan\delta_i = L/(R - l_w/2)$이고, 두 식에서 $R$을 지우면 $\cot\delta_o - \cot\delta_i = l_w / L$을 얻는다. 이를 **애커먼 조건(Ackermann condition)** 이라 하며, 위의 예에서 정확한 값은 $\delta_o = 14.04°$, $\delta_i = 16.36°$이고 $\cot\delta_o - \cot\delta_i = 4.000 - 3.407 = 0.593 = 1.6 / 2.7$이다.
 
 ![그림 3. 사다리꼴 타이로드 배치와 왼쪽 선회, 오른쪽 선회에서의 바퀴 각도](../../images/Week12_12-1_p09.png)
 
@@ -275,13 +275,13 @@ stateDiagram-v2
 
 ### 2.2 상태 공간 모델
 
-동역학 모델(11주차 3.3절)을 제어기 설계에 쓰기 위해 **상태 공간 모델(state-space model)** 로 쓴다. 상태 $\mathbf{x} = [\beta \;\; r]^T$, 입력 $u = \delta$, 출력 $y$에 대해 다음과 같다. 문헌에 따라 요레이트를 $\gamma$로 쓰기도 하며, 기구학 모델의 $\dot\psi$와 같은 양이다.
+동역학 모델(11주차 3.3절)을 제어기 설계에 쓰기 위해 **상태 공간 모델(state-space model)** 로 쓴다. 상태 $`\mathbf{x} = [\beta \;\; r]^T`$, 입력 $u = \delta$, 출력 $y$에 대해 다음과 같다. 문헌에 따라 요레이트를 $\gamma$로 쓰기도 하며, 기구학 모델의 $\dot\psi$와 같은 양이다.
 
-$$
+```math
 \dot{\mathbf{x}} = A\mathbf{x} + Bu, \qquad y = C\mathbf{x}
-$$
+```
 
-$$
+```math
 A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} =
 \begin{bmatrix}
 -\dfrac{C_r + C_f}{mV} & -1 + \dfrac{C_r l_r - C_f l_f}{mV^2} \\
@@ -290,9 +290,9 @@ A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} =
 B = \begin{bmatrix} b_{11} \\ b_{21} \end{bmatrix} =
 \begin{bmatrix} \dfrac{C_f}{mV} \\ \dfrac{C_f l_f}{I_{zz}} \end{bmatrix}, \qquad
 C = \begin{bmatrix} 0 & 1 \end{bmatrix}
-$$
+```
 
-$I_{zz}$는 11주차의 요 관성 모멘트 $I$이다. 출력 행렬 $C = [0 \;\; 1]$은 상태 가운데 요레이트만 측정한다는 뜻이다. 요레이트는 차량의 자이로 센서로 잴 수 있지만, 차체 슬립각은 보통의 차량 센서로 직접 잴 수 없다(2.8절).
+$I_{zz}$는 11주차의 요 관성 모멘트 $I$이다. 출력 행렬 $`C = [0 \;\; 1]`$은 상태 가운데 요레이트만 측정한다는 뜻이다. 요레이트는 차량의 자이로 센서로 잴 수 있지만, 차체 슬립각은 보통의 차량 센서로 직접 잴 수 없다(2.8절).
 
 **계산 예.** 11주차 표 8의 추정 파라미터로 40 km/h($V = 11.11$ m/s)의 행렬을 계산한다.
 
@@ -330,26 +330,26 @@ $I_{zz}$는 11주차의 요 관성 모멘트 $I$이다. 출력 행렬 $C = [0 \;
 1. 무게 중심의 속도는 차체 축에서 $\beta$, 경로 방향에서 $\beta + \Delta\psi$만큼 돌아가 있으므로, 경로에 수직인 성분은 $V\sin(\beta + \Delta\psi) \approx V(\beta + \Delta\psi)$이다.
 2. 회전이 만드는 속도 $L_s r$는 차체 축에 수직이므로, 경로에 수직인 성분은 $L_s r\cos\Delta\psi \approx L_s r$이다.
 
-$$
+```math
 \dot d_s = V(\beta + \Delta\psi) + L_s r
-$$
+```
 
 **$\Delta\psi$의 변화율.** 차체의 헤딩각은 $r$로 바뀌고, 경로의 접선 방향은 경로를 따라 속도 $V$로 이동할 때 곡률만큼 $V\rho$로 바뀐다.
 
-$$
+```math
 \Delta\dot\psi = r - V\rho
-$$
+```
 
 2.2절의 동역학 모델과 합치면 경로 추종 전체를 나타내는 4차 모델이 된다.
 
-$$
+```math
 \begin{aligned}
 \dot\beta &= a_{11}\beta + a_{12} r + b_{11}\delta \\
 \dot r &= a_{21}\beta + a_{22} r + b_{21}\delta \\
 \Delta\dot\psi &= r - V\rho \\
 \dot d_s &= V\beta + V\Delta\psi + L_s r
 \end{aligned}
-$$
+```
 
 ### 2.4 연속 구조와 백스테핑
 
@@ -379,17 +379,17 @@ flowchart LR
 
 ### 2.5 1단계: 원하는 요레이트
 
-먼저 요레이트 $r$를 마음대로 정할 수 있는 가상의 입력이라고 보고, $d_s$가 0으로 가도록 원하는 요레이트 $r_d$를 정한다. $\dot d_s = V(\beta + \Delta\psi) + L_s r$에서 $r = r_d$일 때 $\dot d_s = -K_d d_s$($K_d > 0$)가 되게 하려면 다음과 같이 둔다.
+먼저 요레이트 $r$를 마음대로 정할 수 있는 가상의 입력이라고 보고, $d_s$가 0으로 가도록 원하는 요레이트 $r_d$를 정한다. $\dot d_s = V(\beta + \Delta\psi) + L_s r$에서 $r = r_d$일 때 $\dot d_s = -K_d d_s$($`K_d > 0`$)가 되게 하려면 다음과 같이 둔다.
 
-$$
+```math
 r_d = -\frac{V(\beta + \Delta\psi) + K_d d_s}{L_s}
-$$
+```
 
 $r = r_d$이면 $\dot d_s = V(\beta + \Delta\psi) - V(\beta + \Delta\psi) - K_d d_s = -K_d d_s$이므로 $d_s(t) = d_s(0)e^{-K_d t}$로 지수적으로 줄어든다. 첫 항 $-V(\beta + \Delta\psi)/L_s$는 차량이 경로에 대해 비스듬히 움직여 생기는 이탈을 없애고, 둘째 항 $-K_d d_s / L_s$는 이미 생긴 이탈을 되돌린다. 실제 요레이트는 $r_d$와 다를 수 있으므로 그 차이를 요레이트 오차 $e_r = r - r_d$로 두면, $r = r_d + e_r$를 대입하여 다음을 얻는다.
 
-$$
+```math
 \dot d_s = -K_d d_s + L_s e_r
-$$
+```
 
 ### 2.6 2단계: 조향각
 
@@ -399,35 +399,35 @@ $$
 
 **(2) 대입.** $\dot r$, $\dot\beta$, $\Delta\dot\psi$, $\dot d_s$에 2.3절의 4차 모델을 넣는다.
 
-$$
+```math
 \dot e_r = (a_{21}\beta + a_{22} r + b_{21}\delta) + \frac{V}{L_s}\left(a_{11}\beta + a_{12} r + b_{11}\delta + r - V\rho\right) + \frac{K_d}{L_s}\left(V\beta + V\Delta\psi + L_s r\right)
-$$
+```
 
 **(3) 정리.** 같은 변수끼리 모으면 다음과 같다.
 
-$$
+```math
 \dot e_r = f(\beta, r, \Delta\psi, \rho) + b_\delta\,\delta, \qquad f \equiv h_\beta\beta + h_r r + h_\psi\Delta\psi - h_\rho\rho
-$$
+```
 
-$$
+```math
 b_\delta = b_{21} + \frac{V b_{11}}{L_s}, \quad h_\beta = \frac{V a_{11} + V K_d + L_s a_{21}}{L_s}, \quad h_r = \frac{V a_{12} + V + K_d L_s + L_s a_{22}}{L_s}, \quad h_\psi = \frac{K_d V}{L_s}, \quad h_\rho = \frac{V^2}{L_s}
-$$
+```
 
 **(4) 리아프노프 함수로 조향각 정하기.** 두 오차의 크기를 재는 함수 $\mathcal{V} = \frac{1}{2}W_d d_s^2 + \frac{1}{2}W_r e_r^2$($W_d, W_r > 0$는 가중치)를 잡고 그 변화율을 계산한다.
 
-$$
+```math
 \dot{\mathcal{V}} = W_d d_s\dot d_s + W_r e_r\dot e_r = -W_d K_d d_s^2 + W_d L_s d_s e_r + W_r e_r\left(f + b_\delta\delta\right)
-$$
+```
 
-가운데 항 $W_d L_s d_s e_r$는 부호가 정해지지 않은 교차항이다. 조향각을 다음과 같이 정하면 괄호 안이 $-\frac{W_d L_s}{W_r}d_s - K_r e_r$($K_r > 0$)가 되어 교차항이 지워진다.
+가운데 항 $W_d L_s d_s e_r$는 부호가 정해지지 않은 교차항이다. 조향각을 다음과 같이 정하면 괄호 안이 $-\frac{W_d L_s}{W_r}d_s - K_r e_r$($`K_r > 0`$)가 되어 교차항이 지워진다.
 
-$$
+```math
 \delta = \frac{1}{b_\delta}\left[-f(\beta, r, \Delta\psi, \rho) - \frac{W_d L_s}{W_r}d_s - K_r e_r\right]
-$$
+```
 
-$$
+```math
 \dot{\mathcal{V}} = -W_d K_d d_s^2 - W_r K_r e_r^2 < 0 \quad \left((d_s, e_r) \neq (0, 0)\right)
-$$
+```
 
 $\mathcal{V}$는 오차가 0일 때만 0이고 그 밖에서는 양수이며 계속 줄어들므로, 모델이 정확하면 $d_s$와 $e_r$가 모두 0으로 수렴한다. 조향각 식의 세 항은 각각 알려진 차량과 도로의 동역학(곡률 항 $h_\rho\rho$ 포함)을 상쇄하는 앞먹임, 교차항을 지우는 항, 요레이트 오차를 줄이는 되먹임이다. 이 식은 $b_\delta \neq 0$, 즉 조향이 $\dot e_r$에 영향을 줄 때만 쓸 수 있다.
 
@@ -444,7 +444,7 @@ $\mathcal{V}$는 오차가 0일 때만 0이고 그 밖에서는 양수이며 계
 3. 원하는 요레이트: $r_d = -(11.11 \times 0.015 + 0.5 \times 0.3) / 10 = -(0.1667 + 0.15) / 10 = -0.03167$ rad/s이다. 오른쪽으로 돌아야 한다.
 4. 요레이트 오차: $e_r = 0.02 - (-0.03167) = 0.05167$ rad/s이다.
 5. $f = 7.825 \times 0.005 + (-10.085) \times 0.02 + 0.556 \times 0.01 = 0.0391 - 0.2017 + 0.0056 = -0.1570$이다.
-6. 조향각: $\delta = (0.1570 - 0.1 \times 10 \times 0.3 - 5 \times 0.05167) / 35.45 = (0.1570 - 0.3 - 0.2583) / 35.45 = -0.01132$ rad($-0.65°$)이다. 오른쪽으로 조금 조향한다.
+6. 조향각: $\delta = (0.1570 - 0.1 \times 10 \times 0.3 - 5 \times 0.05167) / 35.45 = (0.1570 - 0.3 - 0.2583) / 35.45 = -0.01132$ rad($`-0.65°`$)이다. 오른쪽으로 조금 조향한다.
 
 같은 설정에서 $d_s(0) = 0.5$ m, 나머지 상태가 0인 상황을 4차 모델로 모의하면 다음과 같다.
 
@@ -465,21 +465,21 @@ $\mathcal{V}$는 오차가 0일 때만 0이고 그 밖에서는 양수이며 계
 
 **관측기의 구조.** 모델을 실시간으로 함께 계산하면서, 모델이 예측한 출력 $C\hat{\mathbf{x}}$와 실제 측정 $y$의 차이로 추정값을 고친다 [3].
 
-$$
+```math
 \dot{\hat{\mathbf{x}}} = A\hat{\mathbf{x}} + B\delta + \mathbf{l}\left(y - C\hat{\mathbf{x}}\right), \qquad \mathbf{l} = \begin{bmatrix} l_1 \\ l_2 \end{bmatrix}
-$$
+```
 
 추정 오차 $\mathbf{e} = \mathbf{x} - \hat{\mathbf{x}}$의 변화율은 $\dot{\mathbf{e}} = A\mathbf{x} + B\delta - A\hat{\mathbf{x}} - B\delta - \mathbf{l}C(\mathbf{x} - \hat{\mathbf{x}}) = (A - \mathbf{l}C)\mathbf{e}$이다. 따라서 $A - \mathbf{l}C$의 고유값이 모두 음의 실수부를 가지도록 이득 $\mathbf{l}$을 고르면, 처음 추정값이 틀려도 오차가 0으로 줄어든다.
 
 **관측 가능 조건.** 요레이트만 재서 $\beta$를 알아낼 수 있으려면 $\beta$가 요레이트의 변화에 흔적을 남겨야 한다. 관측 가능성 행렬로 이를 확인한다.
 
-$$
+```math
 \mathcal{O} = \begin{bmatrix} C \\ CA \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ a_{21} & a_{22} \end{bmatrix}, \qquad \det\mathcal{O} = -a_{21}
-$$
+```
 
 $\mathcal{O}$의 계수(rank)가 2, 즉 $a_{21} = (C_r l_r - C_f l_f)/I_{zz} \neq 0$이어야 관측 가능하다. $C_r l_r = C_f l_f$인 차량에서는 $\dot r$의 식에 $\beta$가 나타나지 않아 요레이트만으로 $\beta$를 알 수 없다. 추정 파라미터에서는 $a_{21} = 16.61 \neq 0$이므로 관측 가능하다.
 
-**이득 계산 예.** 40 km/h에서 $A - \mathbf{l}C$의 고유값을 $-20$, $-25$로 정한다. 플랜트의 고유값($-9.59 \pm 3.51j$)보다 두 배 이상 빠르게 하여 추정값이 실제 상태를 빨리 따라잡게 한다.
+**이득 계산 예.** 40 km/h에서 $A - \mathbf{l}C$의 고유값을 $-20$, $-25$로 정한다. 플랜트의 고유값($`-9.59 \pm 3.51j`$)보다 두 배 이상 빠르게 하여 추정값이 실제 상태를 빨리 따라잡게 한다.
 
 1. $A - \mathbf{l}C$의 원소는 차례로 $a_{11}$, $a_{12} - l_1$, $a_{21}$, $a_{22} - l_2$이므로 특성 방정식은 $\lambda^2 - (a_{11} + a_{22} - l_2)\lambda + a_{11}(a_{22} - l_2) - a_{21}(a_{12} - l_1) = 0$이다.
 2. 원하는 특성 방정식은 $(\lambda + 20)(\lambda + 25) = \lambda^2 + 45\lambda + 500 = 0$이다.
@@ -646,11 +646,11 @@ waypoint_clicker는 RViz가 발행하는 `/clicked_point`를 받아, 벡터 지�
 
 *표 9. waypoint_loader 대화 상자의 속도 재계획 설정*
 
-replan curve mode를 켜면 Autoware.ai 1.14.0의 waypoint_replanner는 곡률 반경이 $R_{th}$ 이하인 곡선 구간마다 가장 작은 곡률 반경 $R$(하한 $R_{\min}$)을 찾고, 그 구간의 속도 상한을 $R_{\min}$에서 $V_{\min}$, $R_{th}$에서 $V_{\max}$가 되도록 선형으로 정한다 [6].
+replan curve mode를 켜면 Autoware.ai 1.14.0의 waypoint_replanner는 곡률 반경이 $R_{th}$ 이하인 곡선 구간마다 가장 작은 곡률 반경 $R$(하한 $`R_{\min}`$)을 찾고, 그 구간의 속도 상한을 $R_{\min}$에서 $V_{\min}$, $R_{th}$에서 $V_{\max}$가 되도록 선형으로 정한다 [6].
 
-$$
+```math
 V(R) = V_{\max} - \frac{V_{\max} - V_{\min}}{R_{th} - R_{\min}}\left(R_{th} - R\right)
-$$
+```
 
 예를 들어 표 9의 값에서 반경 13 m인 곡선의 속도 상한은 $20 - 16 \times 7 / 14 = 12$ km/h이다. 11주차 1.3절이 횡방향 가속도로부터 $\sqrt{0.3 g R}$를 쓴 것과 같은 목적(곡선에서 감속)을 더 단순한 선형 규칙으로 구현한 것이다.
 
@@ -731,7 +731,7 @@ wf_simulator의 [app]에서 초기 위치를 받을 곳을 정하는 Initialize 
 | 기구학적 자전거 모델 | 사인 법칙으로 $\dot\psi = V\cos\beta(\tan\delta_f - \tan\delta_r)/(l_f + l_r)$와 $\beta = \tan^{-1}((l_f\tan\delta_r + l_r\tan\delta_f)/(l_f + l_r))$를 얻고, $\dot X = V\cos(\psi + \beta)$, $\dot Y = V\sin(\psi + \beta)$로 위치를 적분한다. |
 | 애커먼 조향 | 작은 각에서 $\delta_f = L/R$이고 $\delta_o = L/(R + l_w/2)$, $\delta_i = L/(R - l_w/2)$로 안쪽 바퀴가 더 꺾이며, 사다리꼴 타이로드 배치로 구현한다. |
 | 모델 전환과 히스테리시스 | 저속에는 수렴 시간과 발산 위험이 없는 기구학 모델, 고속에는 동역학 모델을 쓰고, 15 km/h와 10 km/h의 두 임계값으로 잦은 전환을 막는다. |
-| 상태 공간 모델 | 상태 $[\beta \;\; r]^T$, 입력 $\delta$, 출력 $y = [0 \;\; 1]\mathbf{x}$(요레이트 측정)로 쓰며, 행렬 원소가 $1/V$, $1/V^2$에 비례한다. |
+| 상태 공간 모델 | 상태 $`[\beta \;\; r]^T`$, 입력 $\delta$, 출력 $`y = [0 \;\; 1]\mathbf{x}`$(요레이트 측정)로 쓰며, 행렬 원소가 $1/V$, $1/V^2$에 비례한다. |
 | 경로 추종 오차 모델 | 전방 주시점의 횡방향 이탈거리와 상대 헤딩각이 $\dot d_s = V(\beta + \Delta\psi) + L_s r$, $\Delta\dot\psi = r - V\rho$를 따른다. |
 | 백스테핑 제어기 | Inner-loop이 $r_d = -(V(\beta + \Delta\psi) + K_d d_s)/L_s$를 정하고, Outer-loop이 리아프노프 함수의 교차항을 지우는 조향각 $\delta = (-f - (W_d L_s/W_r)d_s - K_r e_r)/b_\delta$를 낸다. |
 | 상태 관측기 | $\dot{\hat{\mathbf{x}}} = A\hat{\mathbf{x}} + B\delta + \mathbf{l}(y - C\hat{\mathbf{x}})$로 요레이트 측정에서 차체 슬립각을 추정하며, $a_{21} \neq 0$이어야 관측 가능하다. |
@@ -745,7 +745,7 @@ wf_simulator의 [app]에서 초기 위치를 받을 곳을 정하는 Initialize 
 
 ## 점검 문제
 
-1. **기구학 모델:** $l_f = 1.0$ m, $l_r = 1.6$ m인 차량이 $V = 4$ m/s, $\delta_f = 8°$, $\delta_r = 0$으로 달린다. 차체 슬립각, 요레이트, 회전 반경을 구하라($\tan 8° = 0.14054$).
+1. **기구학 모델:** $l_f = 1.0$ m, $l_r = 1.6$ m인 차량이 $V = 4$ m/s, $\delta_f = 8°$, $\delta_r = 0$으로 달린다. 차체 슬립각, 요레이트, 회전 반경을 구하라($`\tan 8° = 0.14054`$).
 
    <details>
    <summary>정답</summary>
@@ -799,12 +799,12 @@ wf_simulator의 [app]에서 초기 위치를 받을 곳을 정하는 Initialize 
 
    </details>
 
-7. **관측 가능성:** $C = [0 \;\; 1]$이고 $A$의 원소가 $a_{11} = -5$, $a_{12} = -0.9$, $a_{21} = 0$, $a_{22} = -6$인 시스템에서 차체 슬립각을 관측할 수 있는지 판단하고 그 이유를 쓰라.
+7. **관측 가능성:** $`C = [0 \;\; 1]`$이고 $A$의 원소가 $a_{11} = -5$, $a_{12} = -0.9$, $a_{21} = 0$, $a_{22} = -6$인 시스템에서 차체 슬립각을 관측할 수 있는지 판단하고 그 이유를 쓰라.
 
    <details>
    <summary>정답</summary>
 
-   관측 가능성 행렬 $\mathcal{O}$의 두 행은 $[0 \;\; 1]$과 $[a_{21} \;\; a_{22}] = [0 \;\; -6]$이고 행렬식이 0(계수 1)이므로 관측할 수 없다. $a_{21} = 0$이어서 $\dot r = -6r + b_{21}\delta$에 $\beta$가 나타나지 않으므로, 요레이트의 측정값에 $\beta$의 정보가 전혀 담기지 않는다.
+   관측 가능성 행렬 $\mathcal{O}$의 두 행은 $`[0 \;\; 1]`$과 $`[a_{21} \;\; a_{22}] = [0 \;\; -6]`$이고 행렬식이 0(계수 1)이므로 관측할 수 없다. $a_{21} = 0$이어서 $\dot r = -6r + b_{21}\delta$에 $\beta$가 나타나지 않으므로, 요레이트의 측정값에 $\beta$의 정보가 전혀 담기지 않는다.
 
    </details>
 

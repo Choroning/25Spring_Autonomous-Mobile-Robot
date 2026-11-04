@@ -217,7 +217,7 @@ autoware.ai/src/autoware/documentation/autoware_quickstart_examples/launch/rosba
 
 ### 2.1 포인트 클라우드의 표현
 
-포인트 클라우드는 점 $\mathbf{p}_i = (x_i, y_i, z_i)$의 집합 $P = \lbrace\mathbf{p}_1, \dots, \mathbf{p}_N\rbrace$이다. LiDAR의 점에는 좌표 말고도 레이저가 되돌아온 세기(intensity)나 그 점을 측정한 레이저의 번호(ring) 같은 값이 붙을 수 있다. 점의 순서에는 의미가 없으므로 포인트 클라우드는 수학적으로 순서 없는 집합이다. 오픈 소스 라이브러리 **PCL(Point Cloud Library)** 은 포인트 클라우드의 저장, 필터링, 정합 같은 알고리즘을 모아 둔 C++ 라이브러리이며, Autoware의 지도 작성과 위치 인식은 PCL을 바탕으로 한다 [1].
+포인트 클라우드는 점 $`\mathbf{p}_i = (x_i, y_i, z_i)`$의 집합 $`P = \lbrace\mathbf{p}_1, \dots, \mathbf{p}_N\rbrace`$이다. LiDAR의 점에는 좌표 말고도 레이저가 되돌아온 세기(intensity)나 그 점을 측정한 레이저의 번호(ring) 같은 값이 붙을 수 있다. 점의 순서에는 의미가 없으므로 포인트 클라우드는 수학적으로 순서 없는 집합이다. 오픈 소스 라이브러리 **PCL(Point Cloud Library)** 은 포인트 클라우드의 저장, 필터링, 정합 같은 알고리즘을 모아 둔 C++ 라이브러리이며, Autoware의 지도 작성과 위치 인식은 PCL을 바탕으로 한다 [1].
 
 ROS에서는 포인트 클라우드를 `sensor_msgs/PointCloud2` 메시지로 주고받는다 [2]. 이 메시지는 점들을 바이트 배열 하나에 이어 붙여 담고, 각 점의 바이트 안에서 어느 위치에 어떤 값이 있는지를 따로 기술한다.
 
@@ -256,30 +256,30 @@ DATA ascii
 
 ### 2.2 3차원 강체 변환
 
-물체의 모양을 바꾸지 않고 회전과 평행 이동만 하는 변환을 **강체 변환(rigid-body transformation)** 이라고 한다. 3차원 점 $\mathbf{p}$를 회전 행렬 $R$로 돌리고 평행 이동 벡터 $\mathbf{t}$만큼 옮기면 $\mathbf{p}' = R\mathbf{p} + \mathbf{t}$이다. 차량의 방향은 3주차에서 정의한 roll($\phi$), pitch($\theta$), yaw($\psi$)로 나타내며, 각각 $x$축, $y$축, $z$축을 중심으로 한 회전이다.
+물체의 모양을 바꾸지 않고 회전과 평행 이동만 하는 변환을 **강체 변환(rigid-body transformation)** 이라고 한다. 3차원 점 $\mathbf{p}$를 회전 행렬 $R$로 돌리고 평행 이동 벡터 $\mathbf{t}$만큼 옮기면 $\mathbf{p}' = R\mathbf{p} + \mathbf{t}$이다. 차량의 방향은 3주차에서 정의한 roll($`\phi`$), pitch($`\theta`$), yaw($`\psi`$)로 나타내며, 각각 $x$축, $y$축, $z$축을 중심으로 한 회전이다.
 
-$$
+```math
 R_x(\phi) = \begin{pmatrix} 1 & 0 & 0 \\ 0 & \cos\phi & -\sin\phi \\ 0 & \sin\phi & \cos\phi \end{pmatrix}, \quad
 R_y(\theta) = \begin{pmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{pmatrix}, \quad
 R_z(\psi) = \begin{pmatrix} \cos\psi & -\sin\psi & 0 \\ \sin\psi & \cos\psi & 0 \\ 0 & 0 & 1 \end{pmatrix}
-$$
+```
 
 ROS와 PCL은 세 각으로부터 회전 행렬을 $R = R_z(\psi) R_y(\theta) R_x(\phi)$의 순서로 만든다. 즉 먼저 roll, 다음 pitch, 마지막으로 yaw만큼 고정된 축을 중심으로 돌린다. 회전과 평행 이동을 한 번에 다루기 위해 점에 1을 덧붙인 **동차 좌표(homogeneous coordinates)** $(x, y, z, 1)$을 쓰면, 강체 변환은 $4 \times 4$ 행렬 하나의 곱이 된다.
 
-$$
+```math
 T = \begin{pmatrix} R & \mathbf{t} \\ \mathbf{0}^{T} & 1 \end{pmatrix}, \qquad
 \begin{pmatrix} \mathbf{p}' \\ 1 \end{pmatrix} = T \begin{pmatrix} \mathbf{p} \\ 1 \end{pmatrix} = \begin{pmatrix} R\mathbf{p} + \mathbf{t} \\ 1 \end{pmatrix}
-$$
+```
 
 이 행렬을 **동차 변환 행렬(homogeneous transformation matrix)** 이라고 한다. 3차원 포즈 $(x, y, z, \phi, \theta, \psi)$는 $\mathbf{t} = (x, y, z)$이고 $R = R_z(\psi) R_y(\theta) R_x(\phi)$인 동차 변환 행렬 하나와 같은 정보이다.
 
-> **[선형대수학]** 회전 행렬은 $R^{T} R = I$이고 $\det R = 1$인 직교 행렬이다. 따라서 역행렬은 전치 행렬과 같고($R^{-1} = R^{T}$), 동차 변환 행렬의 역행렬은 $T^{-1} = \begin{pmatrix} R^{T} & -R^{T}\mathbf{t} \\ \mathbf{0}^{T} & 1 \end{pmatrix}$이다. 두 변환을 차례로 적용한 결과는 행렬의 곱 $T_1 T_2$이며, 행렬의 곱은 교환 법칙이 성립하지 않으므로 곱하는 순서가 중요하다.
+> **[선형대수학]** 회전 행렬은 $R^{T} R = I$이고 $\det R = 1$인 직교 행렬이다. 따라서 역행렬은 전치 행렬과 같고($`R^{-1} = R^{T}`$), 동차 변환 행렬의 역행렬은 $`T^{-1} = \begin{pmatrix} R^{T} & -R^{T}\mathbf{t} \\ \mathbf{0}^{T} & 1 \end{pmatrix}`$이다. 두 변환을 차례로 적용한 결과는 행렬의 곱 $T_1 T_2$이며, 행렬의 곱은 교환 법칙이 성립하지 않으므로 곱하는 순서가 중요하다.
 
 각이 충분히 작으면 $\cos\alpha \approx 1$, $\sin\alpha \approx \alpha$이고 두 작은 각의 곱은 무시할 수 있으므로, 회전 행렬은 다음과 같이 근사된다. 3.7절에서 이 근사를 실제 출력으로 확인한다.
 
-$$
+```math
 R \approx \begin{pmatrix} 1 & -\psi & \theta \\ \psi & 1 & -\phi \\ -\theta & \phi & 1 \end{pmatrix}
-$$
+```
 
 ### 2.3 좌표계와 변환의 합성
 
@@ -295,18 +295,18 @@ $$
 
 *표 5. Autoware에서 쓰는 주요 좌표계*
 
-좌표계 $B$의 점을 좌표계 $A$의 점으로 바꾸는 변환을 $T^{A}_{B}$로 나타낸다. $T^{A}_{B}$는 $A$에서 본 $B$의 포즈이기도 하다. 그러면 LiDAR가 측정한 점 $\mathbf{p}^{\text{lidar}}$의 지도 좌표는 LiDAR → 차량 → 지도의 순서로 옮겨 구한다.
+좌표계 $B$의 점을 좌표계 $A$의 점으로 바꾸는 변환을 $`T^{A}_{B}`$로 나타낸다. $`T^{A}_{B}`$는 $A$에서 본 $B$의 포즈이기도 하다. 그러면 LiDAR가 측정한 점 $\mathbf{p}^{\text{lidar}}$의 지도 좌표는 LiDAR → 차량 → 지도의 순서로 옮겨 구한다.
 
-$$
+```math
 \mathbf{p}^{\text{map}} = T^{\text{map}}_{\text{base}} \, T^{\text{base}}_{\text{lidar}} \, \mathbf{p}^{\text{lidar}}, \qquad
 T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} \, T^{\text{base}}_{\text{lidar}}
-$$
+```
 
-$T^{\text{base}}_{\text{lidar}}$는 차량에 LiDAR를 달 때 정해지는 고정된 값이고, Runtime Manager의 Setup 탭에서 입력하는 Baselink to Localizer가 바로 이 값이다(4.3절). NDT 정합이 직접 구하는 것은 LiDAR의 포즈 $T^{\text{map}}_{\text{lidar}}$이므로, 차량의 포즈는 위 식을 거꾸로 풀어 $T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}$로 얻는다.
+$`T^{\text{base}}_{\text{lidar}}`$는 차량에 LiDAR를 달 때 정해지는 고정된 값이고, Runtime Manager의 Setup 탭에서 입력하는 Baselink to Localizer가 바로 이 값이다(4.3절). NDT 정합이 직접 구하는 것은 LiDAR의 포즈 $`T^{\text{map}}_{\text{lidar}}`$이므로, 차량의 포즈는 위 식을 거꾸로 풀어 $`T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}`$로 얻는다.
 
 **계산 예: 변환의 합성.** 차량이 지도의 $(10, 5, 0)$ m에서 yaw $= 90°$(지도의 $y$축 방향)를 보고 있고, LiDAR는 차량 기준점에서 앞으로 1.2 m, 위로 2.0 m에 달려 있다고 하자. LiDAR가 자기 앞 5 m, 아래 1.5 m에서 점 $\mathbf{p}^{\text{lidar}} = (5, 0, -1.5)$를 측정하였다.
 
-1. **LiDAR → 차량.** LiDAR는 회전 없이 평행 이동만 되어 있으므로 $\mathbf{p}^{\text{base}} = (5 + 1.2, \; 0, \; -1.5 + 2.0) = (6.2, 0, 0.5)$이다. 차량 기준점에서 앞으로 6.2 m, 위로 0.5 m인 점이다.
+1. **LiDAR → 차량.** LiDAR는 회전 없이 평행 이동만 되어 있으므로 $`\mathbf{p}^{\text{base}} = (5 + 1.2, \; 0, \; -1.5 + 2.0) = (6.2, 0, 0.5)`$이다. 차량 기준점에서 앞으로 6.2 m, 위로 0.5 m인 점이다.
 2. **차량 → 지도.** $R_z(90°)$는 $(x, y, z)$를 $(-y, x, z)$로 보내므로 $R_z(90°)\mathbf{p}^{\text{base}} = (0, 6.2, 0.5)$이고, 차량의 위치를 더하면 $\mathbf{p}^{\text{map}} = (10, 11.2, 0.5)$이다.
 
 차량이 지도의 $y$축 방향을 보고 있으므로, 차량 앞의 점은 지도에서 $y$ 방향으로 6.2 m 떨어진 곳에 놓인다. 같은 방식으로 LiDAR 자체의 지도 위치는 $(0, 0, 0)$을 옮긴 $(10, 6.2, 2.0)$이다.
@@ -399,12 +399,12 @@ LiDAR는 한 번 회전할 때마다 자기 주변 수십 m의 모양만 측정�
 
 **NDT 매핑(NDT mapping)** 은 이 문제를 스캔 정합으로 푼다(3주차 2.6절). 그림 8의 왼쪽 위는 지금까지의 스캔을 쌓아 만든 지도이고, 왼쪽 아래는 새로 들어온 스캔이다. 두 데이터를 NDT로 정합하면 지도에 대한 LiDAR의 상대 위치가 나오고, 그 위치로 새 스캔을 옮겨 3차원 지도에 더한다. 이를 되풀이하면 오른쪽처럼 넓은 지역의 지도가 만들어진다. 식으로 쓰면 다음과 같다.
 
-$$
+```math
 T_k = \arg\min_{T} \; E(T; \, S_k, M_{k-1}), \qquad
 M_k = M_{k-1} \cup \lbrace \, T_k \mathbf{s} \mid \mathbf{s} \in S_k \, \rbrace
-$$
+```
 
-여기서 $S_k$는 $k$번째 스캔(LiDAR 좌표계), $M_{k-1}$은 그 전까지 만든 지도(지도 좌표계), $E$는 스캔을 변환 $T$로 옮겼을 때 지도와 어긋난 정도를 재는 비용 함수, $T_k = T^{\text{map}}_{\text{lidar}}$는 $k$번째 스캔을 측정할 때의 LiDAR 포즈이다. NDT에서는 $E$가 3주차 2.4절의 점수에 음의 부호를 붙인 것이다 [5]. 첫 스캔 $S_0$는 비교할 지도가 없으므로 그대로 지도가 되며, 따라서 지도 좌표계의 원점은 지도 작성을 시작한 순간의 차량 위치이다.
+여기서 $S_k$는 $k$번째 스캔(LiDAR 좌표계), $M_{k-1}$은 그 전까지 만든 지도(지도 좌표계), $E$는 스캔을 변환 $T$로 옮겼을 때 지도와 어긋난 정도를 재는 비용 함수, $`T_k = T^{\text{map}}_{\text{lidar}}`$는 $k$번째 스캔을 측정할 때의 LiDAR 포즈이다. NDT에서는 $E$가 3주차 2.4절의 점수에 음의 부호를 붙인 것이다 [5]. 첫 스캔 $S_0$는 비교할 지도가 없으므로 그대로 지도가 되며, 따라서 지도 좌표계의 원점은 지도 작성을 시작한 순간의 차량 위치이다.
 
 ![그림 9. 여러 장의 사진을 겹치는 부분에 맞추어 이어 붙인 파노라마](../../images/Week09_9-2_p09.png)
 
@@ -433,27 +433,27 @@ flowchart LR
 
 3차원 변환의 매개변수는 평행 이동 3개와 회전각 3개를 모은 $\mathbf{p} = (t_x, t_y, t_z, \phi, \theta, \psi)$이다. 스캔의 점 $\mathbf{x}$는 $T(\mathbf{p}, \mathbf{x}) = R(\phi, \theta, \psi)\mathbf{x} + \mathbf{t}$로 옮겨지고, 옮겨진 점이 들어간 지도 셀의 평균이 $\boldsymbol{\mu}$, 공분산이 $\Sigma$이면 $\mathbf{q} = T(\mathbf{p}, \mathbf{x}) - \boldsymbol{\mu}$이다. 3주차 2.5절의 3차원 점수 함수를 최소화할 때, 점 하나의 기울기 성분은 연쇄 법칙에 따라 다음과 같다.
 
-$$
+```math
 g_i = -d_1 d_2 \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \exp\left( -\frac{d_2}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q} \right), \qquad i = 1, \dots, 6
-$$
+```
 
-$d_1 < 0$이므로 계수 $-d_1 d_2$는 양수이고, $d_1 = -1$, $d_2 = 1$로 두면 3주차 2.4절의 2차원 기울기와 같은 식이 된다. 식의 모양은 2차원과 같고, 달라지는 것은 $\mathbf{q}$를 매개변수로 미분한 $3 \times 6$ 행렬, 즉 **야코비 행렬(Jacobian)** $J = \partial \mathbf{q} / \partial \mathbf{p}$이다. 평행 이동에 대한 미분은 단위 행렬 $I_3$이다. 회전에 대한 미분은 일반적인 각에서는 길지만, 현재 추정 근처에서 작은 회전 증분을 매개변수로 삼으면 2.2절의 근사 $R \approx I + [\boldsymbol{\omega}]_{\times}$를 써서 간단히 구할 수 있다. 여기서 $\boldsymbol{\omega} = (\phi, \theta, \psi)$이고 $[\boldsymbol{\omega}]_{\times}$는 벡터 곱 $\boldsymbol{\omega} \times \mathbf{x}$를 행렬 곱으로 나타낸 반대칭 행렬이다.
+$d_1 < 0$이므로 계수 $-d_1 d_2$는 양수이고, $d_1 = -1$, $d_2 = 1$로 두면 3주차 2.4절의 2차원 기울기와 같은 식이 된다. 식의 모양은 2차원과 같고, 달라지는 것은 $\mathbf{q}$를 매개변수로 미분한 $3 \times 6$ 행렬, 즉 **야코비 행렬(Jacobian)** $J = \partial \mathbf{q} / \partial \mathbf{p}$이다. 평행 이동에 대한 미분은 단위 행렬 $I_3$이다. 회전에 대한 미분은 일반적인 각에서는 길지만, 현재 추정 근처에서 작은 회전 증분을 매개변수로 삼으면 2.2절의 근사 $`R \approx I + [\boldsymbol{\omega}]_{\times}`$를 써서 간단히 구할 수 있다. 여기서 $\boldsymbol{\omega} = (\phi, \theta, \psi)$이고 $`[\boldsymbol{\omega}]_{\times}`$는 벡터 곱 $\boldsymbol{\omega} \times \mathbf{x}$를 행렬 곱으로 나타낸 반대칭 행렬이다.
 
-$$
+```math
 R\mathbf{x} \approx \mathbf{x} + \boldsymbol{\omega} \times \mathbf{x} = \mathbf{x} - \mathbf{x} \times \boldsymbol{\omega}
 \quad \Rightarrow \quad
 \frac{\partial (R\mathbf{x})}{\partial \boldsymbol{\omega}} = -[\mathbf{x}]_{\times} = \begin{pmatrix} 0 & z & -y \\ -z & 0 & x \\ y & -x & 0 \end{pmatrix}
-$$
+```
 
-$$
+```math
 J = \begin{pmatrix} I_3 & -[\mathbf{x}]_{\times} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0 & 0 & z & -y \\ 0 & 1 & 0 & -z & 0 & x \\ 0 & 0 & 1 & y & -x & 0 \end{pmatrix}
-$$
+```
 
-> **[선형대수학]** 벡터 $\mathbf{a} = (a_1, a_2, a_3)$의 반대칭 행렬은 $[\mathbf{a}]_{\times} = \begin{pmatrix} 0 & -a_3 & a_2 \\ a_3 & 0 & -a_1 \\ -a_2 & a_1 & 0 \end{pmatrix}$이며, 모든 $\mathbf{b}$에 대해 $[\mathbf{a}]_{\times}\mathbf{b} = \mathbf{a} \times \mathbf{b}$이다. 벡터 곱은 $\mathbf{a} \times \mathbf{b} = -\mathbf{b} \times \mathbf{a}$를 만족한다.
+> **[선형대수학]** 벡터 $\mathbf{a} = (a_1, a_2, a_3)$의 반대칭 행렬은 $`[\mathbf{a}]_{\times} = \begin{pmatrix} 0 & -a_3 & a_2 \\ a_3 & 0 & -a_1 \\ -a_2 & a_1 & 0 \end{pmatrix}`$이며, 모든 $\mathbf{b}$에 대해 $`[\mathbf{a}]_{\times}\mathbf{b} = \mathbf{a} \times \mathbf{b}`$이다. 벡터 곱은 $\mathbf{a} \times \mathbf{b} = -\mathbf{b} \times \mathbf{a}$를 만족한다.
 
 $J$의 마지막 열 $(-y, x, 0)$은 3주차 2.4절의 2차원 식 $\partial \mathbf{q} / \partial \phi$에 $\phi = 0$을 넣은 $(-y, x)$와 같다. 즉 평면의 yaw 회전은 3차원 식의 특수한 경우이다. 각 열의 뜻을 LiDAR 앞 10 m의 점 $\mathbf{x} = (10, 0, 0)$으로 확인할 수 있다.
 
-- **yaw 열** $(-y, x, 0) = (0, 10, 0)$: yaw를 작은 각 $\delta\psi$만큼 돌리면 이 점은 옆으로 $10\,\delta\psi$만큼 움직인다. 같은 각이라도 수평 거리가 먼 점일수록 크게 움직이므로, 먼 점들이 방향(회전)을 정확히 정하는 데 크게 기여한다.
+- **yaw 열** $(-y, x, 0) = (0, 10, 0)$: yaw를 작은 각 $\delta\psi$만큼 돌리면 이 점은 옆으로 $`10\,\delta\psi`$만큼 움직인다. 같은 각이라도 수평 거리가 먼 점일수록 크게 움직이므로, 먼 점들이 방향(회전)을 정확히 정하는 데 크게 기여한다.
 - **pitch 열** $(z, 0, -x) = (0, 0, -10)$: pitch를 돌리면 앞쪽의 먼 점은 위아래로 움직인다.
 - **roll 열** $(0, -z, y) = (0, 0, 0)$: roll은 $x$축을 중심으로 돌리는 회전이므로, $x$축 위에 놓인 점은 움직이지 않는다. roll을 정하려면 옆쪽이나 위아래에 있는 점이 필요하다.
 
@@ -464,12 +464,12 @@ $J$의 마지막 열 $(-y, x, 0)$은 3주차 2.4절의 2차원 식 $\partial \ma
 Autoware의 `ndt_mapping` 노드는 스캔 하나가 들어올 때마다 다음 일을 한다 [7].
 
 1. **거리 필터.** 스캔의 점마다 수평 거리 $r = \sqrt{x^2 + y^2}$를 계산하여, $r_{\min} < r < r_{\max}$인 점만 남긴다(Minimum Scan Range, Maximum Scan Range). 너무 가까운 점은 대개 차량 자신의 몸체에 맞은 점이고, 너무 먼 점은 드물고 오차가 크다.
-2. **첫 스캔 처리.** 첫 스캔이면 $T^{\text{base}}_{\text{lidar}}$로 옮겨 그대로 지도로 삼는다. 3.3절에서 본 것처럼 지도의 원점은 출발 순간의 차량 기준점이 된다.
+2. **첫 스캔 처리.** 첫 스캔이면 $`T^{\text{base}}_{\text{lidar}}`$로 옮겨 그대로 지도로 삼는다. 3.3절에서 본 것처럼 지도의 원점은 출발 순간의 차량 기준점이 된다.
 3. **다운샘플링.** 거리 필터를 거친 스캔에 복셀 그리드 필터(Leaf Size)를 적용하여 정합에 쓸 점을 줄인다(4.5절).
-4. **초기 추정.** 차량이 직전과 같은 움직임을 이어 간다고 보고(등속 운동 모델) 이번 포즈를 예측한다. $k$번째 스캔의 예측 포즈는 $\hat{x}_k = x_{k-1} + (x_{k-1} - x_{k-2})$이며 $y, z$, yaw도 같은 식으로 예측하고, roll과 pitch는 직전 값을 쓴다. 예측한 차량 포즈에 $T^{\text{base}}_{\text{lidar}}$를 곱하여 LiDAR 포즈의 초기 추정으로 쓴다.
-5. **NDT 정합.** 다운샘플링한 스캔을 지금까지의 지도에 NDT로 정합하여 $T^{\text{map}}_{\text{lidar}}$를 얻는다.
-6. **차량 포즈 계산.** $T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}$로 차량의 포즈를 구하여 `/current_pose`와 TF(`map` → `base_link`)로 발행한다.
-7. **스캔 변환.** 다운샘플링하기 전의 스캔(거리 필터만 거친 것)을 $T^{\text{map}}_{\text{lidar}}$로 지도 좌표계에 옮긴다.
+4. **초기 추정.** 차량이 직전과 같은 움직임을 이어 간다고 보고(등속 운동 모델) 이번 포즈를 예측한다. $k$번째 스캔의 예측 포즈는 $`\hat{x}_k = x_{k-1} + (x_{k-1} - x_{k-2})`$이며 $y, z$, yaw도 같은 식으로 예측하고, roll과 pitch는 직전 값을 쓴다. 예측한 차량 포즈에 $`T^{\text{base}}_{\text{lidar}}`$를 곱하여 LiDAR 포즈의 초기 추정으로 쓴다.
+5. **NDT 정합.** 다운샘플링한 스캔을 지금까지의 지도에 NDT로 정합하여 $`T^{\text{map}}_{\text{lidar}}`$를 얻는다.
+6. **차량 포즈 계산.** $`T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}`$로 차량의 포즈를 구하여 `/current_pose`와 TF(`map` → `base_link`)로 발행한다.
+7. **스캔 변환.** 다운샘플링하기 전의 스캔(거리 필터만 거친 것)을 $`T^{\text{map}}_{\text{lidar}}`$로 지도 좌표계에 옮긴다.
 8. **지도에 더할지 판단.** 마지막으로 지도에 스캔을 더한 위치와 현재 위치 사이의 수평 거리 $\text{shift}$를 계산하여, $\text{shift} \ge$ Minimum Add Scan Shift이면 옮긴 스캔을 지도에 더하고 그 위치를 기억한다. 지도가 바뀌었으므로 다음 정합에 쓸 NDT의 셀 분포도 새로 만든다.
 9. **발행.** 갱신된 지도를 `/ndt_map`으로 발행한다.
 
@@ -583,7 +583,7 @@ shift: 0.0316652
 | Fitness score | 0.315708 | 옮긴 스캔의 각 점과 지도에서 가장 가까운 점 사이 거리의 제곱 평균 (m²) |
 | Number of iteration | 2 | 수렴까지 걸린 반복 횟수 |
 | (x, y, z, roll, pitch, yaw) | 아래 해석 참고 | 지도 좌표계에서 차량 기준점의 포즈 (m, rad) |
-| Transformation Matrix | 아래 해석 참고 | 정합으로 구한 LiDAR의 포즈 $T^{\text{map}}_{\text{lidar}}$ |
+| Transformation Matrix | 아래 해석 참고 | 정합으로 구한 LiDAR의 포즈 $`T^{\text{map}}_{\text{lidar}}`$ |
 | shift | 0.0316652 | 마지막으로 스캔을 더한 위치에서 움직인 수평 거리 (m) |
 | (Processed/Input) | (55 / 55) | `queue_counter`가 센 처리한 스캔(`/ndt_map` 발행 횟수)과 받은 스캔(`/points_raw`)의 수. 받은 55개를 모두 처리하였다 |
 
@@ -596,12 +596,12 @@ shift: 0.0316652
 - **Fitness score의 의미.** $0.3157$ m²의 제곱근은 약 0.56 m이다. 정합에 쓴 대표점은 복셀 안 점들의 무게 중심이라 실제 표면 위에 있지 않을 수 있고, 지나가는 차 같은 움직이는 물체의 점도 섞이므로 이 값이 0이 되지는 않는다. 그래서 값 하나의 크기보다 주행 중에 이 값이 갑자기 커지는지를 보고 정합의 이상을 판단한다.
 - **변환 행렬은 LiDAR의 포즈이다.** 행렬의 왼쪽 위 $3 \times 3$은 회전 행렬이다. 각이 작으므로 2.2절의 근사에 따라 $R_{01} \approx -\psi = -0.00408$, $R_{02} \approx \theta = -0.00114$, $R_{12} \approx -\phi = -0.00052$이고, 출력값과 맞는다. 반면 마지막 열의 평행 이동 $(1.168, 0.014, 2.002)$는 차량의 위치 $(-0.030, 0.010, 0.0005)$와 다르다.
 
-**계산 예: 변환 행렬의 평행 이동 확인.** 이 데이터의 LiDAR는 차량 기준점에서 $(1.2, 0, 2.0)$ m에 회전 없이 달려 있다(4.3절의 TF 값). 2.3절의 식 $T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}$에서 평행 이동 부분은 $\mathbf{t}_{\text{lidar}} = \mathbf{t}_{\text{base}} + R \, (1.2, 0, 2.0)^{T}$이다.
+**계산 예: 변환 행렬의 평행 이동 확인.** 이 데이터의 LiDAR는 차량 기준점에서 $(1.2, 0, 2.0)$ m에 회전 없이 달려 있다(4.3절의 TF 값). 2.3절의 식 $`T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}`$에서 평행 이동 부분은 $`\mathbf{t}_{\text{lidar}} = \mathbf{t}_{\text{base}} + R \, (1.2, 0, 2.0)^{T}`$이다.
 
-1. $R \, (1.2, 0, 2.0)^{T}$의 첫 성분은 $1.2 \times 0.999991 + 2.0 \times (-0.00114083) = 1.19999 - 0.00228 = 1.19771$이다.
+1. $`R \, (1.2, 0, 2.0)^{T}`$의 첫 성분은 $1.2 \times 0.999991 + 2.0 \times (-0.00114083) = 1.19999 - 0.00228 = 1.19771$이다.
 2. 둘째 성분은 $1.2 \times 0.00407961 + 2.0 \times (-0.0005265) = 0.00490 - 0.00105 = 0.00384$이다.
 3. 셋째 성분은 $1.2 \times 0.00114297 + 2.0 \times 0.999999 = 0.00137 + 2.00000 = 2.00137$이다.
-4. 차량의 위치를 더하면 $(1.19771 - 0.02996, \; 0.00384 + 0.01025, \; 2.00137 + 0.00045) = (1.16775, 0.01409, 2.00182)$로, 출력된 행렬의 마지막 열과 일치한다.
+4. 차량의 위치를 더하면 $`(1.19771 - 0.02996, \; 0.00384 + 0.01025, \; 2.00137 + 0.00045) = (1.16775, 0.01409, 2.00182)`$로, 출력된 행렬의 마지막 열과 일치한다.
 
 즉 NDT 정합이 구한 것은 LiDAR의 포즈이고, 화면에 출력되고 `/current_pose`로 발행되는 것은 거기서 LiDAR의 장착 위치를 되돌린 차량의 포즈이다.
 
@@ -615,7 +615,7 @@ bag 재생이 끝나면 3.6절의 PCD OUTPUT 버튼으로 지도를 저장하고
 
 ### 3.9 누적 오차와 루프 결합
 
-NDT 매핑은 스캔마다 직전까지의 지도에 정합하므로, 정합마다 생기는 작은 오차가 다음 정합의 기준이 되어 계속 쌓인다. 이를 **누적 오차(drift)** 라고 한다. 특히 방향의 오차는 진행할수록 위치 오차로 커진다. 방향이 $\delta\psi$만큼 틀어진 채로 거리 $d$를 진행하면 옆으로 벗어나는 거리는 작은 각에서 약 $d \, \delta\psi$이다.
+NDT 매핑은 스캔마다 직전까지의 지도에 정합하므로, 정합마다 생기는 작은 오차가 다음 정합의 기준이 되어 계속 쌓인다. 이를 **누적 오차(drift)** 라고 한다. 특히 방향의 오차는 진행할수록 위치 오차로 커진다. 방향이 $\delta\psi$만큼 틀어진 채로 거리 $d$를 진행하면 옆으로 벗어나는 거리는 작은 각에서 약 $`d \, \delta\psi`$이다.
 
 **계산 예: 방향 오차가 만드는 위치 오차.** 어느 지점에서 지도의 방향이 0.1°만큼 틀어졌다고 하자. $0.1° = 0.1 \times \pi / 180 \approx 0.001745$ rad이므로, 그 지점에서 500 m를 더 진행한 곳의 지도는 옆으로 약 $500 \times 0.001745 \approx 0.87$ m 어긋난다. 차선 폭이 3 m 남짓임을 생각하면 무시할 수 없는 크기이다.
 
@@ -673,7 +673,7 @@ Map 탭에서 위치 인식에 쓸 지도와 지도 좌표계의 관계를 불�
 
 *그림 17. Setup 탭의 Baselink to Localizer에 LiDAR 장착 위치를 입력한 화면*
 
-Localizer로 Velodyne을 고르고, Baselink to Localizer에 $x = 1.2$, $y = 0$, $z = 2$, yaw $= 0$, pitch $= 0$, roll $= 0$을 입력한 뒤 TF 버튼을 누른다. 각 칸 위의 `rosparam : tf_x` 같은 이름은 이 값이 ROS 매개변수 `tf_x` 등으로 저장된다는 뜻이다. 이 값이 2.3절의 $T^{\text{base}}_{\text{lidar}}$이며, LiDAR가 차량 기준점에서 앞으로 1.2 m, 위로 2 m에 회전 없이 달려 있음을 뜻한다. Vehicle Model과 Vehicle Info는 RViz에 그릴 차량 모델과 차량의 치수 정보를 불러오는 칸이며, 위치 인식 자체에는 필요하지 않다.
+Localizer로 Velodyne을 고르고, Baselink to Localizer에 $x = 1.2$, $y = 0$, $z = 2$, yaw $= 0$, pitch $= 0$, roll $= 0$을 입력한 뒤 TF 버튼을 누른다. 각 칸 위의 `rosparam : tf_x` 같은 이름은 이 값이 ROS 매개변수 `tf_x` 등으로 저장된다는 뜻이다. 이 값이 2.3절의 $`T^{\text{base}}_{\text{lidar}}`$이며, LiDAR가 차량 기준점에서 앞으로 1.2 m, 위로 2 m에 회전 없이 달려 있음을 뜻한다. Vehicle Model과 Vehicle Info는 RViz에 그릴 차량 모델과 차량의 치수 정보를 불러오는 칸이며, 위치 인식 자체에는 필요하지 않다.
 
 ### 4.4 LiDAR 노드와 포인트 필터
 
@@ -704,10 +704,10 @@ LIDARs 목록에서 Velodyne HDL-32E를 체크하고, Points Downsampler에서 `
 
 **복셀 그리드 필터(voxel grid filter)** 는 그림 19처럼 동작한다 [9], [10]. (a) 공간을 한 변의 길이가 $l$(leaf size)인 정육면체 복셀로 나눈다. (b) 각 점이 어느 복셀에 들어가는지 정한다. (c) 복셀마다 그 안의 점들을 무게 중심 하나로 바꾼다. 점 $\mathbf{p} = (x, y, z)$가 들어가는 복셀의 번호는 각 좌표를 $l$로 나누어 내림한 정수 세 개이다.
 
-$$
+```math
 (i, j, k) = \left( \left\lfloor \frac{x}{l} \right\rfloor, \left\lfloor \frac{y}{l} \right\rfloor, \left\lfloor \frac{z}{l} \right\rfloor \right), \qquad
 \bar{\mathbf{p}}_{ijk} = \frac{1}{\vert V_{ijk} \vert} \sum_{\mathbf{p} \in V_{ijk}} \mathbf{p}
-$$
+```
 
 $V_{ijk}$는 번호가 $(i, j, k)$인 복셀에 들어간 점들의 집합이고, $\vert V_{ijk} \vert$는 그 점의 수이다. 출력 점의 수는 점이 하나 이상 들어간 복셀의 수와 같다. $\lfloor a \rfloor$는 $a$보다 크지 않은 가장 큰 정수이므로 $\lfloor -0.3 \rfloor = -1$이다. 실제 구현은 포인트 클라우드의 최솟값을 기준으로 번호를 매기지만, 복셀을 나누는 방식은 같다.
 
@@ -715,12 +715,12 @@ $V_{ijk}$는 번호가 $(i, j, k)$인 복셀에 들어간 점들의 집합이고
 
 | 점 | 좌표 (m) | 복셀 번호 $(\lfloor x \rfloor, \lfloor y \rfloor, \lfloor z \rfloor)$ |
 |:-----|:-----|:-----|
-| $\mathbf{p}_1$ | $(0.2, 0.3, 0.1)$ | $(0, 0, 0)$ |
-| $\mathbf{p}_2$ | $(0.6, 0.1, 0.4)$ | $(0, 0, 0)$ |
-| $\mathbf{p}_3$ | $(0.4, 0.8, 0.7)$ | $(0, 0, 0)$ |
-| $\mathbf{p}_4$ | $(1.2, 0.5, 0.2)$ | $(1, 0, 0)$ |
-| $\mathbf{p}_5$ | $(1.8, 0.9, 0.6)$ | $(1, 0, 0)$ |
-| $\mathbf{p}_6$ | $(2.5, 2.5, 0.5)$ | $(2, 2, 0)$ |
+| $`\mathbf{p}_1`$ | $(0.2, 0.3, 0.1)$ | $(0, 0, 0)$ |
+| $`\mathbf{p}_2`$ | $(0.6, 0.1, 0.4)$ | $(0, 0, 0)$ |
+| $`\mathbf{p}_3`$ | $(0.4, 0.8, 0.7)$ | $(0, 0, 0)$ |
+| $`\mathbf{p}_4`$ | $(1.2, 0.5, 0.2)$ | $(1, 0, 0)$ |
+| $`\mathbf{p}_5`$ | $(1.8, 0.9, 0.6)$ | $(1, 0, 0)$ |
+| $`\mathbf{p}_6`$ | $(2.5, 2.5, 0.5)$ | $(2, 2, 0)$ |
 
 *표 9. 여섯 점의 복셀 번호*
 
@@ -728,7 +728,7 @@ $V_{ijk}$는 번호가 $(i, j, k)$인 복셀에 들어간 점들의 집합이고
 - 복셀 $(1, 0, 0)$에는 두 점이 있으므로 $\left( \frac{1.2 + 1.8}{2}, \frac{0.5 + 0.9}{2}, \frac{0.2 + 0.6}{2} \right) = (1.5, 0.7, 0.4)$이다.
 - 복셀 $(2, 2, 0)$에는 점이 하나뿐이므로 $(2.5, 2.5, 0.5)$가 그대로 남는다.
 
-여섯 점이 세 점으로 줄었다. 점이 많이 몰린 곳(복셀 $(0, 0, 0)$)일수록 많이 줄고 점이 드문 곳은 그대로 남으므로, 결과는 공간에 고르게 퍼진다. 무게 중심은 원래 점들 사이에 있으므로 표면의 대략적인 모양도 유지된다.
+여섯 점이 세 점으로 줄었다. 점이 많이 몰린 곳(복셀 $`(0, 0, 0)`$)일수록 많이 줄고 점이 드문 곳은 그대로 남으므로, 결과는 공간에 고르게 퍼진다. 무게 중심은 원래 점들 사이에 있으므로 표면의 대략적인 모양도 유지된다.
 
 다운샘플링이 위치 인식에 주는 효과는 다음과 같다.
 
@@ -744,7 +744,7 @@ Computing 탭에서 GNSS 위치 변환 노드와 NDT 매칭 노드를 실행한�
 
 *그림 20. Computing 탭에서 nmea2tfpose와 ndt_matching을 선택한 화면*
 
-**nmea2tfpose.** Localization > gnss_localizer의 `nmea2tfpose`를 체크한다. 이 노드는 GNSS 수신기가 내보낸 NMEA 문장(`/nmea_sentence`)을 읽어 위도, 경도, 높이를 얻고, 이를 그 지역에 맞게 정의된 평면 직각 좌표계의 $(x, y, z)$로 바꾸어 `/gnss_pose`로 발행하며, TF로 `map`과 `gps` 좌표계의 관계도 발행한다 [7]. 위치는 GGA나 RMC 문장에서 읽고, 방향은 방향을 담은 문장이 있으면 그것을 쓰고 없으면 연속한 두 위치를 잇는 방향($\text{atan2}(\Delta y, \Delta x)$)으로 계산한다.
+**nmea2tfpose.** Localization > gnss_localizer의 `nmea2tfpose`를 체크한다. 이 노드는 GNSS 수신기가 내보낸 NMEA 문장(`/nmea_sentence`)을 읽어 위도, 경도, 높이를 얻고, 이를 그 지역에 맞게 정의된 평면 직각 좌표계의 $(x, y, z)$로 바꾸어 `/gnss_pose`로 발행하며, TF로 `map`과 `gps` 좌표계의 관계도 발행한다 [7]. 위치는 GGA나 RMC 문장에서 읽고, 방향은 방향을 담은 문장이 있으면 그것을 쓰고 없으면 연속한 두 위치를 잇는 방향($`\text{atan2}(\Delta y, \Delta x)`$)으로 계산한다.
 
 > **용어 정의:** **NMEA 0183**은 GNSS 수신기 같은 항해 장비가 측정값을 쉼표로 구분한 텍스트 문장으로 내보내는 표준이다 [11]. 문장은 `$`로 시작하고, 그 뒤의 다섯 글자가 문장의 종류(예: `GPGGA`)를 나타내며, `*` 뒤의 두 글자는 오류 검출용 검사합(checksum)이다.
 
@@ -848,7 +848,7 @@ flowchart LR
 
 | 문장 | 판단과 근거 |
 |:-----|:-----|
-| NDT 매핑에서 지도 좌표계의 원점은 지도 작성을 시작한 순간의 차량 기준점이다. | **T.** 첫 스캔을 $T^{\text{base}}_{\text{lidar}}$로 옮겨 그대로 지도로 삼기 때문이다. |
+| NDT 매핑에서 지도 좌표계의 원점은 지도 작성을 시작한 순간의 차량 기준점이다. | **T.** 첫 스캔을 $`T^{\text{base}}_{\text{lidar}}`$로 옮겨 그대로 지도로 삼기 때문이다. |
 | ndt_mapping은 다운샘플링한 스캔을 지도에 더한다. | **F.** 다운샘플링한 스캔은 정합에만 쓰고, 지도에는 거리 필터만 거친 스캔을 옮겨 더한다. |
 | ndt_mapping이 출력하는 Transformation Matrix의 평행 이동은 차량 기준점의 위치이다. | **F.** 변환 행렬은 LiDAR의 포즈이며, 차량 기준점의 위치는 여기서 LiDAR의 장착 위치를 되돌린 $(x, y, z)$이다. |
 | 복셀 그리드 필터의 출력 점 수는 점이 들어 있는 복셀의 수와 같다. | **T.** 점이 하나 이상 들어간 복셀마다 무게 중심 하나를 남기기 때문이다. |
@@ -866,11 +866,11 @@ flowchart LR
 | 포인트 클라우드 지도와 벡터 지도 | 포인트 클라우드 지도는 타일별 PCD 파일로 위치 인식에 쓰고, 벡터 지도는 도로 요소별 CSV 파일로 경로 생성과 판단에 쓴다. |
 | 포인트 클라우드 | 3차원 점의 순서 없는 집합이며, ROS에서는 `sensor_msgs/PointCloud2`로 주고받고 파일로는 PCD 형식으로 저장한다. |
 | 강체 변환 | $\mathbf{p}' = R\mathbf{p} + \mathbf{t}$이며, 동차 변환 행렬 하나로 나타내고 $R = R_z(\psi) R_y(\theta) R_x(\phi)$로 만든다. |
-| 변환의 합성 | $T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}$이며, NDT가 구한 LiDAR 포즈에서 장착 위치를 되돌려 차량의 포즈를 얻는다. |
+| 변환의 합성 | $`T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}`$이며, NDT가 구한 LiDAR 포즈에서 장착 위치를 되돌려 차량의 포즈를 얻는다. |
 | NDT 매핑 | 새 스캔을 지금까지의 지도에 NDT로 정합하고 그 포즈로 옮겨 지도에 더하는 과정을 되풀이하는 지도 작성 방법이다. |
 | ndt_mapping의 처리 | 거리 필터, 다운샘플링, 등속 운동 모델의 초기 추정, NDT 정합, 이동 거리 기준의 지도 추가로 이루어진다. |
-| 3차원 NDT의 야코비 행렬 | 작은 회전에서 $J = (I_3 \;\; -[\mathbf{x}]_{\times})$이며, 먼 점일수록 회전을 정하는 데 크게 기여한다. |
-| 누적 오차 | 정합 오차가 쌓여 지도가 휘는 현상이며, 방향 오차 $\delta\psi$는 거리 $d$에서 약 $d\,\delta\psi$의 위치 오차를 만들고 루프 결합으로 바로잡는다. |
+| 3차원 NDT의 야코비 행렬 | 작은 회전에서 $`J = (I_3 \;\; -[\mathbf{x}]_{\times})`$이며, 먼 점일수록 회전을 정하는 데 크게 기여한다. |
+| 누적 오차 | 정합 오차가 쌓여 지도가 휘는 현상이며, 방향 오차 $\delta\psi$는 거리 $d$에서 약 $`d\,\delta\psi`$의 위치 오차를 만들고 루프 결합으로 바로잡는다. |
 | 복셀 그리드 필터 | 공간을 leaf size의 복셀로 나누어 복셀마다 무게 중심 하나만 남기며, 정합의 계산량을 줄이고 점의 밀도를 고르게 한다. |
 | nmea2tfpose | NMEA 문장의 위도, 경도, 높이를 지도의 평면 좌표로 바꾸어 `/gnss_pose`와 TF로 발행하며, NDT 매칭의 초기 위치로 쓰인다. |
 | 위치 인식의 실행 | bag 재생, 지도와 TF, LiDAR와 voxel_grid_filter, nmea2tfpose, ndt_matching의 순서로 실행하고 RViz에서 스캔이 지도에 겹치는지 확인한다. |
@@ -904,7 +904,7 @@ flowchart LR
    <details>
    <summary>정답</summary>
 
-   먼저 LiDAR → 차량 변환으로 $\mathbf{p}^{\text{base}} = (4 + 1.0, \; 2, \; -1.5 + 1.5) = (5, 2, 0)$이다. $R_z(180°)$는 $(x, y, z)$를 $(-x, -y, z)$로 보내므로 $R_z(180°)\mathbf{p}^{\text{base}} = (-5, -2, 0)$이고, 차량의 위치를 더하면 $\mathbf{p}^{\text{map}} = (15, -2, 0)$이다. 차량이 지도의 $-x$ 방향을 보고 있으므로 차량 앞 5 m의 점은 지도에서 $x$가 5 작은 곳에 놓인다.
+   먼저 LiDAR → 차량 변환으로 $`\mathbf{p}^{\text{base}} = (4 + 1.0, \; 2, \; -1.5 + 1.5) = (5, 2, 0)`$이다. $R_z(180°)$는 $(x, y, z)$를 $(-x, -y, z)$로 보내므로 $R_z(180°)\mathbf{p}^{\text{base}} = (-5, -2, 0)$이고, 차량의 위치를 더하면 $\mathbf{p}^{\text{map}} = (15, -2, 0)$이다. 차량이 지도의 $-x$ 방향을 보고 있으므로 차량 앞 5 m의 점은 지도에서 $x$가 5 작은 곳에 놓인다.
 
    </details>
 
@@ -931,7 +931,7 @@ flowchart LR
    <details>
    <summary>정답</summary>
 
-   변환 행렬은 NDT 정합으로 구한 LiDAR의 포즈 $T^{\text{map}}_{\text{lidar}}$이고, 차량의 위치는 여기서 LiDAR의 장착 위치 $(1.2, 0, 2.0)$을 되돌린 차량 기준점의 포즈 $T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} (T^{\text{base}}_{\text{lidar}})^{-1}$이다. 회전이 거의 없으므로 두 위치의 차이는 장착 위치와 거의 같다.
+   변환 행렬은 NDT 정합으로 구한 LiDAR의 포즈 $`T^{\text{map}}_{\text{lidar}}`$이고, 차량의 위치는 여기서 LiDAR의 장착 위치 $(1.2, 0, 2.0)$을 되돌린 차량 기준점의 포즈 $`T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} (T^{\text{base}}_{\text{lidar}})^{-1}`$이다. 회전이 거의 없으므로 두 위치의 차이는 장착 위치와 거의 같다.
 
    </details>
 

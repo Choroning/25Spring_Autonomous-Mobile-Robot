@@ -90,11 +90,11 @@ Hybrid A\*를 제안한 연구는 탐색 결과를 초기값으로 두고, 경�
 
 *표 1. 경로 평활화 비용 함수를 이루는 항*
 
-평활 항은 경로 점 $\mathbf{x}_i$에 대해 변위 $\Delta\mathbf{x}_i = \mathbf{x}_i - \mathbf{x}_{i-1}$를 정의하고 다음 값을 더한다.
+평활 항은 경로 점 $`\mathbf{x}_i`$에 대해 변위 $`\Delta\mathbf{x}_i = \mathbf{x}_i - \mathbf{x}_{i-1}`$를 정의하고 다음 값을 더한다.
 
-$$
+```math
 J_s = \sum_i \left\lVert \Delta\mathbf{x}_{i+1} - \Delta\mathbf{x}_i \right\rVert^2
-$$
+```
 
 예를 들어 점 (0, 0), (1, 0.4), (2, 0), (3, 0.4), (4, 0)으로 이루어진 지그재그 경로는 변위가 (1, 0.4), (1, −0.4), (1, 0.4), (1, −0.4)이고, 이웃한 변위의 차이가 (0, −0.8), (0, 0.8), (0, −0.8)이므로 $J_s = 3 \times 0.8^2 = 1.92$이다. 같은 두 끝점을 잇는 직선 경로는 변위가 모두 같아 $J_s = 0$이다. 최적화는 장애물 항과 곡률 항을 지키는 범위에서 이 값을 줄이므로 경로가 펴진다.
 
@@ -113,15 +113,15 @@ $$
 
 **곡률 반경 구하기.** 이웃한 세 경로 점 $W_1$, $W_2$, $W_3$를 지나는 원(외접원)의 반지름을 그 지점의 곡률 반경으로 쓴다. 세 변의 길이를 $a = \lvert W_2 W_3 \rvert$, $b = \lvert W_3 W_1 \rvert$, $c = \lvert W_1 W_2 \rvert$, 삼각형의 넓이를 $S$라 하면 다음과 같다. 세 점이 한 직선 위에 있으면 $S = 0$이므로 $R = \infty$(직선 구간)이다.
 
-$$
+```math
 R = \frac{abc}{4S}
-$$
+```
 
 **최대 속도 구하기.** 반지름 $R$인 원을 속도 $V$로 달리는 차량에는 원의 중심 쪽으로 $a_y = V^2 / R$의 횡방향 가속도가 걸린다. 승차감을 위해 이 값을 $0.3g$($g = 9.81$ m/s²이므로 약 2.94 m/s²) 이하로 제한하면 $V^2 / R \le 0.3 g$이고, 이를 $V$에 대해 풀면 구간 $i$의 최대 속도가 나온다.
 
-$$
+```math
 V_i = \sqrt{0.3 \cdot g \cdot R_i}
-$$
+```
 
 **계산 예.** 세 점이 $W_1 = (0, 0)$, $W_2 = (4, 1)$, $W_3 = (8, 0)$ m라 하자.
 
@@ -140,7 +140,7 @@ $$
 
 *표 2. 곡률 반경에 따른 최대 속도(횡방향 가속도 0.3g 제한)*
 
-최대 속도는 반경의 제곱근에 비례하므로, 반경이 4배가 되어도 속도는 2배만 늘어난다. 직선 구간($R = \infty$)에서는 이 식이 상한을 주지 않으므로 도로의 제한 속도 $V_{\max}$를 쓰고, 실제 프로파일은 $V_i = \min\left(V_{\max}, \sqrt{0.3 g R_i}\right)$로 정한 뒤 이웃한 점 사이의 속도 변화가 가속도 한계를 넘지 않게 다듬는다. 3주차의 twist_filter가 횡방향 가속도 한도로 목표 속도를 줄이는 것도 같은 원리이다.
+최대 속도는 반경의 제곱근에 비례하므로, 반경이 4배가 되어도 속도는 2배만 늘어난다. 직선 구간($`R = \infty`$)에서는 이 식이 상한을 주지 않으므로 도로의 제한 속도 $V_{\max}$를 쓰고, 실제 프로파일은 $V_i = \min\left(V_{\max}, \sqrt{0.3 g R_i}\right)$로 정한 뒤 이웃한 점 사이의 속도 변화가 가속도 한계를 넘지 않게 다듬는다. 3주차의 twist_filter가 횡방향 가속도 한도로 목표 속도를 줄이는 것도 같은 원리이다.
 
 ### 1.4 장애물 회피 경로: swerve와 nudge
 
@@ -274,7 +274,7 @@ flowchart LR
 
 ### 2.1 바퀴 위치의 속도
 
-타이어가 내는 힘은 바퀴가 향한 방향과 바퀴가 실제로 움직이는 방향의 차이에 따라 정해진다. 그러므로 먼저 앞바퀴와 뒷바퀴 위치의 속도를 구한다. 차체를 강체로 보면, 무게 중심에서 앞으로 $l_f$ 떨어진 점의 속도는 무게 중심의 속도에 회전 때문에 생기는 속도를 더한 것이다. 반시계 방향으로 요레이트 $r$로 돌면, 앞쪽 점은 왼쪽($+y$)으로 $l_f r$, 뒤쪽 점은 오른쪽($-y$)으로 $l_r r$의 속도를 더 얻는다.
+타이어가 내는 힘은 바퀴가 향한 방향과 바퀴가 실제로 움직이는 방향의 차이에 따라 정해진다. 그러므로 먼저 앞바퀴와 뒷바퀴 위치의 속도를 구한다. 차체를 강체로 보면, 무게 중심에서 앞으로 $l_f$ 떨어진 점의 속도는 무게 중심의 속도에 회전 때문에 생기는 속도를 더한 것이다. 반시계 방향으로 요레이트 $r$로 돌면, 앞쪽 점은 왼쪽($`+y`$)으로 $l_f r$, 뒤쪽 점은 오른쪽($`-y`$)으로 $l_r r$의 속도를 더 얻는다.
 
 | 위치 | $x$ 방향 속도 | $y$ 방향 속도 |
 |:-----|:-----|:-----|
@@ -284,7 +284,7 @@ flowchart LR
 
 *표 5. 차체 좌표계에서 본 무게 중심과 바퀴 위치의 속도 성분*
 
-> **참고:** 강체 위의 두 점 P와 Q의 속도는 $\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}$의 관계를 가진다. 평면 운동에서 $\boldsymbol{\omega} = r\,\hat{\mathbf{z}}$이고 앞바퀴가 $\overrightarrow{PQ} = l_f \hat{\mathbf{x}}$에 있으면 $\boldsymbol{\omega} \times \overrightarrow{PQ} = r l_f \hat{\mathbf{y}}$이므로, 회전은 $x$ 방향 속도를 바꾸지 않고 $y$ 방향 속도만 $l_f r$만큼 바꾼다. 뒷바퀴는 $\overrightarrow{PQ} = -l_r \hat{\mathbf{x}}$이므로 $-l_r r \hat{\mathbf{y}}$이다.
+> **참고:** 강체 위의 두 점 P와 Q의 속도는 $`\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}`$의 관계를 가진다. 평면 운동에서 $`\boldsymbol{\omega} = r\,\hat{\mathbf{z}}`$이고 앞바퀴가 $\overrightarrow{PQ} = l_f \hat{\mathbf{x}}$에 있으면 $\boldsymbol{\omega} \times \overrightarrow{PQ} = r l_f \hat{\mathbf{y}}$이므로, 회전은 $x$ 방향 속도를 바꾸지 않고 $y$ 방향 속도만 $l_f r$만큼 바꾼다. 뒷바퀴는 $\overrightarrow{PQ} = -l_r \hat{\mathbf{x}}$이므로 $-l_r r \hat{\mathbf{y}}$이다.
 
 ### 2.2 타이어 슬립각
 
@@ -292,9 +292,9 @@ flowchart LR
 
 바퀴 위치의 속도가 차체 $x$축과 이루는 각을 $\theta_f$(앞바퀴), $\theta_r$(뒷바퀴)라 하자. 앞바퀴는 $x$축에 대해 $\delta$만큼, 뒷바퀴는 0만큼 향해 있으므로 두 바퀴의 슬립각은 다음과 같다.
 
-$$
+```math
 \alpha_f = \delta - \theta_f, \qquad \alpha_r = 0 - \theta_r = -\theta_r
-$$
+```
 
 타이어가 완전히 구르기만 하면 바퀴는 향한 방향으로만 움직이므로 $\alpha = 0$이다. 선회 중에는 원의 중심 쪽 힘이 필요하고, 고무 타이어는 접지면이 옆으로 비틀리면서(슬립각이 생기면서) 그 힘을 낸다.
 
@@ -302,39 +302,39 @@ $$
 
 앞바퀴 위치의 속도를 크기 $V_f$와 방향 $\theta_f = \delta - \alpha_f$로 나타내고, 표 5의 성분과 같다고 놓는다.
 
-$$
+```math
 \underbrace{V_f \sin(\delta - \alpha_f)}_{y\text{ 방향 바퀴 속도}} = \underbrace{l_f r + V \sin\beta}_{y\text{ 방향 차체 속도}}, \qquad \underbrace{V_f \cos(\delta - \alpha_f)}_{x\text{ 방향 바퀴 속도}} = \underbrace{V \cos\beta}_{x\text{ 방향 차체 속도}}
-$$
+```
 
 두 식을 나누면 $V_f$가 지워진다.
 
-$$
+```math
 \tan(\delta - \alpha_f) = \frac{l_f r + V \sin\beta}{V \cos\beta}
-$$
+```
 
 $\beta \ll 1$이면 $\sin\beta \approx \beta$, $\cos\beta \approx 1$이고, 우변 전체도 작은 값이므로 $\tan(\delta - \alpha_f) \approx \delta - \alpha_f$이다. 따라서 다음을 얻는다.
 
-$$
+```math
 \delta - \alpha_f \approx \beta + \frac{l_f r}{V} \quad \Longrightarrow \quad \alpha_f \approx \delta - \beta - \frac{l_f r}{V}
-$$
+```
 
-앞바퀴의 슬립각은 조향각에서 차체 슬립각과 회전이 만드는 각 $l_f r / V$를 뺀 것이다. 조향을 더 하면 $\alpha_f$가 커져 앞바퀴의 횡력이 커지고, 차체가 이미 돌고 있으면($r > 0$) 그만큼 작아진다.
+앞바퀴의 슬립각은 조향각에서 차체 슬립각과 회전이 만드는 각 $l_f r / V$를 뺀 것이다. 조향을 더 하면 $\alpha_f$가 커져 앞바퀴의 횡력이 커지고, 차체가 이미 돌고 있으면($`r > 0`$) 그만큼 작아진다.
 
 ### 2.4 후륜의 각도 관계
 
 뒷바퀴는 조향하지 않으므로 속도 방향은 $\theta_r = -\alpha_r$이다. 같은 방법으로 성분을 맞춘다.
 
-$$
+```math
 \underbrace{V_r \sin\alpha_r}_{y\text{ 방향 바퀴 속도}} = \underbrace{l_r r - V \sin\beta}_{y\text{ 방향 차체 속도}}, \qquad \underbrace{V_r \cos\alpha_r}_{x\text{ 방향 바퀴 속도}} = \underbrace{V \cos\beta}_{x\text{ 방향 차체 속도}}
-$$
+```
 
 첫 식은 표 5의 $y$ 방향 속도 $V\sin\beta - l_r r$에 $-1$을 곱한 것이다. 바퀴의 속도 방향이 $-\alpha_r$이기 때문이다. 두 식을 나누고 작은 각도 근사를 쓰면 다음과 같다.
 
-$$
+```math
 \tan\alpha_r = \frac{l_r r - V \sin\beta}{V \cos\beta} \quad \Longrightarrow \quad \alpha_r \approx -\beta + \frac{l_r r}{V}
-$$
+```
 
-> **참고:** 슬립각의 부호를 정하는 방식은 문헌마다 다르다. 그림 10의 $\beta_f$, $\beta_r$는 바퀴가 향한 방향에서 속도 방향까지 잰 각으로, 2.2절의 $\alpha_f$, $\alpha_r$와 부호만 반대이다($\beta_f = -\alpha_f = \beta + l_f r / V - \delta$, $\beta_r = -\alpha_r = \beta - l_r r / V$). 그래서 같은 횡력을 $Y_f = -C_f \beta_f$처럼 음의 부호를 붙여 쓰기도 한다 [2]. 강의자료는 전륜의 결과를 2.2절의 규약에 따라 $\beta_f = \delta - \beta - l_f r / V$로 쓰면서 3.1절의 힘 관계에서는 그림 10의 규약인 $Y_f = -C_f(\beta + l_f r / V - \delta)$를 써서 두 규약을 섞고, 후륜의 결과는 $\beta_r = -\beta - l_r r / V$로 쓰는데 이 식은 어느 규약에도 맞지 않는 오류이다. 후륜의 바른 결과는 2.2절의 규약에서 $\alpha_r \approx -\beta + l_r r / V$, 그림 10의 규약에서 $\beta_r \approx \beta - l_r r / V$이고, 강의자료의 힘 관계 $Y_r = -C_r(\beta - l_r r / V)$도 이 결과와 맞는다.
+> **참고:** 슬립각의 부호를 정하는 방식은 문헌마다 다르다. 그림 10의 $\beta_f$, $\beta_r$는 바퀴가 향한 방향에서 속도 방향까지 잰 각으로, 2.2절의 $\alpha_f$, $\alpha_r$와 부호만 반대이다($\beta_f = -\alpha_f = \beta + l_f r / V - \delta$, $`\beta_r = -\alpha_r = \beta - l_r r / V`$). 그래서 같은 횡력을 $Y_f = -C_f \beta_f$처럼 음의 부호를 붙여 쓰기도 한다 [2]. 강의자료는 전륜의 결과를 2.2절의 규약에 따라 $\beta_f = \delta - \beta - l_f r / V$로 쓰면서 3.1절의 힘 관계에서는 그림 10의 규약인 $Y_f = -C_f(\beta + l_f r / V - \delta)$를 써서 두 규약을 섞고, 후륜의 결과는 $\beta_r = -\beta - l_r r / V$로 쓰는데 이 식은 어느 규약에도 맞지 않는 오류이다. 후륜의 바른 결과는 2.2절의 규약에서 $\alpha_r \approx -\beta + l_r r / V$, 그림 10의 규약에서 $\beta_r \approx \beta - l_r r / V$이고, 강의자료의 힘 관계 $Y_r = -C_r(\beta - l_r r / V)$도 이 결과와 맞는다.
 
 ### 2.5 작은 각도 근사와 수치 예
 
@@ -366,13 +366,13 @@ $$
 
 타이어의 횡력은 슬립각이 작은 범위에서 슬립각에 거의 비례한다. 이 비례 상수를 **코너링 강성(cornering stiffness)** 이라 한다 [3].
 
-> **용어 정의:** **코너링 강성** $C$는 슬립각이 0 근처일 때 횡력이 슬립각에 따라 늘어나는 기울기 $C = \partial Y / \partial \alpha \,\vert_{\alpha = 0}$이며 단위는 N/rad이다. 이 기울기로 횡력을 $Y = C\alpha$로 나타내는 모델을 **선형 타이어 모델(linear tire model)** 이라 한다.
+> **용어 정의:** **코너링 강성** $C$는 슬립각이 0 근처일 때 횡력이 슬립각에 따라 늘어나는 기울기 $`C = \partial Y / \partial \alpha \,\vert_{\alpha = 0}`$이며 단위는 N/rad이다. 이 기울기로 횡력을 $Y = C\alpha$로 나타내는 모델을 **선형 타이어 모델(linear tire model)** 이라 한다.
 
 2.3절과 2.4절의 슬립각을 넣으면 앞 축과 뒤 축의 횡력은 다음과 같다.
 
-$$
+```math
 Y_f = C_f \alpha_f = -C_f\left(\beta + \frac{l_f r}{V} - \delta\right), \qquad Y_r = C_r \alpha_r = -C_r\left(\beta - \frac{l_r r}{V}\right)
-$$
+```
 
 2.5절의 예에서 $C_f = C_r = 70000$ N/rad이면 $Y_f = 70000 \times 0.037 = 2590$ N, $Y_r = 70000 \times 0.0114 = 798$ N이다. 두 힘 모두 왼쪽을 향하므로 차량은 왼쪽으로 선회하는 중이다.
 
@@ -384,15 +384,15 @@ $$
 
 **횡방향 힘의 평형.** 차체 좌표계에서 무게 중심의 속도 성분은 $u = V\cos\beta$(앞쪽), $v = V\sin\beta$(왼쪽)이다. 차체 좌표계 자체가 요레이트 $r$로 돌기 때문에, 무게 중심의 횡방향 가속도는 $v$의 변화율에 회전에 의한 항 $u r$를 더한 $a_y = \dot v + u r$이다 [3]. 차속 $V$가 일정하고 $\beta$가 작으면 $v \approx V\beta$, $u \approx V$이므로 $a_y \approx V\dot\beta + V r = V(\dot\beta + r)$이다. 앞바퀴 횡력의 차체 $y$ 성분은 $Y_f\cos\delta \approx Y_f$이므로 다음을 얻는다.
 
-$$
+```math
 mV\left(\frac{d\beta}{dt} + r\right) = Y_f + Y_r
-$$
+```
 
 **요 모멘트의 평형.** 앞 축의 횡력은 무게 중심에 대해 팔 길이 $l_f$로 반시계 방향 모멘트를, 뒤 축의 횡력은 팔 길이 $l_r$로 시계 방향 모멘트를 만든다.
 
-$$
+```math
 I\frac{dr}{dt} = l_f Y_f - l_r Y_r
-$$
+```
 
 > **참고:** $a_y = \dot v + u r$의 $ur$ 항은 회전하는 좌표계에서 속도를 쟀기 때문에 생긴다. 차량이 일정한 속도 $V$로 반지름 $R$의 원을 정상 선회하면 $\dot\beta = 0$이고 $r = V/R$이므로 $a_y = V r = V^2/R$, 즉 익숙한 구심 가속도가 된다.
 
@@ -402,31 +402,31 @@ $$
 
 **1단계: 횡방향 식.** 우변을 전개한다.
 
-$$
+```math
 Y_f + Y_r = -(C_f + C_r)\beta + \frac{C_r l_r - C_f l_f}{V} r + C_f \delta
-$$
+```
 
 좌변의 $mVr$를 우변으로 옮기고 양변을 $mV$로 나눈다.
 
-$$
+```math
 \dot\beta = -\frac{C_f + C_r}{mV}\beta + \left(-1 + \frac{C_r l_r - C_f l_f}{mV^2}\right) r + \frac{C_f}{mV}\delta
-$$
+```
 
 **2단계: 요 방향 식.** 우변을 전개한다.
 
-$$
+```math
 l_f Y_f - l_r Y_r = (C_r l_r - C_f l_f)\beta - \frac{C_f l_f^2 + C_r l_r^2}{V} r + C_f l_f \delta
-$$
+```
 
 양변을 $I$로 나눈다.
 
-$$
+```math
 \dot r = \frac{C_r l_r - C_f l_f}{I}\beta - \frac{C_f l_f^2 + C_r l_r^2}{IV} r + \frac{C_f l_f}{I}\delta
-$$
+```
 
-**3단계: 행렬 형태.** 상태 벡터 $\mathbf{x} = [\beta \;\; r]^T$와 입력 $\delta$로 쓰면 다음과 같다.
+**3단계: 행렬 형태.** 상태 벡터 $`\mathbf{x} = [\beta \;\; r]^T`$와 입력 $\delta$로 쓰면 다음과 같다.
 
-$$
+```math
 \begin{bmatrix} \dot\beta \\ \dot r \end{bmatrix} =
 \begin{bmatrix}
 -\dfrac{C_f + C_r}{mV} & -1 + \dfrac{C_r l_r - C_f l_f}{mV^2} \\
@@ -435,7 +435,7 @@ $$
 \begin{bmatrix} \beta \\ r \end{bmatrix}
 +
 \begin{bmatrix} \dfrac{C_f}{mV} \\ \dfrac{C_f l_f}{I} \end{bmatrix} \delta
-$$
+```
 
 이 식은 조향각이 차체 슬립각과 요레이트를 어떻게 바꾸는지 나타내는 **동역학적 자전거 모델(dynamic bicycle model)** 이다. 두 행렬을 차례로 $A$, $B$라 하면 $\dot{\mathbf{x}} = A\mathbf{x} + B\delta$이다. 행렬의 원소가 $1/V$, $1/V^2$를 포함하므로 같은 차량이라도 속도에 따라 응답이 달라진다.
 
@@ -447,7 +447,7 @@ $$
 
 1. **일정한 차속:** 종방향 속도 $V$가 일정하거나 횡방향 운동보다 천천히 변한다.
 2. **작은 각도:** $\beta$, $\delta$, 타이어 슬립각이 작아 삼각 함수를 1차 근사할 수 있다.
-3. **선형 타이어 모델:** 횡력이 슬립각에 비례한다($Y = C\alpha$).
+3. **선형 타이어 모델:** 횡력이 슬립각에 비례한다($`Y = C\alpha`$).
 4. **단일 트랙:** 좌우 바퀴를 하나로 합치고, 롤과 좌우 하중 이동, 노면의 경사, 공기력을 무시한다.
 
 가정 1과 2 때문에 이 모델은 차속이 일정한 구간의 작은 조향 입력에 대해 정확하다. 또 행렬 원소가 $1/V$에 비례하므로 $V$가 0에 가까운 저속에서는 쓸 수 없는데, 12주차에서 저속에는 기구학 모델을 쓰는 이유가 여기에 있다.
@@ -456,9 +456,9 @@ $$
 
 조향각 $\delta$를 일정하게 유지하면 차량은 시간이 지나 $\dot\beta = 0$, $\dot r = 0$인 **정상 선회(steady-state cornering)** 에 이른다. 이때 상태는 $A\mathbf{x} + B\delta = 0$을 풀어 얻으며, 요레이트는 다음과 같이 정리된다 [2].
 
-$$
+```math
 r_{ss} = \frac{V}{l\,(1 + KV^2)}\,\delta, \qquad K = \frac{m\,(C_r l_r - C_f l_f)}{l^2 C_f C_r}
-$$
+```
 
 $K$를 **안정 계수(stability factor)** 라 한다. $K = 0$이면 $r_{ss} = V\delta / l$로, 타이어 슬립이 없는 기구학 모델(3.8절)의 작은 조향각에서의 요레이트와 같다. $K > 0$이면 같은 조향에 대한 요레이트가 기구학 값보다 작고, 기구학 값에 대한 비율 $1/(1 + KV^2)$이 속도가 높을수록 더 작아지는데, 이를 **언더스티어(understeer)** 라 한다. $K < 0$이면 요레이트가 더 커지는 **오버스티어(oversteer)** 이며, $1 + KV^2 = 0$이 되는 속도 이상에서는 차량이 불안정해진다.
 
@@ -482,7 +482,7 @@ $K$를 **안정 계수(stability factor)** 라 한다. $K = 0$이면 $r_{ss} = V
 
 차체 슬립각 대신 무게 중심의 횡방향 속도 $v = V\beta$를 상태로 쓰기도 한다. $V$가 일정하면 $\dot v = V\dot\beta$이고 $\beta = v/V$이므로, 3.3절의 식에 대입하여 정리하면 다음과 같다.
 
-$$
+```math
 \begin{bmatrix} \dot r \\ \dot v \end{bmatrix} =
 \begin{bmatrix}
 -\dfrac{C_r l_r^2 + C_f l_f^2}{I V} & \dfrac{C_r l_r - C_f l_f}{I V} \\
@@ -491,7 +491,7 @@ $$
 \begin{bmatrix} r \\ v \end{bmatrix}
 +
 \begin{bmatrix} \dfrac{C_f l_f}{I} \\ \dfrac{C_f}{m} \end{bmatrix} \delta
-$$
+```
 
 예를 들어 $\dot r$ 식의 $\beta$ 항 $\frac{C_r l_r - C_f l_f}{I}\beta$에 $\beta = v/V$를 넣으면 $\frac{C_r l_r - C_f l_f}{IV}v$가 된다. 두 형태는 같은 물리를 다른 변수로 쓴 것이므로 고유값(응답의 빠르기와 진동)이 같다. 3.7절의 파라미터 추정 모델은 이 형태를 쓰고, 출력으로 요레이트 $r$와 횡방향 가속도 $a_y = \dot v + V r$를 낸다.
 
@@ -553,24 +553,24 @@ $$
 
 삼각형 OCA와 OCB에 사인 법칙(삼각형의 각 변의 길이와 그 대각의 사인의 비가 일정하다는 법칙)을 적용하고 정리하면 다음 두 식을 얻는다.
 
-$$
+```math
 \frac{\sin(\delta_f - \beta)}{l_f} = \frac{\sin\left(\frac{\pi}{2} - \delta_f\right)}{R} \;\Longrightarrow\; \tan\delta_f\cos\beta - \sin\beta = \frac{l_f}{R} \qquad \text{(식 1)}
-$$
+```
 
-$$
+```math
 \frac{\sin(\beta - \delta_r)}{l_r} = \frac{\sin\left(\frac{\pi}{2} + \delta_r\right)}{R} \;\Longrightarrow\; \sin\beta - \tan\delta_r\cos\beta = \frac{l_r}{R} \qquad \text{(식 2)}
-$$
+```
 
 (식 1)과 (식 2)를 더하면 $(\tan\delta_f - \tan\delta_r)\cos\beta = (l_f + l_r)/R$ (식 3)이다. 저속에서 회전 반경이 천천히 변하면 차체 전체가 O를 중심으로 돌므로 요레이트는 $\dot\psi = V/R$이고, 여기에 (식 3)을 넣으면 요레이트가 조향각으로 표현된다. 또 (식 2)에 $l_f$를, (식 1)에 $l_r$를 곱해 빼면 $R$이 지워져 차체 슬립각이 정해진다. 무게 중심 속도의 방향은 전역 좌표계에서 $\psi + \beta$이므로 모델은 다음과 같다.
 
-$$
+```math
 \begin{aligned}
 \dot X &= V\cos(\psi + \beta), \qquad \dot Y = V\sin(\psi + \beta) \\
 \dot\psi &= \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right), \qquad \beta = \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
 \end{aligned}
-$$
+```
 
-이 모델은 $V$로 나누는 항이 없으므로 정지 직전의 저속에서도 쓸 수 있다. 앞바퀴만 조향하고($\delta_r = 0$) 조향각이 작으면 $\dot\psi \approx V\delta_f / l$로, 3.5절에서 $K = 0$인 경우와 같다. 각 삼각형의 각을 구하는 과정과 계산 예, 차량의 폭을 고려한 확장은 12주차 1절에서 다룬다.
+이 모델은 $V$로 나누는 항이 없으므로 정지 직전의 저속에서도 쓸 수 있다. 앞바퀴만 조향하고($`\delta_r = 0`$) 조향각이 작으면 $\dot\psi \approx V\delta_f / l$로, 3.5절에서 $K = 0$인 경우와 같다. 각 삼각형의 각을 구하는 과정과 계산 예, 차량의 폭을 고려한 확장은 12주차 1절에서 다룬다.
 
 ---
 
@@ -639,7 +639,7 @@ $$
    <details>
    <summary>정답</summary>
 
-   앞바퀴에는 $+y$ 방향(왼쪽)으로 $l_f r$, 뒷바퀴에는 $-y$ 방향(오른쪽)으로 $l_r r$가 더해진다. 강체의 속도 관계 $\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}$에서 $\boldsymbol{\omega} = r\hat{\mathbf{z}}$와 앞쪽 위치 $l_f \hat{\mathbf{x}}$의 외적은 $r l_f \hat{\mathbf{y}}$, 뒤쪽 위치 $-l_r\hat{\mathbf{x}}$와의 외적은 $-r l_r \hat{\mathbf{y}}$이기 때문이다.
+   앞바퀴에는 $+y$ 방향(왼쪽)으로 $l_f r$, 뒷바퀴에는 $-y$ 방향(오른쪽)으로 $l_r r$가 더해진다. 강체의 속도 관계 $`\mathbf{v}_Q = \mathbf{v}_P + \boldsymbol{\omega} \times \overrightarrow{PQ}`$에서 $\boldsymbol{\omega} = r\hat{\mathbf{z}}$와 앞쪽 위치 $l_f \hat{\mathbf{x}}$의 외적은 $r l_f \hat{\mathbf{y}}$, 뒤쪽 위치 $-l_r\hat{\mathbf{x}}$와의 외적은 $-r l_r \hat{\mathbf{y}}$이기 때문이다.
 
    </details>
 

@@ -631,24 +631,30 @@ rosbag play --clock drive.bag                       # 기록 당시의 시각을
 
 3D 지도 작성(3.4절)과 위치 인식(3.6절)은 모두 두 포인트 클라우드를 겹치도록 맞추는 **스캔 매칭(scan matching)**, 곧 **정합(registration)** 을 바탕으로 한다. 두 포인트 클라우드를 가장 잘 겹치게 하는 회전과 평행 이동을 찾으면, 그것이 두 포인트 클라우드를 측정한 센서 사이의 상대 위치와 방향이 된다. Autoware는 정합 방법으로 **NDT(normal distributions transform)** 를 쓴다 [15], [16].
 
-NDT는 기준 포인트 클라우드(지도)을 같은 크기의 격자 칸(셀)으로 나누고, 각 칸에 들어 있는 점들을 하나의 **정규 분포(normal distribution)** 로 요약한다. 칸 안의 점 $\mathbf{x}_1, \ldots, \mathbf{x}_n$의 평균 $\mathbf{q}$와 공분산 $\Sigma$는 다음과 같다(Biber와 Strasser의 정의를 따라 $n$으로 나눈다).
+NDT는 기준 포인트 클라우드(지도)을 같은 크기의 격자 칸(셀)으로 나누고, 각 칸에 들어 있는 점들을 하나의 **정규 분포(normal distribution)** 로 요약한다. 칸 안의 점 $`\mathbf{x}_1, \ldots, \mathbf{x}_n`$의 평균 $\mathbf{q}$와 공분산 $\Sigma$는 다음과 같다(Biber와 Strasser의 정의를 따라 $n$으로 나눈다).
 
-$$\mathbf{q} = \frac{1}{n}\sum_{i=1}^{n}\mathbf{x}_i, \qquad \Sigma = \frac{1}{n}\sum_{i=1}^{n}(\mathbf{x}_i-\mathbf{q})(\mathbf{x}_i-\mathbf{q})^{\top}$$
+```math
+\mathbf{q} = \frac{1}{n}\sum_{i=1}^{n}\mathbf{x}_i, \qquad \Sigma = \frac{1}{n}\sum_{i=1}^{n}(\mathbf{x}_i-\mathbf{q})(\mathbf{x}_i-\mathbf{q})^{\top}
+```
 
 새로 측정한 점 $\mathbf{x}'$가 이 칸의 분포에 얼마나 잘 맞는지는 다음 값으로 잰다. 점이 평균에 가까울수록 값이 1에 가깝고, 같은 거리만큼 벗어나더라도 점들이 넓게 퍼져 있는 방향(분산이 큰 방향)으로 벗어나면 값이 덜 줄어든다.
 
-$$p(\mathbf{x}') = \exp\left(-\frac{(\mathbf{x}'-\mathbf{q})^{\top}\Sigma^{-1}(\mathbf{x}'-\mathbf{q})}{2}\right)$$
+```math
+p(\mathbf{x}') = \exp\left(-\frac{(\mathbf{x}'-\mathbf{q})^{\top}\Sigma^{-1}(\mathbf{x}'-\mathbf{q})}{2}\right)
+```
 
-새 포인트 클라우드의 각 점 $\mathbf{x}_k$를 후보 자세 $\mathbf{p}$(2차원이면 $x, y$ 이동과 회전각, 3차원이면 세 축의 이동과 회전)로 옮긴 점을 $T(\mathbf{p}, \mathbf{x}_k)$라 하고, 그 점이 떨어진 칸의 평균과 공분산을 $\mathbf{q}_k, \Sigma_k$라 하면, 자세 $\mathbf{p}$의 점수는 모든 점의 값을 더한 것이다.
+새 포인트 클라우드의 각 점 $`\mathbf{x}_k`$를 후보 자세 $\mathbf{p}$(2차원이면 $x, y$ 이동과 회전각, 3차원이면 세 축의 이동과 회전)로 옮긴 점을 $`T(\mathbf{p}, \mathbf{x}_k)`$라 하고, 그 점이 떨어진 칸의 평균과 공분산을 $`\mathbf{q}_k, \Sigma_k`$라 하면, 자세 $\mathbf{p}$의 점수는 모든 점의 값을 더한 것이다.
 
-$$\text{score}(\mathbf{p}) = \sum_{k} \exp\left(-\frac{(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)^{\top}\Sigma_k^{-1}(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)}{2}\right)$$
+```math
+\text{score}(\mathbf{p}) = \sum_{k} \exp\left(-\frac{(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)^{\top}\Sigma_k^{-1}(T(\mathbf{p},\mathbf{x}_k)-\mathbf{q}_k)}{2}\right)
+```
 
 NDT는 이 점수를 가장 크게 하는 자세 $\mathbf{p}$를 뉴턴 방법 같은 최적화로 찾는다. 점 하나하나의 짝을 찾는 대신 칸마다 미리 계산한 분포를 쓰므로 계산이 빠르고, 점수가 자세에 대해 매끄럽게 변하므로 미분을 이용한 최적화가 가능하다.
 
 **예제.** 2차원에서 한 칸에 지도 점 $(0, 0), (2, 0), (0, 2), (2, 2)$가 있다고 하자.
 
-1. 평균은 $\mathbf{q} = \frac{1}{4}(0+2+0+2,\ 0+0+2+2) = (1, 1)$이다.
-2. 평균에서의 편차는 $(-1, -1), (1, -1), (-1, 1), (1, 1)$이다. 각 편차 $\mathbf{d}$의 외적 $\mathbf{d}\mathbf{d}^{\top}$는 차례로 $\begin{pmatrix}1&1\\1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&1\\1&1\end{pmatrix}$이고, 합은 $\begin{pmatrix}4&0\\0&4\end{pmatrix}$이므로 $\Sigma = \frac{1}{4}\begin{pmatrix}4&0\\0&4\end{pmatrix} = I$(단위 행렬)이다.
+1. 평균은 $`\mathbf{q} = \frac{1}{4}(0+2+0+2,\ 0+0+2+2) = (1, 1)`$이다.
+2. 평균에서의 편차는 $(-1, -1), (1, -1), (-1, 1), (1, 1)$이다. 각 편차 $\mathbf{d}$의 외적 $\mathbf{d}\mathbf{d}^{\top}$는 차례로 $`\begin{pmatrix}1&1\\1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&1\\1&1\end{pmatrix}`$이고, 합은 $`\begin{pmatrix}4&0\\0&4\end{pmatrix}`$이므로 $`\Sigma = \frac{1}{4}\begin{pmatrix}4&0\\0&4\end{pmatrix} = I`$(단위 행렬)이다.
 3. $\Sigma^{-1} = I$이므로 $p(\mathbf{x}') = \exp(-\lVert\mathbf{x}'-\mathbf{q}\rVert^2/2)$이다. 점 $(1, 1)$은 $\exp(0) = 1$, 점 $(2, 1)$은 $\exp(-1/2) \approx 0.6065$, 점 $(3, 1)$은 $\exp(-2) \approx 0.1353$이다. 평균에서 멀어질수록 값이 빠르게 작아진다.
 4. 이제 센서 좌표로 $(-0.5, 0)$과 $(0.5, 0)$에 있는 두 점으로 이루어진 새 포인트 클라우드를 회전 없이 평행 이동 $\mathbf{t}$만큼 옮겨 맞춘다고 하자. 단순화를 위해 옮긴 점은 칸의 경계와 관계없이 모두 이 칸의 분포로 평가한다고 가정한다.
 

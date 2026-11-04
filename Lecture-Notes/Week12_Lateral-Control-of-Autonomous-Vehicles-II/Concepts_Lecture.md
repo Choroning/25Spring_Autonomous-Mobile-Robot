@@ -74,55 +74,55 @@ If the slip angles are zero, the velocity of A points in the direction of the fr
 - **Triangle OCA:** The angle at O is $\delta_f - \beta$, the difference between the velocity directions of A and C (because OA and OC are perpendicular to these two velocities). The angle at A, between the body axis (direction AC) and OA, is $\pi/2 - \delta_f$. The side opposite O is $\lvert CA \rvert = l_f$, and the side opposite A is $\lvert OC \rvert = R$.
 - **Triangle OCB:** The angle at O is $\beta - \delta_r$, and the angle at B is $\pi/2 + \delta_r$. The side opposite O is $\lvert CB \rvert = l_r$, and the side opposite B is $R$.
 
-Apply the law of sines (for the sides $a$, $b$, $c$ of a triangle and their opposite angles $\theta_a$, $\theta_b$, $\theta_c$, $a / \sin\theta_a = b / \sin\theta_b = c / \sin\theta_c$) to the two triangles.
+Apply the law of sines (for the sides $a$, $b$, $c$ of a triangle and their opposite angles $\theta_a$, $\theta_b$, $\theta_c$, $`a / \sin\theta_a = b / \sin\theta_b = c / \sin\theta_c`$) to the two triangles.
 
-$$
+```math
 \frac{\sin(\delta_f - \beta)}{l_f} = \frac{\sin\left(\frac{\pi}{2} - \delta_f\right)}{R}, \qquad \frac{\sin(\beta - \delta_r)}{l_r} = \frac{\sin\left(\frac{\pi}{2} + \delta_r\right)}{R}
-$$
+```
 
 **Rearranging the front wheel equation.** $\sin(\delta_f - \beta) = \sin\delta_f\cos\beta - \cos\delta_f\sin\beta$ and $\sin(\pi/2 - \delta_f) = \cos\delta_f$. Multiply both sides by $l_f / \cos\delta_f$.
 
-$$
+```math
 \tan\delta_f\cos\beta - \sin\beta = \frac{l_f}{R} \qquad \text{(Eq. 1)}
-$$
+```
 
 **Rearranging the rear wheel equation.** $\sin(\beta - \delta_r) = \sin\beta\cos\delta_r - \cos\beta\sin\delta_r$ and $\sin(\pi/2 + \delta_r) = \cos\delta_r$. Multiply both sides by $l_r / \cos\delta_r$.
 
-$$
+```math
 \sin\beta - \tan\delta_r\cos\beta = \frac{l_r}{R} \qquad \text{(Eq. 2)}
-$$
+```
 
 ### 1.3 Turning Radius, Yaw Rate, and Sideslip Angle
 
 **Turning radius.** Adding (Eq. 1) and (Eq. 2) eliminates $\sin\beta$.
 
-$$
+```math
 (\tan\delta_f - \tan\delta_r)\cos\beta = \frac{l_f + l_r}{R} \qquad \text{(Eq. 3)}
-$$
+```
 
 **Yaw rate.** If the vehicle drives at low speed so that the turning radius changes slowly, the center of gravity moves at speed $V$ on a circle of radius $R$ about O, and the whole body rotates about O with the same angular velocity. Therefore the rate of change of the heading angle equals the angular velocity of the circular motion.
 
-$$
+```math
 \dot\psi = \frac{V}{R}
-$$
+```
 
 Substituting $1/R = (\tan\delta_f - \tan\delta_r)\cos\beta / (l_f + l_r)$ from (Eq. 3) expresses the yaw rate in terms of the steering angles.
 
-$$
+```math
 \dot\psi = \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right)
-$$
+```
 
 **Sideslip angle.** To eliminate $R$, multiply (Eq. 2) by $l_f$ and (Eq. 1) by $l_r$ and subtract. The right-hand side becomes $l_f l_r/R - l_r l_f/R = 0$.
 
-$$
+```math
 l_f\sin\beta - l_f\tan\delta_r\cos\beta - l_r\tan\delta_f\cos\beta + l_r\sin\beta = 0
-$$
+```
 
 Collecting the $\sin\beta$ terms and the $\cos\beta$ terms gives $(l_f + l_r)\sin\beta = (l_f\tan\delta_r + l_r\tan\delta_f)\cos\beta$, and dividing both sides by $(l_f + l_r)\cos\beta$ gives the following.
 
-$$
+```math
 \beta = \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
-$$
+```
 
 In the kinematic model, the sideslip angle is determined only by the steering angles and the position of the center of gravity. The fact that it is an algebraic formula, with no differential equation to solve, becomes important in Section 2.1.
 
@@ -130,14 +130,14 @@ In the kinematic model, the sideslip angle is determined only by the steering an
 
 The velocity of the center of gravity is rotated by $\beta$ from the body axis, and the body axis is rotated by $\psi$ from the $X$ axis, so the direction of the velocity in the global frame is $\psi + \beta$. The kinematic bicycle model is therefore as follows [1].
 
-$$
+```math
 \begin{aligned}
 \dot X &= V\cos(\psi + \beta) \\
 \dot Y &= V\sin(\psi + \beta) \\
 \dot\psi &= \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right) \\
 \beta &= \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
 \end{aligned}
-$$
+```
 
 The inputs are $V$, $\delta_f$, and $\delta_r$, and the states are $X$, $Y$, and $\psi$. If only the front wheel is steered, $\delta_r = 0$.
 
@@ -155,9 +155,9 @@ Compute for a vehicle with $l_f = 1.2$ m, $l_r = 1.5$ m, $V = 5$ m/s, $\delta_f 
 
 If the initial heading angle is $\psi(0) = 0$ and the vehicle starts at the origin, the heading angle after $t$ seconds is $\psi(t) = \dot\psi t$ and the position is a point on the circle.
 
-$$
+```math
 X(t) = R\left[\sin(\psi(t) + \beta) - \sin\beta\right], \qquad Y(t) = R\left[\cos\beta - \cos(\psi(t) + \beta)\right]
-$$
+```
 
 At $t = 2$ s, $\psi = 0.650$ rad, $X = 8.960$ m, and $Y = 4.030$ m. Integrating the equations of motion numerically with a small time step gives the same values.
 
@@ -185,17 +185,17 @@ In Figure 2, $L$ is the wheelbase, $l_w$ is the distance between the left and ri
 
 In the bicycle model with small slip and $\delta_r = 0$, $\cos\beta \approx 1$ and $\tan\delta_f \approx \delta_f$, so the following two equations hold.
 
-$$
+```math
 \dot\psi = \frac{V\delta_f}{l_f + l_r} = \frac{V\delta_f}{L}, \qquad \dot\psi = \frac{V}{R} \quad \Longrightarrow \quad \delta_f = \frac{L}{R}
-$$
+```
 
 Apply this relation to the left and right wheels separately. Regard the outer wheel as turning on a circle of radius $R + l_w/2$ and the inner wheel on a circle of radius $R - l_w/2$, and the average of the two wheel angles approximately equals the steering angle of the bicycle model.
 
-$$
+```math
 \delta_f = \frac{L}{R} \approx \frac{\delta_o + \delta_i}{2}, \qquad \delta_o = \frac{L}{R + \frac{l_w}{2}}, \qquad \delta_i = \frac{L}{R - \frac{l_w}{2}}
-$$
+```
 
-The difference between the two steering angles is $\delta_i - \delta_o = L l_w / (R^2 - l_w^2/4) \approx L l_w / R^2 = \delta_f^2\,l_w / L$, which is proportional to the square of the steering angle. The difference is small in a gentle turn with a large radius but becomes large when the wheels are turned sharply with a small radius, as in parking.
+The difference between the two steering angles is $`\delta_i - \delta_o = L l_w / (R^2 - l_w^2/4) \approx L l_w / R^2 = \delta_f^2\,l_w / L`$, which is proportional to the square of the steering angle. The difference is small in a gentle turn with a large radius but becomes large when the wheels are turned sharply with a small radius, as in parking.
 
 **Worked example.** A vehicle with $L = 2.7$ m and $l_w = 1.6$ m turns with $R = 10$ m.
 
@@ -204,7 +204,7 @@ The difference between the two steering angles is $\delta_i - \delta_o = L l_w /
 3. Inner wheel: $\delta_i = 2.7 / 9.2 = 0.2935$ rad (16.82°).
 4. Difference: $\delta_i - \delta_o = 0.0435$ rad (2.49°), almost the same as the approximation $\delta_f^2l_w / L = 0.27^2 \times 1.6 / 2.7 = 0.0432$ rad.
 
-> **Note:** The formulas above use the small-angle approximation ($\tan\delta \approx \delta$). Without the approximation, $\tan\delta_o = L/(R + l_w/2)$ and $\tan\delta_i = L/(R - l_w/2)$, and eliminating $R$ from the two equations gives $\cot\delta_o - \cot\delta_i = l_w / L$. This is called the **Ackermann condition**; in the example above the exact values are $\delta_o = 14.04°$ and $\delta_i = 16.36°$, and $\cot\delta_o - \cot\delta_i = 4.000 - 3.407 = 0.593 = 1.6 / 2.7$.
+> **Note:** The formulas above use the small-angle approximation ($`\tan\delta \approx \delta`$). Without the approximation, $\tan\delta_o = L/(R + l_w/2)$ and $\tan\delta_i = L/(R - l_w/2)$, and eliminating $R$ from the two equations gives $\cot\delta_o - \cot\delta_i = l_w / L$. This is called the **Ackermann condition**; in the example above the exact values are $\delta_o = 14.04°$ and $\delta_i = 16.36°$, and $\cot\delta_o - \cot\delta_i = 4.000 - 3.407 = 0.593 = 1.6 / 2.7$.
 
 ![Figure 3. Trapezoidal tie rod arrangement and the wheel angles in a left turn and a right turn](../../images/Week12_12-1_p09.png)
 
@@ -275,13 +275,13 @@ With hysteresis, once the model switches to the dynamic model at 16 km/h, it is 
 
 ### 2.2 State-Space Model
 
-To use the dynamic model (Section 3.3 of Week 11) for controller design, it is written as a **state-space model**. For the state $\mathbf{x} = [\beta \;\; r]^T$, the input $u = \delta$, and the output $y$, it is as follows. Some references write the yaw rate as $\gamma$; it is the same quantity as $\dot\psi$ of the kinematic model.
+To use the dynamic model (Section 3.3 of Week 11) for controller design, it is written as a **state-space model**. For the state $`\mathbf{x} = [\beta \;\; r]^T`$, the input $u = \delta$, and the output $y$, it is as follows. Some references write the yaw rate as $\gamma$; it is the same quantity as $\dot\psi$ of the kinematic model.
 
-$$
+```math
 \dot{\mathbf{x}} = A\mathbf{x} + Bu, \qquad y = C\mathbf{x}
-$$
+```
 
-$$
+```math
 A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} =
 \begin{bmatrix}
 -\dfrac{C_r + C_f}{mV} & -1 + \dfrac{C_r l_r - C_f l_f}{mV^2} \\
@@ -290,9 +290,9 @@ A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} =
 B = \begin{bmatrix} b_{11} \\ b_{21} \end{bmatrix} =
 \begin{bmatrix} \dfrac{C_f}{mV} \\ \dfrac{C_f l_f}{I_{zz}} \end{bmatrix}, \qquad
 C = \begin{bmatrix} 0 & 1 \end{bmatrix}
-$$
+```
 
-$I_{zz}$ is the yaw moment of inertia $I$ of Week 11. The output matrix $C = [0 \;\; 1]$ means that only the yaw rate among the states is measured. The yaw rate can be measured by the gyro sensor of the vehicle, but the sideslip angle cannot be measured directly by ordinary vehicle sensors (Section 2.8).
+$I_{zz}$ is the yaw moment of inertia $I$ of Week 11. The output matrix $`C = [0 \;\; 1]`$ means that only the yaw rate among the states is measured. The yaw rate can be measured by the gyro sensor of the vehicle, but the sideslip angle cannot be measured directly by ordinary vehicle sensors (Section 2.8).
 
 **Worked example.** Compute the matrices at 40 km/h ($V = 11.11$ m/s) with the estimated parameters of Table 8 in Week 11.
 
@@ -330,26 +330,26 @@ In Figure 5, $d_s$ is the sum of the two parts $d_{s1}$ and $d_{s2}$ above and b
 1. The velocity of the center of gravity is rotated by $\beta$ from the body axis and by $\beta + \Delta\psi$ from the path direction, so its component perpendicular to the path is $V\sin(\beta + \Delta\psi) \approx V(\beta + \Delta\psi)$.
 2. The velocity $L_s r$ created by the rotation is perpendicular to the body axis, so its component perpendicular to the path is $L_s r\cos\Delta\psi \approx L_s r$.
 
-$$
+```math
 \dot d_s = V(\beta + \Delta\psi) + L_s r
-$$
+```
 
 **Rate of change of $\Delta\psi$.** The heading angle of the body changes at $r$, and the tangent direction of the path changes at $V\rho$ by the curvature as the point moves along the path at speed $V$.
 
-$$
+```math
 \Delta\dot\psi = r - V\rho
-$$
+```
 
 Combined with the dynamic model of Section 2.2, this gives a fourth-order model of the whole path tracking problem.
 
-$$
+```math
 \begin{aligned}
 \dot\beta &= a_{11}\beta + a_{12} r + b_{11}\delta \\
 \dot r &= a_{21}\beta + a_{22} r + b_{21}\delta \\
 \Delta\dot\psi &= r - V\rho \\
 \dot d_s &= V\beta + V\Delta\psi + L_s r
 \end{aligned}
-$$
+```
 
 ### 2.4 Cascade Structure and Backstepping
 
@@ -379,17 +379,17 @@ The Inner-loop in Figure 6 is the sub-system for the lateral offset; it computes
 
 ### 2.5 Step 1: The Desired Yaw Rate
 
-First, regard the yaw rate $r$ as a virtual input that can be chosen freely, and set the desired yaw rate $r_d$ so that $d_s$ goes to 0. In $\dot d_s = V(\beta + \Delta\psi) + L_s r$, to make $\dot d_s = -K_d d_s$ ($K_d > 0$) when $r = r_d$, set the following.
+First, regard the yaw rate $r$ as a virtual input that can be chosen freely, and set the desired yaw rate $r_d$ so that $d_s$ goes to 0. In $\dot d_s = V(\beta + \Delta\psi) + L_s r$, to make $\dot d_s = -K_d d_s$ ($`K_d > 0`$) when $r = r_d$, set the following.
 
-$$
+```math
 r_d = -\frac{V(\beta + \Delta\psi) + K_d d_s}{L_s}
-$$
+```
 
 If $r = r_d$, then $\dot d_s = V(\beta + \Delta\psi) - V(\beta + \Delta\psi) - K_d d_s = -K_d d_s$, so $d_s(t) = d_s(0)e^{-K_d t}$ decays exponentially. The first term $-V(\beta + \Delta\psi)/L_s$ cancels the departure caused by the vehicle moving at an angle to the path, and the second term $-K_d d_s / L_s$ brings back a departure that has already occurred. Because the actual yaw rate may differ from $r_d$, let the difference be the yaw rate error $e_r = r - r_d$; substituting $r = r_d + e_r$ gives the following.
 
-$$
+```math
 \dot d_s = -K_d d_s + L_s e_r
-$$
+```
 
 ### 2.6 Step 2: The Steering Angle
 
@@ -399,37 +399,37 @@ Now drive $e_r$ to 0 with the actual input $\delta$. The rate of change of $e_r$
 
 **(2) Substitute.** Insert the fourth-order model of Section 2.3 for $\dot r$, $\dot\beta$, $\Delta\dot\psi$, and $\dot d_s$.
 
-$$
+```math
 \dot e_r = (a_{21}\beta + a_{22} r + b_{21}\delta) + \frac{V}{L_s}\left(a_{11}\beta + a_{12} r + b_{11}\delta + r - V\rho\right) + \frac{K_d}{L_s}\left(V\beta + V\Delta\psi + L_s r\right)
-$$
+```
 
 **(3) Rearrange.** Collecting the terms of each variable gives the following.
 
-$$
+```math
 \dot e_r = f(\beta, r, \Delta\psi, \rho) + b_\delta\,\delta, \qquad f \equiv h_\beta\beta + h_r r + h_\psi\Delta\psi - h_\rho\rho
-$$
+```
 
-$$
+```math
 b_\delta = b_{21} + \frac{V b_{11}}{L_s}, \quad h_\beta = \frac{V a_{11} + V K_d + L_s a_{21}}{L_s}, \quad h_r = \frac{V a_{12} + V + K_d L_s + L_s a_{22}}{L_s}, \quad h_\psi = \frac{K_d V}{L_s}, \quad h_\rho = \frac{V^2}{L_s}
-$$
+```
 
 **(4) Choose the steering angle with a Lyapunov function.** Take the function $\mathcal{V} = \frac{1}{2}W_d d_s^2 + \frac{1}{2}W_r e_r^2$ ($W_d, W_r > 0$ are weights) that measures the size of the two errors, and compute its rate of change.
 
-$$
+```math
 \dot{\mathcal{V}} = W_d d_s\dot d_s + W_r e_r\dot e_r = -W_d K_d d_s^2 + W_d L_s d_s e_r + W_r e_r\left(f + b_\delta\delta\right)
-$$
+```
 
-The middle term $W_d L_s d_s e_r$ is a cross term whose sign is not fixed. Choosing the steering angle as follows makes the expression in parentheses $-\frac{W_d L_s}{W_r}d_s - K_r e_r$ ($K_r > 0$), which cancels the cross term.
+The middle term $W_d L_s d_s e_r$ is a cross term whose sign is not fixed. Choosing the steering angle as follows makes the expression in parentheses $-\frac{W_d L_s}{W_r}d_s - K_r e_r$ ($`K_r > 0`$), which cancels the cross term.
 
-$$
+```math
 \delta = \frac{1}{b_\delta}\left[-f(\beta, r, \Delta\psi, \rho) - \frac{W_d L_s}{W_r}d_s - K_r e_r\right]
-$$
+```
 
-$$
+```math
 \dot{\mathcal{V}} = -W_d K_d d_s^2 - W_r K_r e_r^2 < 0 \quad \left((d_s, e_r) \neq (0, 0)\right)
-$$
+```
 
-$\mathcal{V}$ is 0 only when the errors are 0, positive elsewhere, and keeps decreasing, so if the model is exact, both $d_s$ and $e_r$ converge to 0. The three terms of the steering formula are, in order, a feedforward that cancels the known vehicle and road dynamics (including the curvature term $h_\rho\rho$), a term that cancels the cross term, and a feedback that reduces the yaw rate error. This formula can be used only when $b_\delta \neq 0$, that is, when the steering affects $\dot e_r$.
+$\mathcal{V}$ is 0 only when the errors are 0, positive elsewhere, and keeps decreasing, so if the model is exact, both $d_s$ and $e_r$ converge to 0. The three terms of the steering formula are, in order, a feedforward that cancels the known vehicle and road dynamics (including the curvature term $`h_\rho\rho`$), a term that cancels the cross term, and a feedback that reduces the yaw rate error. This formula can be used only when $b_\delta \neq 0$, that is, when the steering affects $\dot e_r$.
 
 > **Definition:** A **Lyapunov function** is a function that is 0 only when the state is at the equilibrium, positive elsewhere, and decreases as time passes along the system. If such a function exists, it can be shown that the state goes to the equilibrium without solving for the solution directly. Backstepping is a method that adds a term to this function at each step and chooses the control input so that its rate of change is negative [2].
 
@@ -444,7 +444,7 @@ Compute with the matrices at 40 km/h (Section 2.2) and $L_s = 10$ m, $K_d = 0.5$
 3. Desired yaw rate: $r_d = -(11.11 \times 0.015 + 0.5 \times 0.3) / 10 = -(0.1667 + 0.15) / 10 = -0.03167$ rad/s. The vehicle must turn right.
 4. Yaw rate error: $e_r = 0.02 - (-0.03167) = 0.05167$ rad/s.
 5. $f = 7.825 \times 0.005 + (-10.085) \times 0.02 + 0.556 \times 0.01 = 0.0391 - 0.2017 + 0.0056 = -0.1570$.
-6. Steering angle: $\delta = (0.1570 - 0.1 \times 10 \times 0.3 - 5 \times 0.05167) / 35.45 = (0.1570 - 0.3 - 0.2583) / 35.45 = -0.01132$ rad ($-0.65°$). The vehicle steers slightly to the right.
+6. Steering angle: $\delta = (0.1570 - 0.1 \times 10 \times 0.3 - 5 \times 0.05167) / 35.45 = (0.1570 - 0.3 - 0.2583) / 35.45 = -0.01132$ rad ($`-0.65°`$). The vehicle steers slightly to the right.
 
 Simulating the fourth-order model with the same settings, starting from $d_s(0) = 0.5$ m with the other states at 0, gives the following.
 
@@ -465,21 +465,21 @@ The steering formula of Section 2.6 needs $\beta$, but the sideslip angle cannot
 
 **Structure of the observer.** The observer runs the model in real time and corrects the estimate with the difference between the output predicted by the model $C\hat{\mathbf{x}}$ and the actual measurement $y$ [3].
 
-$$
+```math
 \dot{\hat{\mathbf{x}}} = A\hat{\mathbf{x}} + B\delta + \mathbf{l}\left(y - C\hat{\mathbf{x}}\right), \qquad \mathbf{l} = \begin{bmatrix} l_1 \\ l_2 \end{bmatrix}
-$$
+```
 
 The rate of change of the estimation error $\mathbf{e} = \mathbf{x} - \hat{\mathbf{x}}$ is $\dot{\mathbf{e}} = A\mathbf{x} + B\delta - A\hat{\mathbf{x}} - B\delta - \mathbf{l}C(\mathbf{x} - \hat{\mathbf{x}}) = (A - \mathbf{l}C)\mathbf{e}$. Therefore, if the gain $\mathbf{l}$ is chosen so that all eigenvalues of $A - \mathbf{l}C$ have negative real parts, the error decays to 0 even if the initial estimate is wrong.
 
 **Observability condition.** For $\beta$ to be determined from yaw rate measurements alone, $\beta$ must leave a trace in the change of the yaw rate. This is checked with the observability matrix.
 
-$$
+```math
 \mathcal{O} = \begin{bmatrix} C \\ CA \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ a_{21} & a_{22} \end{bmatrix}, \qquad \det\mathcal{O} = -a_{21}
-$$
+```
 
 The system is observable when the rank of $\mathcal{O}$ is 2, that is, when $a_{21} = (C_r l_r - C_f l_f)/I_{zz} \neq 0$. For a vehicle with $C_r l_r = C_f l_f$, $\beta$ does not appear in the equation for $\dot r$, so $\beta$ cannot be determined from the yaw rate alone. With the estimated parameters, $a_{21} = 16.61 \neq 0$, so the system is observable.
 
-**Example of computing the gain.** At 40 km/h, set the eigenvalues of $A - \mathbf{l}C$ to $-20$ and $-25$. Making them more than twice as fast as the eigenvalues of the plant ($-9.59 \pm 3.51j$) lets the estimate catch up with the actual state quickly.
+**Example of computing the gain.** At 40 km/h, set the eigenvalues of $A - \mathbf{l}C$ to $-20$ and $-25$. Making them more than twice as fast as the eigenvalues of the plant ($`-9.59 \pm 3.51j`$) lets the estimate catch up with the actual state quickly.
 
 1. The entries of $A - \mathbf{l}C$ are $a_{11}$, $a_{12} - l_1$, $a_{21}$, and $a_{22} - l_2$ in order, so its characteristic equation is $\lambda^2 - (a_{11} + a_{22} - l_2)\lambda + a_{11}(a_{22} - l_2) - a_{21}(a_{12} - l_1) = 0$.
 2. The desired characteristic equation is $(\lambda + 20)(\lambda + 25) = \lambda^2 + 45\lambda + 500 = 0$.
@@ -646,11 +646,11 @@ The values in the dialog are passed to waypoint_replanner on the `/config/waypoi
 
 *Table 9. Speed replanning settings in the waypoint_loader dialog*
 
-With replan curve mode on, the waypoint_replanner of Autoware.ai 1.14.0 finds, in each curve segment whose radius of curvature is at most $R_{th}$, the smallest radius of curvature $R$ (lower bound $R_{\min}$) and sets the speed limit of that segment linearly, so that it is $V_{\min}$ at $R_{\min}$ and $V_{\max}$ at $R_{th}$ [6].
+With replan curve mode on, the waypoint_replanner of Autoware.ai 1.14.0 finds, in each curve segment whose radius of curvature is at most $R_{th}$, the smallest radius of curvature $R$ (lower bound $`R_{\min}`$) and sets the speed limit of that segment linearly, so that it is $V_{\min}$ at $R_{\min}$ and $V_{\max}$ at $R_{th}$ [6].
 
-$$
+```math
 V(R) = V_{\max} - \frac{V_{\max} - V_{\min}}{R_{th} - R_{\min}}\left(R_{th} - R\right)
-$$
+```
 
 For example, with the values in Table 9, the speed limit of a curve with radius 13 m is $20 - 16 \times 7 / 14 = 12$ km/h. This implements the same goal as the $\sqrt{0.3 g R}$ from the lateral acceleration in Section 1.3 of Week 11 (slowing down in curves) with a simpler linear rule.
 
@@ -731,7 +731,7 @@ Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual co
 | Kinematic bicycle model | The law of sines gives $\dot\psi = V\cos\beta(\tan\delta_f - \tan\delta_r)/(l_f + l_r)$ and $\beta = \tan^{-1}((l_f\tan\delta_r + l_r\tan\delta_f)/(l_f + l_r))$, and the position is integrated with $\dot X = V\cos(\psi + \beta)$, $\dot Y = V\sin(\psi + \beta)$. |
 | Ackermann steering | For small angles $\delta_f = L/R$, and with $\delta_o = L/(R + l_w/2)$, $\delta_i = L/(R - l_w/2)$ the inner wheel turns more; this is realized by a trapezoidal tie rod arrangement. |
 | Model switching and hysteresis | The kinematic model, with no convergence time and no risk of divergence, is used at low speed and the dynamic model at high speed, and two thresholds of 15 km/h and 10 km/h prevent frequent switching. |
-| State-space model | Written with the state $[\beta \;\; r]^T$, the input $\delta$, and the output $y = [0 \;\; 1]\mathbf{x}$ (yaw rate measurement), with matrix entries proportional to $1/V$ and $1/V^2$. |
+| State-space model | Written with the state $`[\beta \;\; r]^T`$, the input $\delta$, and the output $`y = [0 \;\; 1]\mathbf{x}`$ (yaw rate measurement), with matrix entries proportional to $1/V$ and $1/V^2$. |
 | Path tracking error model | The lateral offset and relative heading angle at the lookahead point follow $\dot d_s = V(\beta + \Delta\psi) + L_s r$ and $\Delta\dot\psi = r - V\rho$. |
 | Backstepping controller | The Inner-loop sets $r_d = -(V(\beta + \Delta\psi) + K_d d_s)/L_s$, and the Outer-loop outputs the steering angle $\delta = (-f - (W_d L_s/W_r)d_s - K_r e_r)/b_\delta$, which cancels the cross term of the Lyapunov function. |
 | State observer | Estimates the sideslip angle from yaw rate measurements with $\dot{\hat{\mathbf{x}}} = A\hat{\mathbf{x}} + B\delta + \mathbf{l}(y - C\hat{\mathbf{x}})$; the system is observable only if $a_{21} \neq 0$. |
@@ -745,7 +745,7 @@ Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual co
 
 ## Self-Check Questions
 
-1. **Kinematic model:** A vehicle with $l_f = 1.0$ m and $l_r = 1.6$ m drives with $V = 4$ m/s, $\delta_f = 8°$, and $\delta_r = 0$. Find the sideslip angle, the yaw rate, and the turning radius ($\tan 8° = 0.14054$).
+1. **Kinematic model:** A vehicle with $l_f = 1.0$ m and $l_r = 1.6$ m drives with $V = 4$ m/s, $\delta_f = 8°$, and $\delta_r = 0$. Find the sideslip angle, the yaw rate, and the turning radius ($`\tan 8° = 0.14054`$).
 
    <details>
    <summary>Answer</summary>
@@ -799,12 +799,12 @@ Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual co
 
    </details>
 
-7. **Observability:** For a system with $C = [0 \;\; 1]$ and the entries of $A$ given by $a_{11} = -5$, $a_{12} = -0.9$, $a_{21} = 0$, $a_{22} = -6$, decide whether the sideslip angle can be observed and give the reason.
+7. **Observability:** For a system with $`C = [0 \;\; 1]`$ and the entries of $A$ given by $a_{11} = -5$, $a_{12} = -0.9$, $a_{21} = 0$, $a_{22} = -6$, decide whether the sideslip angle can be observed and give the reason.
 
    <details>
    <summary>Answer</summary>
 
-   The two rows of the observability matrix $\mathcal{O}$ are $[0 \;\; 1]$ and $[a_{21} \;\; a_{22}] = [0 \;\; -6]$, and its determinant is 0 (rank 1), so the sideslip angle cannot be observed. Because $a_{21} = 0$, $\beta$ does not appear in $\dot r = -6r + b_{21}\delta$, so the yaw rate measurements carry no information about $\beta$.
+   The two rows of the observability matrix $\mathcal{O}$ are $`[0 \;\; 1]`$ and $`[a_{21} \;\; a_{22}] = [0 \;\; -6]`$, and its determinant is 0 (rank 1), so the sideslip angle cannot be observed. Because $a_{21} = 0$, $\beta$ does not appear in $\dot r = -6r + b_{21}\delta$, so the yaw rate measurements carry no information about $\beta$.
 
    </details>
 

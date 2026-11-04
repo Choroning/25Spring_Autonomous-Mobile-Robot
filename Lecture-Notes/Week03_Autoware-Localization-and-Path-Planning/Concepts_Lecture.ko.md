@@ -134,17 +134,17 @@ GNSS(위성 항법 시스템) 수신기만으로도 위치를 알 수 있지만,
 NDT는 지도의 점들을 다음과 같이 요약한다 [1].
 
 1. 공간을 한 변의 길이가 일정한 셀(cell)로 나눈다. 이 길이를 **해상도(resolution)** 라고 한다. 3차원에서는 셀을 **복셀(voxel)** 이라고도 부른다.
-2. 각 셀에 들어 있는 점 $\mathbf{x}_1, \dots, \mathbf{x}_n$의 평균 벡터와 공분산 행렬을 구한다. 점이 너무 적은 셀은 분포를 믿을 수 없으므로 쓰지 않는다(Biber와 Strasser는 점이 3개 미만인 셀을 버린다).
+2. 각 셀에 들어 있는 점 $`\mathbf{x}_1, \dots, \mathbf{x}_n`$의 평균 벡터와 공분산 행렬을 구한다. 점이 너무 적은 셀은 분포를 믿을 수 없으므로 쓰지 않는다(Biber와 Strasser는 점이 3개 미만인 셀을 버린다).
 3. 그 셀 안의 한 위치 $\mathbf{x}$에서 점이 측정될 가능성을 평균과 공분산으로 정한 정규 분포로 모델링한다.
 
-$$
+```math
 \boldsymbol{\mu} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_i, \qquad
 \Sigma = \frac{1}{n} \sum_{i=1}^{n} (\mathbf{x}_i - \boldsymbol{\mu})(\mathbf{x}_i - \boldsymbol{\mu})^{T}
-$$
+```
 
-$$
+```math
 p(\mathbf{x}) \propto \exp\left( -\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu}) \right)
-$$
+```
 
 > **[확률및통계]** 다변량 정규 분포의 밀도는 $\exp$ 안의 이차 형식 $(\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})$으로 정해진다. 이 값의 제곱근을 **마할라노비스 거리(Mahalanobis distance)** 라고 하며, 점들이 넓게 퍼진 방향으로는 같은 거리라도 작게, 좁게 모인 방향으로는 크게 잰다. 공분산 행렬의 고유벡터는 분포가 퍼진 방향, 고윳값은 그 방향의 분산이다.
 
@@ -158,11 +158,11 @@ $$
 - 평균을 뺀 편차는 $(-1.5, -0.1)$, $(-0.5, 0.1)$, $(0.5, -0.1)$, $(1.5, 0.1)$이다.
 - $x$ 방향 분산은 $(2.25 + 0.25 + 0.25 + 2.25)/4 = 1.25$, $y$ 방향 분산은 $(0.01 \times 4)/4 = 0.01$, 공분산은 $(0.15 - 0.05 - 0.05 + 0.15)/4 = 0.05$이다.
 
-$$
+```math
 \Sigma = \begin{pmatrix} 1.25 & 0.05 \\ 0.05 & 0.01 \end{pmatrix}, \qquad
 \det \Sigma = 1.25 \times 0.01 - 0.05^2 = 0.01, \qquad
 \Sigma^{-1} = \frac{1}{0.01} \begin{pmatrix} 0.01 & -0.05 \\ -0.05 & 1.25 \end{pmatrix} = \begin{pmatrix} 1 & -5 \\ -5 & 125 \end{pmatrix}
-$$
+```
 
 이제 이 셀에 놓인 세 위치에서 $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$를 계산한다. 여기서 $\mathbf{q} = \mathbf{x} - \boldsymbol{\mu}$이고, $\mathbf{q} = (q_x, q_y)$이면 $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = q_x^2 - 10 q_x q_y + 125 q_y^2$이다.
 
@@ -186,42 +186,42 @@ $$
 
 평면에서 스캔을 옮기는 변환은 평행 이동 $(t_x, t_y)$와 회전각 $\phi$의 세 매개변수 $\mathbf{p} = (t_x, t_y, \phi)$로 나타낸다. 스캔의 점 $\mathbf{x} = (x, y)$는 다음과 같이 지도 좌표계의 점 $\mathbf{x}'$로 옮겨진다.
 
-$$
+```math
 \mathbf{x}' = T(\mathbf{p}, \mathbf{x}) = \begin{pmatrix} \cos\phi & -\sin\phi \\ \sin\phi & \cos\phi \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} t_x \\ t_y \end{pmatrix}
-$$
+```
 
-옮겨진 점 $\mathbf{x}_i'$마다 그 점이 들어간 셀의 평균 $\boldsymbol{\mu}_i$와 공분산 $\Sigma_i$로 정규 분포 값을 구하고, 모든 점에 대해 더한 것이 그 변환의 **점수(score)** 이다 [1].
+옮겨진 점 $`\mathbf{x}_i'`$마다 그 점이 들어간 셀의 평균 $`\boldsymbol{\mu}_i`$와 공분산 $\Sigma_i$로 정규 분포 값을 구하고, 모든 점에 대해 더한 것이 그 변환의 **점수(score)** 이다 [1].
 
-$$
+```math
 \text{score}(\mathbf{p}) = \sum_{i} \exp\left( -\frac{1}{2} \mathbf{q}_i^{T} \Sigma_i^{-1} \mathbf{q}_i \right), \qquad \mathbf{q}_i = T(\mathbf{p}, \mathbf{x}_i) - \boldsymbol{\mu}_i
-$$
+```
 
 점수가 클수록 스캔의 점들이 지도의 표면 위에 잘 놓인 것이다. 최적화는 보통 최소화 문제로 쓰므로 $s(\mathbf{p}) = -\text{score}(\mathbf{p})$를 최소화한다. NDT는 이 문제를 **뉴턴 방법(Newton's method)** 으로 푼다. 현재 추정값 $\mathbf{p}$에서 $s$의 기울기 $\mathbf{g}$와 헤세 행렬 $H$를 구하고, 연립 방정식을 풀어 갱신량 $\Delta\mathbf{p}$를 얻는다.
 
-$$
+```math
 H \, \Delta\mathbf{p} = -\mathbf{g}, \qquad \mathbf{p} \leftarrow \mathbf{p} + \Delta\mathbf{p}
-$$
+```
 
 > **[미적분학]** 뉴턴 방법은 현재 점 근처에서 함수를 이차 함수 $s(\mathbf{p} + \Delta\mathbf{p}) \approx s(\mathbf{p}) + \mathbf{g}^{T} \Delta\mathbf{p} + \frac{1}{2} \Delta\mathbf{p}^{T} H \Delta\mathbf{p}$로 근사하고, 이 이차 함수의 최솟값으로 한 번에 옮겨 간다. 이차 함수를 $\Delta\mathbf{p}$로 미분하여 0으로 두면 $\mathbf{g} + H \Delta\mathbf{p} = \mathbf{0}$이 된다. $H$가 양의 정부호일 때만 이 점이 최솟값이다.
 
 점 하나의 항 $s = -\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$를 매개변수 $p_i$로 미분하면 연쇄 법칙에 따라 다음을 얻는다. 여기서 $f = \exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$이다.
 
-$$
+```math
 g_i = \frac{\partial s}{\partial p_i} = \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) f
-$$
+```
 
-$$
+```math
 H_{ij} = \frac{\partial^2 s}{\partial p_i \partial p_j} = f \left( -\left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_j} \right) + \frac{\partial \mathbf{q}}{\partial p_j}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} + \mathbf{q}^{T} \Sigma^{-1} \frac{\partial^2 \mathbf{q}}{\partial p_i \partial p_j} \right)
-$$
+```
 
 전체 기울기와 헤세 행렬은 스캔의 모든 점에 대해 이 값을 더한 것이다. 변환식을 미분하면 $\mathbf{q}$의 편미분은 다음과 같다. 두 번 미분하여 0이 아닌 것은 $\phi$로 두 번 미분한 항 하나뿐이다.
 
-$$
+```math
 \frac{\partial \mathbf{q}}{\partial t_x} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial t_y} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial \phi} = \begin{pmatrix} -x \sin\phi - y \cos\phi \\ x \cos\phi - y \sin\phi \end{pmatrix}, \qquad
 \frac{\partial^2 \mathbf{q}}{\partial \phi^2} = \begin{pmatrix} -x \cos\phi + y \sin\phi \\ -x \sin\phi - y \cos\phi \end{pmatrix}
-$$
+```
 
 NDT 정합 전체의 흐름은 다음과 같다.
 
@@ -240,7 +240,7 @@ flowchart TD
 
 **계산 예 1: 기울기.** 표 2의 셀만 있는 지도에서, 스캔의 한 점 $\mathbf{x} = (2.5, 0.2)$를 초기 추정 $\mathbf{p} = (0, 0, 0)$으로 옮기면 $\mathbf{x}' = (2.5, 0.2)$이다.
 
-- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$이고, $\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)$이다.
+- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$이고, $`\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)`$이다.
 - $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 0 \times (-0.5) + 0.1 \times 12.5 = 1.25$이므로 $f = e^{-0.625} = 0.5353$이다.
 - $\phi = 0$에서 $\frac{\partial \mathbf{q}}{\partial \phi} = (-y, x) = (-0.2, 2.5)$이다.
 - 따라서 $g_{t_x} = (-0.5)(0.5353) = -0.268$, $g_{t_y} = (12.5)(0.5353) = 6.691$, $g_{\phi} = \big( (-0.5)(-0.2) + (12.5)(2.5) \big)(0.5353) = 31.35 \times 0.5353 = 16.78$이다.
@@ -249,9 +249,9 @@ $s$를 줄이는 방향은 $-\mathbf{g} = (0.268, -6.691, -16.78)$이다. $t_y$�
 
 **계산 예 2: 뉴턴 방법의 반복.** 점 하나로는 세 매개변수를 모두 정할 수 없으므로, $t_x = \phi = 0$으로 두고 $t_y$만 움직이는 경우를 본다. 스캔의 점이 $(2.5, 0.15)$이면 $\mathbf{q} = (0, q_y)$, $q_y = 0.05 + t_y$이고, 비대각 항이 사라져 $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 125 q_y^2$이다. 이때 위 식은 다음과 같이 줄어든다.
 
-$$
+```math
 f = e^{-62.5 q_y^2}, \qquad g = 125 \, q_y \, f, \qquad H = 125 \, f \, (1 - 125 q_y^2), \qquad \Delta t_y = -\frac{g}{H}
-$$
+```
 
 | 반복 | $t_y$ | $q_y$ | $f$ | $g$ | $H$ | $\Delta t_y$ |
 |:-----|:-----|:-----|:-----|:-----|:-----|:-----|
@@ -260,7 +260,7 @@ $$
 | 2 | $-0.0484$ | $0.0016$ | $0.9998$ | $0.196$ | $124.9$ | $-0.0016$ |
 | 3 | $-0.0500$ | $0.0000$ | $1.0000$ | $0.000$ | $125.0$ | $0.0000$ |
 
-*표 3. $t_y$ 하나만 움직일 때 뉴턴 방법의 반복*
+*표 3. $`t_y`$ 하나만 움직일 때 뉴턴 방법의 반복*
 
 세 번 만에 $t_y = -0.05$로 수렴하여 점이 셀의 평균 높이 $y = 0.1$에 놓인다. 반복할수록 $q_y$가 $0.05 \to -0.0227 \to 0.0016$으로 빠르게 줄어드는데, 이는 최솟값 근처에서 뉴턴 방법이 보이는 빠른(이차) 수렴이다.
 
@@ -270,9 +270,9 @@ $$
 
 3차원에서는 변환의 매개변수가 평행 이동 $(t_x, t_y, t_z)$와 세 회전각(roll, pitch, yaw)의 6개로 늘고, 셀은 정육면체 복셀이 된다. Magnusson은 이 3차원 NDT를 정리하면서, 지도에 없는 물체에서 온 점(이상점, outlier)이 점수를 지배하지 않도록 정규 분포에 균일 분포를 섞은 모델을 쓰고, 이를 다시 가우스 함수로 근사한 점수 함수를 제안하였다 [2].
 
-$$
+```math
 s(\mathbf{p}) = \sum_{k} d_1 \exp\left( -\frac{d_2}{2} \mathbf{q}_k^{T} \Sigma_k^{-1} \mathbf{q}_k \right)
-$$
+```
 
 여기서 $d_1$, $d_2$는 이상점의 비율과 셀 크기에서 정해지는 상수이고 $d_1 < 0$이므로, 각 항은 2차원의 $s = -\text{score}$처럼 음수이다. 이 점수는 2차원의 경우와 같은 꼴이므로 기울기와 헤세 행렬도 같은 방식으로 구하고, 뉴턴 방향으로 움직일 걸음의 크기는 선 탐색으로 정한다. 오픈 소스 포인트 클라우드 라이브러리 PCL(Point Cloud Library)이 이 방법을 구현하며 선 탐색에는 More-Thuente 방법을 쓰고 [3], Autoware의 ndt_matching은 PCL의 구현이나 이를 고친 구현을 골라 쓴다 [4].
 
@@ -590,9 +590,9 @@ flowchart LR
 2. 목표점도 원 위에 있으므로 중심까지의 거리가 $R$이다: $x_t^2 + (y_t - R)^2 = R^2$.
 3. 전개하면 $x_t^2 + y_t^2 - 2 y_t R + R^2 = R^2$이므로 $l^2 - 2 y_t R = 0$이다.
 
-$$
+```math
 R = \frac{l^2}{2 y_t}, \qquad \kappa = \frac{1}{R} = \frac{2 y_t}{l^2}
-$$
+```
 
 목표점이 진행 방향과 이루는 각을 $\alpha$라 하면 $y_t = l \sin\alpha$이므로 같은 식을 $\kappa = 2 \sin\alpha / l$로도 쓸 수 있다. $y_t > 0$(목표점이 왼쪽)이면 $\kappa > 0$으로 왼쪽으로, $y_t < 0$이면 오른쪽으로 돈다. $y_t = 0$이면 곡률이 0, 즉 직진이다.
 
@@ -621,9 +621,9 @@ Autoware의 pure_pursuit는 경로의 웨이포인트를 차례로 보며 현재
 
 전방 주시 거리는 두 가지 방식으로 정한다. Dialog 모드에서는 대화 상자에 입력한 고정 속도와 고정 전방 주시 거리를 쓴다. Waypoint 모드에서는 속도를 웨이포인트의 목표 속도에서 가져오고, 전방 주시 거리를 현재 속도에 비례하게 정한다 [5].
 
-$$
+```math
 l = \begin{cases} l_{\min} & (r \, v < l_{\min}) \\ \min(r \, v, \; 10 v) & (\text{otherwise}) \end{cases}
-$$
+```
 
 여기서 $r$은 lookahead_ratio, $l_{\min}$은 minimum_lookahead_distance, $v$는 현재 속도(m/s)이다. 예시 설정 $r = 2$, $l_{\min} = 4$ m에서는 다음과 같다.
 
@@ -646,9 +646,9 @@ $$
 
 곡률 $\kappa$인 원을 속도 $v$로 달리는 차량은 원의 중심 쪽으로 $a_y = v^2 \kappa = v \omega$의 횡방향 가속도(구심 가속도)를 받는다. 이 값이 크면 승객이 불편하고, 타이어의 마찰 한계를 넘으면 차량이 미끄러진다. twist_filter는 pure_pursuit가 낸 목표 속도와 각속도로 횡방향 가속도를 계산하여, 정한 한도 $a_{\max}$(lateral_accel_limit)를 넘으면 명령을 제한한다. 초기 Autoware.ai(1.8.0)의 twist_filter는 각속도 $\omega$를 그대로 두고 속도를 $a_{\max} / \omega$로 바꾸었다(오른쪽으로 돌아 $\omega < 0$이면 이 값이 음수가 되는 결함이 있다) [7]. Autoware.ai 1.14.0의 twist_filter는 반대로 속도를 그대로 두고 각속도의 크기를 $a_{\max} / v$로 줄이며, 횡방향 저크(jerk, 횡방향 가속도의 변화율)의 한도도 함께 적용한다 [5]. 어느 방식이든 실제로 그리는 곡률 $\omega / v$가 경로의 곡률과 달라진다. 경로의 곡률 $\kappa$를 그대로 따르면서 한도를 지키려면 속도가 다음을 만족해야 하며, 이 값이 곡선 구간에서 낼 수 있는 속도의 상한이다.
 
-$$
+```math
 v^2 \kappa \le a_{\max} \quad \Longrightarrow \quad v \le \sqrt{\frac{a_{\max}}{\kappa}}
-$$
+```
 
 6.3절의 목표점($\kappa = 0.1176$ m⁻¹)에서 한도가 예시 설정의 $a_{\max} = 5$ m/s²이면, $v = 5$ m/s의 $a_y = 2.94$ m/s²는 한도 안이므로 그대로 통과한다. 같은 곡선을 $v = 8$ m/s로 달리려 하면 $\omega = 8 \times 0.1176 \approx 0.941$ rad/s, $a_y = 64 \times 0.1176 \approx 7.53$ m/s²로 한도를 넘는다. 곡률을 지키려면 속도를 $\sqrt{5 / 0.1176} \approx 6.52$ m/s(약 23.5 km/h) 이하로 줄여야 한다. 초기 구현은 속도를 $5 / 0.941 \approx 5.31$ m/s로 줄이므로 곡률이 $0.941 / 5.31 \approx 0.177$ m⁻¹로 커지고, 1.14.0의 구현은 각속도를 $5 / 8 = 0.625$ rad/s로 줄이므로 곡률이 $0.625 / 8 \approx 0.078$ m⁻¹로 작아져 경로보다 바깥쪽을 돈다.
 
@@ -900,7 +900,7 @@ shasum -a 256 ubuntu-18.04.6-desktop-amd64.iso    # macOS
 | 벽을 따라 움직인 점과 벽에 수직으로 움직인 점은 같은 거리라도 NDT 점수가 다르다. | **T.** 공분산이 벽 방향으로 길게 퍼져 있으므로 벽에 수직인 방향의 이탈을 더 크게 벌한다. |
 | 뉴턴 방법은 어떤 초기 추정에서 시작해도 점수를 높이는 방향으로 움직인다. | **F.** 헤세 행렬이 양의 정부호가 아니면 반대 방향으로 갈 수 있으므로 구현은 헤세 행렬을 보정하거나 선 탐색을 쓴다. |
 | NDT의 Resolution을 키우면 초기 추정 오차에 더 강해지지만 정확도는 떨어질 수 있다. | **T.** 셀이 크면 점수 함수가 완만해져 수렴 범위가 넓어지지만 표면의 세부 모양이 뭉개진다. |
-| pure pursuit에서 목표점이 차량의 바로 앞($y_t = 0$)에 있으면 곡률은 0이다. | **T.** $\kappa = 2 y_t / l^2 = 0$이므로 직진한다. |
+| pure pursuit에서 목표점이 차량의 바로 앞($`y_t = 0`$)에 있으면 곡률은 0이다. | **T.** $\kappa = 2 y_t / l^2 = 0$이므로 직진한다. |
 | 같은 곡률에서 속도를 두 배로 하면 횡방향 가속도도 두 배가 된다. | **F.** $a_y = v^2 \kappa$이므로 네 배가 된다. |
 | VirtualBox에서 Erase disk and install Ubuntu를 고르면 호스트의 Windows가 지워진다. | **F.** 가상 머신 안의 가상 디스크만 지워진다. |
 

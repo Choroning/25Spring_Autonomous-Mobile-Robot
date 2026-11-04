@@ -80,7 +80,9 @@ For an autonomous vehicle to find itself on a map, it needs a position in coordi
 
 Each satellite broadcasts its orbit information and the time at which it sent the signal. The receiver subtracts the transmission time from the arrival time to get the travel time $\Delta t$ of the signal and multiplies it by the speed of light $c \approx 3 \times 10^{8}$ m/s to compute the distance to the satellite. The satellites, however, carry atomic clocks while the receiver uses an inexpensive quartz clock, so the two clocks disagree and the computed distance contains a term caused by the receiver clock error. A distance that includes this clock error is called a **pseudorange** [1].
 
-$$\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i$$
+```math
+\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i
+```
 
 Here $\rho_i$ is the pseudorange to the $i$-th satellite, $(x_i, y_i, z_i)$ is the satellite position known from the orbit information, $(x, y, z)$ is the receiver position to be found, $\delta t_r$ is the receiver clock error, and $\varepsilon_i$ collects the remaining errors discussed in Section 1.3. There are four unknowns, $x, y, z, \delta t_r$, so **at least four satellites must be visible** to obtain a position. Without the clock error, the intersection of three spheres built from the distances to three satellites would be the receiver position; the fourth satellite is needed to solve for the clock error.
 
@@ -136,11 +138,15 @@ Among the errors in Table 2, the satellite clock, satellite orbit, ionospheric, 
 - The reference station builds correction information from the difference between its known coordinates $(x_1, y_1, z_1)$ and the coordinates $(x_1', y_1', z_1')$ measured with GNSS, and sends it to vehicles within an effective radius, which are called **rovers**.
 - A rover that receives the correction information adds it to its own measured coordinates $(x_2', y_2', z_2')$ to correct the error.
 
-$$(dx,\ dy,\ dz) = (x_1 - x_1',\ y_1 - y_1',\ z_1 - z_1')$$
+```math
+(dx,\ dy,\ dz) = (x_1 - x_1',\ y_1 - y_1',\ z_1 - z_1')
+```
 
-$$(x_2,\ y_2,\ z_2) = (x_2' + dx,\ y_2' + dy,\ z_2' + dz)$$
+```math
+(x_2,\ y_2,\ z_2) = (x_2' + dx,\ y_2' + dy,\ z_2' + dz)
+```
 
-For example, in a local coordinate system (in m), if the true coordinates of the reference station are $(1000.0, 2000.0, 50.0)$ and its measured coordinates are $(1002.3, 1998.6, 53.1)$, the correction is $(1000.0 - 1002.3,\ 2000.0 - 1998.6,\ 50.0 - 53.1) = (-2.3, +1.4, -3.1)$. If the rover measures $(1502.1, 2501.2, 55.0)$ at the same moment, its corrected coordinates are $(1502.1 - 2.3,\ 2501.2 + 1.4,\ 55.0 - 3.1) = (1499.8, 2502.6, 51.9)$.
+For example, in a local coordinate system (in m), if the true coordinates of the reference station are $(1000.0, 2000.0, 50.0)$ and its measured coordinates are $(1002.3, 1998.6, 53.1)$, the correction is $`(1000.0 - 1002.3,\ 2000.0 - 1998.6,\ 50.0 - 53.1) = (-2.3, +1.4, -3.1)`$. If the rover measures $(1502.1, 2501.2, 55.0)$ at the same moment, its corrected coordinates are $`(1502.1 - 2.3,\ 2501.2 + 1.4,\ 55.0 - 3.1) = (1499.8, 2502.6, 51.9)`$.
 
 This method can reduce only the **errors common to both receivers**. Multipath and receiver noise arise separately at each receiver, so correction information cannot remove them. Also, the farther apart the reference station and the rover are, the more the atmosphere along their signal paths differs and the smaller the share of common error becomes, so correction information has an effective radius.
 
@@ -172,7 +178,9 @@ DGPS measures range with the **time-difference observation method**. A satellite
 
 One bit of the code is called a **chip**, and the GPS C/A code is sent at $1.023 \times 10^{6}$ chips per second [6]. The length that one chip occupies along the direction of propagation, that is, the "wavelength" of the code, is as follows.
 
-$$\lambda_{\text{C/A}} = \frac{c}{f_{\text{C/A}}} = \frac{299{,}792{,}458\ \text{m/s}}{1.023 \times 10^{6}\ \text{Hz}} \approx 293\ \text{m}$$
+```math
+\lambda_{\text{C/A}} = \frac{c}{f_{\text{C/A}}} = \frac{299{,}792{,}458\ \text{m/s}}{1.023 \times 10^{6}\ \text{Hz}} \approx 293\ \text{m}
+```
 
 Rounding the chip rate to 1 MHz gives $3 \times 10^{8} / 10^{6} = 300$ m. Because the receiver aligns arrival times against chips several hundred meters long, measurement noise of a few meters remains no matter how well it reads the position within a chip. The accuracy of DGPS with corrections applied is about **1-5 m**.
 
@@ -184,13 +192,17 @@ Rounding the chip rate to 1 MHz gives $3 \times 10^{8} / 10^{6} = 300$ m. Becaus
 
 The code is transmitted on a high-frequency sine wave called the **carrier**. RTK uses this carrier itself as a ruler instead of the code, in the **phase-difference observation method**: it observes how many carrier wavelengths fit between the satellite and the receiver (rover) to obtain the distance. The carrier frequency of the GPS L1 signal is 1575.42 MHz, so its wavelength is as follows [6].
 
-$$\lambda_{L1} = \frac{c}{f_{L1}} = \frac{299{,}792{,}458\ \text{m/s}}{1575.42 \times 10^{6}\ \text{Hz}} \approx 0.190\ \text{m} = 19\ \text{cm}$$
+```math
+\lambda_{L1} = \frac{c}{f_{L1}} = \frac{299{,}792{,}458\ \text{m/s}}{1575.42 \times 10^{6}\ \text{Hz}} \approx 0.190\ \text{m} = 19\ \text{cm}
+```
 
 Comparing the two rulers gives $1575.42 / 1.023 = 1540$, so the carrier wavelength is 1/1540 of the C/A code chip length. If both measurements read the position within one wavelength (chip) with the same relative precision, say 1%, the code measurement noise is $293 \times 0.01 \approx 2.9$ m while the carrier measurement noise is $0.19 \times 0.01 \approx 0.0019$ m, about 2 mm. This is why carrier-phase ranging is far more precise than code ranging.
 
 The problem is that the receiver measures the phase within one wavelength (the fractional part) precisely but cannot know **how many whole wavelengths** lie between it and the satellite. This unknown integer $N$ is called the **integer ambiguity**, and the range measured with the carrier phase can be written as follows.
 
-$$\Phi = \lambda \left( N + \frac{\phi}{2\pi} \right)$$
+```math
+\Phi = \lambda \left( N + \frac{\phi}{2\pi} \right)
+```
 
 Here $\phi$ is the phase (in radians) measured by the receiver. RTK determines $N$ with **differencing techniques** [1], [2].
 
@@ -233,7 +245,9 @@ Whereas a camera is a **passive sensor** that only receives ambient light, LiDAR
 
 Both sensors measure the time the wave takes to reach the object and come back, the **time of flight (ToF)** $t$, and since the wave makes the round trip at the speed of light $c$, the distance $d$ to the object is as follows.
 
-$$d = \frac{c \cdot t}{2}$$
+```math
+d = \frac{c \cdot t}{2}
+```
 
 The division by 2 is needed because $t$ is a round-trip time. For example, if the reflection returns after 200 ns, $d = (3 \times 10^{8} \times 200 \times 10^{-9}) / 2 = 60 / 2 = 30$ m. Conversely, distinguishing distances in steps of 1 cm requires resolving time differences of $t = 2 \times 0.01 / (3 \times 10^{8}) \approx 6.7 \times 10^{-11}$ s, about 67 ps, so these sensors contain very precise timing circuits.
 
@@ -247,7 +261,9 @@ A LiDAR fires short pulses of near-infrared laser light (commonly at a wavelengt
 
 In Figure 8, $\varphi$ is the azimuth measured from the X axis in the horizontal plane and $\theta$ is the elevation measured upward from the horizontal plane [8]. The coordinates of the reflection point are as follows.
 
-$$x = d \cos\theta \cos\varphi, \qquad y = d \cos\theta \sin\varphi, \qquad z = d \sin\theta$$
+```math
+x = d \cos\theta \cos\varphi, \qquad y = d \cos\theta \sin\varphi, \qquad z = d \sin\theta
+```
 
 For example, with $d = 20$ m, $\theta = 5°$, and $\varphi = 30°$, the values $\cos 5° \approx 0.9962$, $\sin 5° \approx 0.0872$, $\cos 30° \approx 0.8660$, and $\sin 30° = 0.5$ give $x = 20 \times 0.9962 \times 0.8660 \approx 17.25$ m, $y = 20 \times 0.9962 \times 0.5 \approx 9.96$ m, and $z = 20 \times 0.0872 \approx 1.74$ m. Hundreds of thousands of such points collected every second form the **point cloud** used for map building and NDT matching in Weeks 2 and 9.
 
@@ -295,7 +311,9 @@ The ranging principle is the time of flight of Section 2.1, but most automotive 
 
 A major advantage of radar is that it **measures relative velocity directly**. A radio wave reflected from an approaching or receding object changes frequency through the **Doppler effect**, and the change $f_D$ is proportional to the radial velocity $v$ [12].
 
-$$f_D = \frac{2v}{\lambda}$$
+```math
+f_D = \frac{2v}{\lambda}
+```
 
 For example, if a car in front of a 77 GHz radar ($\lambda \approx 0.00389$ m) approaches at 20 m/s, $f_D = 2 \times 20 / 0.00389 \approx 10{,}300$ Hz, a frequency change of about 10.3 kHz. LiDAR and cameras must estimate velocity from the change in position over several measurements, but radar obtains velocity from a single measurement.
 
@@ -515,9 +533,11 @@ The identifier and the RTR bit together are called the **arbitration field**. Th
 
 The length of a frame carrying 8 bytes of data is computed as follows.
 
-$$1 + 11 + 1 + 6 + 64 + 15 + 1 + 1 + 1 + 7 = 108 \text{ bits}, \qquad 108 + 3 = 111 \text{ bits (including the interframe space)}$$
+```math
+1 + 11 + 1 + 6 + 64 + 15 + 1 + 1 + 1 + 7 = 108 \text{ bits}, \qquad 108 + 3 = 111 \text{ bits (including the interframe space)}
+```
 
-At a bit rate of 500 kbit/s, one bit takes $1 / (500 \times 10^{3}) = 2$ µs, so one frame takes $111 \times 2 = 222$ µs and the bus carries at most $1 / (222 \times 10^{-6}) \approx 4{,}500$ frames per second. Of the 111 bits, 64 are data, so the efficiency is $64 / 111 \approx 57.7\%$. In practice bit stuffing adds more bits; in the standard format, an 8-byte frame can contain up to 24 stuff bits [21].
+At a bit rate of 500 kbit/s, one bit takes $1 / (500 \times 10^{3}) = 2$ µs, so one frame takes $111 \times 2 = 222$ µs and the bus carries at most $1 / (222 \times 10^{-6}) \approx 4{,}500$ frames per second. Of the 111 bits, 64 are data, so the efficiency is $`64 / 111 \approx 57.7\%`$. In practice bit stuffing adds more bits; in the standard format, an 8-byte frame can contain up to 24 stuff bits [21].
 
 ### 3.6 Arbitration and Priority
 
@@ -712,7 +732,7 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
    <details>
    <summary>Answer</summary>
 
-   At least four are needed. In the pseudorange equation $\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i$, the unknowns are the receiver position $x, y, z$ and the receiver clock error $\delta t_r$, four in total. With four unknowns, at least four independent equations, that is, pseudoranges to four different satellites, are needed.
+   At least four are needed. In the pseudorange equation $`\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i`$, the unknowns are the receiver position $x, y, z$ and the receiver clock error $\delta t_r$, four in total. With four unknowns, at least four independent equations, that is, pseudoranges to four different satellites, are needed.
 
    </details>
 
@@ -730,7 +750,7 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
    <details>
    <summary>Answer</summary>
 
-   The correction is the true coordinates minus the measured coordinates: $(500.0 - 497.5,\ 800.0 - 801.2,\ 30.0 - 34.0) = (+2.5, -1.2, -4.0)$. Adding it to the rover's measured coordinates gives $(620.4 + 2.5,\ 905.0 - 1.2,\ 36.5 - 4.0) = (622.9, 903.8, 32.5)$. This correction holds under the assumption that the two receivers use the same satellites and their errors are common.
+   The correction is the true coordinates minus the measured coordinates: $`(500.0 - 497.5,\ 800.0 - 801.2,\ 30.0 - 34.0) = (+2.5, -1.2, -4.0)`$. Adding it to the rover's measured coordinates gives $`(620.4 + 2.5,\ 905.0 - 1.2,\ 36.5 - 4.0) = (622.9, 903.8, 32.5)`$. This correction holds under the assumption that the two receivers use the same satellites and their errors are common.
 
    </details>
 

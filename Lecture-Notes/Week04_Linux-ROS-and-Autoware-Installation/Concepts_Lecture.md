@@ -633,7 +633,7 @@ angular:
 ---
 ```
 
-The type of the velocity commands that pure_pursuit and twist_filter in Week 3 exchange (`twist_raw`, `twist_cmd`), `geometry_msgs/TwistStamped`, is this `Twist` with an added `header` that carries the time and the coordinate frame. Both the turtle moving on a plane and the vehicle are told how to move with two values, `linear.x` (linear velocity $v$) and `angular.z` (angular velocity $\omega$).
+The type of the velocity commands that pure_pursuit and twist_filter in Week 3 exchange (`twist_raw`, `twist_cmd`), `geometry_msgs/TwistStamped`, is this `Twist` with an added `header` that carries the time and the coordinate frame. Both the turtle moving on a plane and the vehicle are told how to move with two values, `linear.x` (linear velocity $`v`$) and `angular.z` (angular velocity $`\omega`$).
 
 ### 4.5 Stopping Nodes and Setting Up a Workspace Environment
 

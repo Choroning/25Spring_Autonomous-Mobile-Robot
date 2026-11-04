@@ -217,7 +217,7 @@ Both map building and localization are computations that move point clouds aroun
 
 ### 2.1 Representing Point Clouds
 
-A point cloud is a set of points $P = \lbrace\mathbf{p}_1, \dots, \mathbf{p}_N\rbrace$ with $\mathbf{p}_i = (x_i, y_i, z_i)$. A LiDAR point may carry values besides its coordinates, such as the strength of the returned laser (intensity) or the index of the laser that measured it (ring). The order of the points has no meaning, so a point cloud is mathematically an unordered set. The open-source **PCL (Point Cloud Library)** is a C++ library that collects algorithms for storing, filtering, and registering point clouds, and map building and localization in Autoware are based on PCL [1].
+A point cloud is a set of points $`P = \lbrace\mathbf{p}_1, \dots, \mathbf{p}_N\rbrace`$ with $`\mathbf{p}_i = (x_i, y_i, z_i)`$. A LiDAR point may carry values besides its coordinates, such as the strength of the returned laser (intensity) or the index of the laser that measured it (ring). The order of the points has no meaning, so a point cloud is mathematically an unordered set. The open-source **PCL (Point Cloud Library)** is a C++ library that collects algorithms for storing, filtering, and registering point clouds, and map building and localization in Autoware are based on PCL [1].
 
 In ROS, point clouds are exchanged as `sensor_msgs/PointCloud2` messages [2]. The message packs all points into a single byte array and separately describes which value sits at which position within the bytes of each point.
 
@@ -256,30 +256,30 @@ DATA ascii
 
 ### 2.2 Rigid-Body Transformations in 3D
 
-A transformation that only rotates and translates an object without changing its shape is called a **rigid-body transformation**. Rotating a 3D point $\mathbf{p}$ by a rotation matrix $R$ and moving it by a translation vector $\mathbf{t}$ gives $\mathbf{p}' = R\mathbf{p} + \mathbf{t}$. The orientation of a vehicle is expressed by roll ($\phi$), pitch ($\theta$), and yaw ($\psi$) as defined in Week 3, which are rotations about the $x$-, $y$-, and $z$-axes, respectively.
+A transformation that only rotates and translates an object without changing its shape is called a **rigid-body transformation**. Rotating a 3D point $\mathbf{p}$ by a rotation matrix $R$ and moving it by a translation vector $\mathbf{t}$ gives $\mathbf{p}' = R\mathbf{p} + \mathbf{t}$. The orientation of a vehicle is expressed by roll ($`\phi`$), pitch ($`\theta`$), and yaw ($`\psi`$) as defined in Week 3, which are rotations about the $x$-, $y$-, and $z$-axes, respectively.
 
-$$
+```math
 R_x(\phi) = \begin{pmatrix} 1 & 0 & 0 \\ 0 & \cos\phi & -\sin\phi \\ 0 & \sin\phi & \cos\phi \end{pmatrix}, \quad
 R_y(\theta) = \begin{pmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{pmatrix}, \quad
 R_z(\psi) = \begin{pmatrix} \cos\psi & -\sin\psi & 0 \\ \sin\psi & \cos\psi & 0 \\ 0 & 0 & 1 \end{pmatrix}
-$$
+```
 
 ROS and PCL build the rotation matrix from the three angles in the order $R = R_z(\psi) R_y(\theta) R_x(\phi)$; that is, they rotate first by roll, then by pitch, and finally by yaw about fixed axes. To handle rotation and translation together, a 1 is appended to the point to form **homogeneous coordinates** $(x, y, z, 1)$, and a rigid-body transformation becomes a single product with a $4 \times 4$ matrix.
 
-$$
+```math
 T = \begin{pmatrix} R & \mathbf{t} \\ \mathbf{0}^{T} & 1 \end{pmatrix}, \qquad
 \begin{pmatrix} \mathbf{p}' \\ 1 \end{pmatrix} = T \begin{pmatrix} \mathbf{p} \\ 1 \end{pmatrix} = \begin{pmatrix} R\mathbf{p} + \mathbf{t} \\ 1 \end{pmatrix}
-$$
+```
 
 This matrix is called a **homogeneous transformation matrix**. A 3D pose $(x, y, z, \phi, \theta, \psi)$ carries the same information as one homogeneous transformation matrix with $\mathbf{t} = (x, y, z)$ and $R = R_z(\psi) R_y(\theta) R_x(\phi)$.
 
-> **[Linear Algebra]** A rotation matrix is an orthogonal matrix with $R^{T} R = I$ and $\det R = 1$. Its inverse therefore equals its transpose ($R^{-1} = R^{T}$), and the inverse of a homogeneous transformation matrix is $T^{-1} = \begin{pmatrix} R^{T} & -R^{T}\mathbf{t} \\ \mathbf{0}^{T} & 1 \end{pmatrix}$. Applying two transformations in sequence gives the matrix product $T_1 T_2$, and since matrix multiplication is not commutative, the order of multiplication matters.
+> **[Linear Algebra]** A rotation matrix is an orthogonal matrix with $R^{T} R = I$ and $\det R = 1$. Its inverse therefore equals its transpose ($`R^{-1} = R^{T}`$), and the inverse of a homogeneous transformation matrix is $`T^{-1} = \begin{pmatrix} R^{T} & -R^{T}\mathbf{t} \\ \mathbf{0}^{T} & 1 \end{pmatrix}`$. Applying two transformations in sequence gives the matrix product $T_1 T_2$, and since matrix multiplication is not commutative, the order of multiplication matters.
 
 When the angles are sufficiently small, $\cos\alpha \approx 1$ and $\sin\alpha \approx \alpha$, and products of two small angles can be neglected, so the rotation matrix is approximated as follows. Section 3.7 checks this approximation against actual output.
 
-$$
+```math
 R \approx \begin{pmatrix} 1 & -\psi & \theta \\ \psi & 1 & -\phi \\ -\theta & \phi & 1 \end{pmatrix}
-$$
+```
 
 ### 2.3 Coordinate Frames and Composition of Transformations
 
@@ -295,18 +295,18 @@ An autonomous driving system has several **coordinate frames**. The same point h
 
 *Table 5. Main coordinate frames used in Autoware*
 
-The transformation that converts a point in frame $B$ into a point in frame $A$ is denoted $T^{A}_{B}$. $T^{A}_{B}$ is also the pose of $B$ seen from $A$. The map coordinates of a point $\mathbf{p}^{\text{lidar}}$ measured by the LiDAR are then obtained by moving it in the order LiDAR → vehicle → map.
+The transformation that converts a point in frame $B$ into a point in frame $A$ is denoted $`T^{A}_{B}`$. $`T^{A}_{B}`$ is also the pose of $B$ seen from $A$. The map coordinates of a point $\mathbf{p}^{\text{lidar}}$ measured by the LiDAR are then obtained by moving it in the order LiDAR → vehicle → map.
 
-$$
+```math
 \mathbf{p}^{\text{map}} = T^{\text{map}}_{\text{base}} \, T^{\text{base}}_{\text{lidar}} \, \mathbf{p}^{\text{lidar}}, \qquad
 T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} \, T^{\text{base}}_{\text{lidar}}
-$$
+```
 
-$T^{\text{base}}_{\text{lidar}}$ is a fixed value determined when the LiDAR is mounted on the vehicle, and the Baselink to Localizer entered in the Setup tab of the Runtime Manager is exactly this value (Section 4.3). What NDT registration computes directly is the LiDAR pose $T^{\text{map}}_{\text{lidar}}$, so the vehicle pose is obtained by solving the equation above backward: $T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}$.
+$`T^{\text{base}}_{\text{lidar}}`$ is a fixed value determined when the LiDAR is mounted on the vehicle, and the Baselink to Localizer entered in the Setup tab of the Runtime Manager is exactly this value (Section 4.3). What NDT registration computes directly is the LiDAR pose $`T^{\text{map}}_{\text{lidar}}`$, so the vehicle pose is obtained by solving the equation above backward: $`T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}`$.
 
 **Worked example: composing transformations.** Suppose the vehicle is at $(10, 5, 0)$ m in the map facing yaw $= 90°$ (the map $y$-axis), and the LiDAR is mounted 1.2 m ahead of and 2.0 m above the vehicle reference point. The LiDAR measures a point $\mathbf{p}^{\text{lidar}} = (5, 0, -1.5)$ located 5 m ahead of and 1.5 m below itself.
 
-1. **LiDAR → vehicle.** The LiDAR is only translated, without rotation, so $\mathbf{p}^{\text{base}} = (5 + 1.2, \; 0, \; -1.5 + 2.0) = (6.2, 0, 0.5)$. This point is 6.2 m ahead of and 0.5 m above the vehicle reference point.
+1. **LiDAR → vehicle.** The LiDAR is only translated, without rotation, so $`\mathbf{p}^{\text{base}} = (5 + 1.2, \; 0, \; -1.5 + 2.0) = (6.2, 0, 0.5)`$. This point is 6.2 m ahead of and 0.5 m above the vehicle reference point.
 2. **Vehicle → map.** $R_z(90°)$ maps $(x, y, z)$ to $(-y, x, z)$, so $R_z(90°)\mathbf{p}^{\text{base}} = (0, 6.2, 0.5)$, and adding the vehicle position gives $\mathbf{p}^{\text{map}} = (10, 11.2, 0.5)$.
 
 Because the vehicle faces the map $y$-axis, a point ahead of the vehicle lands 6.2 m away in the $y$ direction of the map. In the same way, the map position of the LiDAR itself is $(10, 6.2, 2.0)$, obtained by moving $(0, 0, 0)$.
@@ -399,12 +399,12 @@ In each rotation, a LiDAR measures only the shape of its surroundings within a f
 
 **NDT mapping** solves this problem with scan matching (Week 3, Section 2.6). The upper left of Figure 8 is the map built by stacking the scans so far, and the lower left is a newly arrived scan. Registering the two with NDT gives the relative position of the LiDAR with respect to the map, and the new scan is moved by that position and added to the 3D map. Repeating this builds a map of a wide area as on the right. In equations, this is as follows.
 
-$$
+```math
 T_k = \arg\min_{T} \; E(T; \, S_k, M_{k-1}), \qquad
 M_k = M_{k-1} \cup \lbrace \, T_k \mathbf{s} \mid \mathbf{s} \in S_k \, \rbrace
-$$
+```
 
-Here $S_k$ is the $k$-th scan (in the LiDAR frame), $M_{k-1}$ is the map built so far (in the map frame), $E$ is a cost function measuring how far the scan moved by a transformation $T$ deviates from the map, and $T_k = T^{\text{map}}_{\text{lidar}}$ is the LiDAR pose when the $k$-th scan was measured. In NDT, $E$ is the score of Week 3, Section 2.4 with a negative sign [5]. The first scan $S_0$ has no map to compare with and becomes the map as it is, so the origin of the map frame is the vehicle position at the moment map building starts.
+Here $S_k$ is the $k$-th scan (in the LiDAR frame), $M_{k-1}$ is the map built so far (in the map frame), $E$ is a cost function measuring how far the scan moved by a transformation $T$ deviates from the map, and $`T_k = T^{\text{map}}_{\text{lidar}}`$ is the LiDAR pose when the $k$-th scan was measured. In NDT, $E$ is the score of Week 3, Section 2.4 with a negative sign [5]. The first scan $S_0$ has no map to compare with and becomes the map as it is, so the origin of the map frame is the vehicle position at the moment map building starts.
 
 ![Figure 9. Panorama stitched from several photos by aligning their overlapping parts](../../images/Week09_9-2_p09.png)
 
@@ -433,27 +433,27 @@ Week 3, Sections 2.3-2.4 derived the NDT score, gradient, and Hessian in the pla
 
 The parameters of a 3D transformation collect three translations and three rotation angles, $\mathbf{p} = (t_x, t_y, t_z, \phi, \theta, \psi)$. A scan point $\mathbf{x}$ is moved by $T(\mathbf{p}, \mathbf{x}) = R(\phi, \theta, \psi)\mathbf{x} + \mathbf{t}$, and if the map cell containing the moved point has mean $\boldsymbol{\mu}$ and covariance $\Sigma$, then $\mathbf{q} = T(\mathbf{p}, \mathbf{x}) - \boldsymbol{\mu}$. When minimizing the 3D score function of Week 3, Section 2.5, the gradient components for one point follow from the chain rule.
 
-$$
+```math
 g_i = -d_1 d_2 \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \exp\left( -\frac{d_2}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q} \right), \qquad i = 1, \dots, 6
-$$
+```
 
-Since $d_1 < 0$, the coefficient $-d_1 d_2$ is positive, and setting $d_1 = -1$, $d_2 = 1$ gives the same expression as the 2D gradient of Week 3, Section 2.4. The form of the equation is the same as in 2D; what changes is the $3 \times 6$ matrix obtained by differentiating $\mathbf{q}$ with respect to the parameters, the **Jacobian** $J = \partial \mathbf{q} / \partial \mathbf{p}$. The derivative with respect to translation is the identity matrix $I_3$. The derivative with respect to rotation is long at general angles, but if a small rotation increment near the current estimate is taken as the parameter, it follows simply from the approximation $R \approx I + [\boldsymbol{\omega}]_{\times}$ of Section 2.2. Here $\boldsymbol{\omega} = (\phi, \theta, \psi)$, and $[\boldsymbol{\omega}]_{\times}$ is the skew-symmetric matrix that expresses the cross product $\boldsymbol{\omega} \times \mathbf{x}$ as a matrix product.
+Since $d_1 < 0$, the coefficient $-d_1 d_2$ is positive, and setting $d_1 = -1$, $d_2 = 1$ gives the same expression as the 2D gradient of Week 3, Section 2.4. The form of the equation is the same as in 2D; what changes is the $3 \times 6$ matrix obtained by differentiating $\mathbf{q}$ with respect to the parameters, the **Jacobian** $J = \partial \mathbf{q} / \partial \mathbf{p}$. The derivative with respect to translation is the identity matrix $I_3$. The derivative with respect to rotation is long at general angles, but if a small rotation increment near the current estimate is taken as the parameter, it follows simply from the approximation $`R \approx I + [\boldsymbol{\omega}]_{\times}`$ of Section 2.2. Here $\boldsymbol{\omega} = (\phi, \theta, \psi)$, and $`[\boldsymbol{\omega}]_{\times}`$ is the skew-symmetric matrix that expresses the cross product $\boldsymbol{\omega} \times \mathbf{x}$ as a matrix product.
 
-$$
+```math
 R\mathbf{x} \approx \mathbf{x} + \boldsymbol{\omega} \times \mathbf{x} = \mathbf{x} - \mathbf{x} \times \boldsymbol{\omega}
 \quad \Rightarrow \quad
 \frac{\partial (R\mathbf{x})}{\partial \boldsymbol{\omega}} = -[\mathbf{x}]_{\times} = \begin{pmatrix} 0 & z & -y \\ -z & 0 & x \\ y & -x & 0 \end{pmatrix}
-$$
+```
 
-$$
+```math
 J = \begin{pmatrix} I_3 & -[\mathbf{x}]_{\times} \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0 & 0 & z & -y \\ 0 & 1 & 0 & -z & 0 & x \\ 0 & 0 & 1 & y & -x & 0 \end{pmatrix}
-$$
+```
 
-> **[Linear Algebra]** The skew-symmetric matrix of a vector $\mathbf{a} = (a_1, a_2, a_3)$ is $[\mathbf{a}]_{\times} = \begin{pmatrix} 0 & -a_3 & a_2 \\ a_3 & 0 & -a_1 \\ -a_2 & a_1 & 0 \end{pmatrix}$, and $[\mathbf{a}]_{\times}\mathbf{b} = \mathbf{a} \times \mathbf{b}$ for every $\mathbf{b}$. The cross product satisfies $\mathbf{a} \times \mathbf{b} = -\mathbf{b} \times \mathbf{a}$.
+> **[Linear Algebra]** The skew-symmetric matrix of a vector $\mathbf{a} = (a_1, a_2, a_3)$ is $`[\mathbf{a}]_{\times} = \begin{pmatrix} 0 & -a_3 & a_2 \\ a_3 & 0 & -a_1 \\ -a_2 & a_1 & 0 \end{pmatrix}`$, and $`[\mathbf{a}]_{\times}\mathbf{b} = \mathbf{a} \times \mathbf{b}`$ for every $\mathbf{b}$. The cross product satisfies $\mathbf{a} \times \mathbf{b} = -\mathbf{b} \times \mathbf{a}$.
 
 The last column of $J$, $(-y, x, 0)$, equals $(-y, x)$, the 2D expression $\partial \mathbf{q} / \partial \phi$ of Week 3, Section 2.4 evaluated at $\phi = 0$. That is, planar yaw rotation is a special case of the 3D equations. The meaning of each column can be checked with the point $\mathbf{x} = (10, 0, 0)$ located 10 m ahead of the LiDAR.
 
-- **Yaw column** $(-y, x, 0) = (0, 10, 0)$: rotating yaw by a small angle $\delta\psi$ moves this point sideways by $10\,\delta\psi$. For the same angle, points at a larger horizontal distance move more, so distant points contribute strongly to determining the orientation (rotation) accurately.
+- **Yaw column** $(-y, x, 0) = (0, 10, 0)$: rotating yaw by a small angle $\delta\psi$ moves this point sideways by $`10\,\delta\psi`$. For the same angle, points at a larger horizontal distance move more, so distant points contribute strongly to determining the orientation (rotation) accurately.
 - **Pitch column** $(z, 0, -x) = (0, 0, -10)$: rotating pitch moves a distant point ahead up or down.
 - **Roll column** $(0, -z, y) = (0, 0, 0)$: roll is a rotation about the $x$-axis, so a point on the $x$-axis does not move. Points to the side or above and below are needed to determine roll.
 
@@ -464,12 +464,12 @@ The Hessian likewise becomes a $6 \times 6$ matrix in the same way as the 2D equ
 The Autoware `ndt_mapping` node does the following every time a scan arrives [7].
 
 1. **Range filter.** For each scan point, compute the horizontal distance $r = \sqrt{x^2 + y^2}$ and keep only points with $r_{\min} < r < r_{\max}$ (Minimum Scan Range, Maximum Scan Range). Points too close are usually hits on the vehicle's own body, and points too far are sparse and have large errors.
-2. **First scan.** If this is the first scan, move it by $T^{\text{base}}_{\text{lidar}}$ and take it as the map as it is. As seen in Section 3.3, the map origin becomes the vehicle reference point at the starting moment.
+2. **First scan.** If this is the first scan, move it by $`T^{\text{base}}_{\text{lidar}}`$ and take it as the map as it is. As seen in Section 3.3, the map origin becomes the vehicle reference point at the starting moment.
 3. **Downsampling.** Apply a voxel grid filter (Leaf Size) to the range-filtered scan to reduce the points used for registration (Section 4.5).
-4. **Initial guess.** Predict the current pose by assuming that the vehicle continues the same motion as just before (a constant-velocity motion model). The predicted pose for the $k$-th scan is $\hat{x}_k = x_{k-1} + (x_{k-1} - x_{k-2})$, with $y, z$, and yaw predicted by the same formula and roll and pitch taken from the previous values. The predicted vehicle pose multiplied by $T^{\text{base}}_{\text{lidar}}$ is used as the initial guess of the LiDAR pose.
-5. **NDT registration.** Register the downsampled scan to the map so far with NDT to obtain $T^{\text{map}}_{\text{lidar}}$.
-6. **Vehicle pose.** Compute the vehicle pose as $T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}$ and publish it on `/current_pose` and as TF (`map` → `base_link`).
-7. **Scan transformation.** Move the scan before downsampling (only range-filtered) into the map frame with $T^{\text{map}}_{\text{lidar}}$.
+4. **Initial guess.** Predict the current pose by assuming that the vehicle continues the same motion as just before (a constant-velocity motion model). The predicted pose for the $k$-th scan is $`\hat{x}_k = x_{k-1} + (x_{k-1} - x_{k-2})`$, with $y, z$, and yaw predicted by the same formula and roll and pitch taken from the previous values. The predicted vehicle pose multiplied by $`T^{\text{base}}_{\text{lidar}}`$ is used as the initial guess of the LiDAR pose.
+5. **NDT registration.** Register the downsampled scan to the map so far with NDT to obtain $`T^{\text{map}}_{\text{lidar}}`$.
+6. **Vehicle pose.** Compute the vehicle pose as $`T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} \, (T^{\text{base}}_{\text{lidar}})^{-1}`$ and publish it on `/current_pose` and as TF (`map` → `base_link`).
+7. **Scan transformation.** Move the scan before downsampling (only range-filtered) into the map frame with $`T^{\text{map}}_{\text{lidar}}`$.
 8. **Decide whether to add to the map.** Compute the horizontal distance $\text{shift}$ between the position where a scan was last added to the map and the current position; if $\text{shift} \ge$ Minimum Add Scan Shift, add the moved scan to the map and remember this position. Since the map has changed, the NDT cell distributions used for the next registration are rebuilt as well.
 9. **Publish.** Publish the updated map on `/ndt_map`.
 
@@ -583,7 +583,7 @@ shift: 0.0316652
 | Fitness score | 0.315708 | Mean of the squared distances between each point of the moved scan and its nearest point in the map (m²) |
 | Number of iteration | 2 | Number of iterations until convergence |
 | (x, y, z, roll, pitch, yaw) | See the interpretation below | Pose of the vehicle reference point in the map frame (m, rad) |
-| Transformation Matrix | See the interpretation below | LiDAR pose $T^{\text{map}}_{\text{lidar}}$ obtained by registration |
+| Transformation Matrix | See the interpretation below | LiDAR pose $`T^{\text{map}}_{\text{lidar}}`$ obtained by registration |
 | shift | 0.0316652 | Horizontal distance moved since a scan was last added (m) |
 | (Processed/Input) | (55 / 55) | Counts kept by `queue_counter` of processed scans (number of `/ndt_map` messages) and received scans (`/points_raw`). All 55 received scans have been processed |
 
@@ -596,12 +596,12 @@ The following can be read from this output.
 - **Meaning of the fitness score.** The square root of $0.3157$ m² is about 0.56 m. The representative points used for registration are centroids of the points in each voxel and may not lie on the actual surface, and points of moving objects such as passing cars are mixed in, so this value does not become 0. The size of a single value therefore matters less than whether the value suddenly grows while driving, which signals a registration problem.
 - **The transformation matrix is the LiDAR pose.** The upper-left $3 \times 3$ block of the matrix is the rotation matrix. Since the angles are small, the approximation of Section 2.2 gives $R_{01} \approx -\psi = -0.00408$, $R_{02} \approx \theta = -0.00114$, and $R_{12} \approx -\phi = -0.00052$, which match the output. The translation in the last column, $(1.168, 0.014, 2.002)$, however, differs from the vehicle position $(-0.030, 0.010, 0.0005)$.
 
-**Worked example: checking the translation of the transformation matrix.** In this data, the LiDAR is mounted at $(1.2, 0, 2.0)$ m from the vehicle reference point without rotation (the TF values of Section 4.3). In the equation $T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}$ of Section 2.3, the translation part is $\mathbf{t}_{\text{lidar}} = \mathbf{t}_{\text{base}} + R \, (1.2, 0, 2.0)^{T}$.
+**Worked example: checking the translation of the transformation matrix.** In this data, the LiDAR is mounted at $(1.2, 0, 2.0)$ m from the vehicle reference point without rotation (the TF values of Section 4.3). In the equation $`T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}`$ of Section 2.3, the translation part is $`\mathbf{t}_{\text{lidar}} = \mathbf{t}_{\text{base}} + R \, (1.2, 0, 2.0)^{T}`$.
 
-1. The first component of $R \, (1.2, 0, 2.0)^{T}$ is $1.2 \times 0.999991 + 2.0 \times (-0.00114083) = 1.19999 - 0.00228 = 1.19771$.
+1. The first component of $`R \, (1.2, 0, 2.0)^{T}`$ is $1.2 \times 0.999991 + 2.0 \times (-0.00114083) = 1.19999 - 0.00228 = 1.19771$.
 2. The second component is $1.2 \times 0.00407961 + 2.0 \times (-0.0005265) = 0.00490 - 0.00105 = 0.00384$.
 3. The third component is $1.2 \times 0.00114297 + 2.0 \times 0.999999 = 0.00137 + 2.00000 = 2.00137$.
-4. Adding the vehicle position gives $(1.19771 - 0.02996, \; 0.00384 + 0.01025, \; 2.00137 + 0.00045) = (1.16775, 0.01409, 2.00182)$, which matches the last column of the printed matrix.
+4. Adding the vehicle position gives $`(1.19771 - 0.02996, \; 0.00384 + 0.01025, \; 2.00137 + 0.00045) = (1.16775, 0.01409, 2.00182)`$, which matches the last column of the printed matrix.
 
 That is, NDT registration finds the LiDAR pose, and what is printed and published on `/current_pose` is the vehicle pose obtained by undoing the LiDAR's mounting position.
 
@@ -615,7 +615,7 @@ Once the map is complete, the same NDT registration is performed against the fix
 
 ### 3.9 Drift and Loop Closure
 
-NDT mapping registers each scan to the map built up to the previous scan, so the small error of each registration becomes the reference for the next one and keeps accumulating. This is called **drift**. Errors in orientation in particular grow into position errors as the vehicle proceeds. Proceeding a distance $d$ with an orientation off by $\delta\psi$ deviates sideways by about $d \, \delta\psi$ for small angles.
+NDT mapping registers each scan to the map built up to the previous scan, so the small error of each registration becomes the reference for the next one and keeps accumulating. This is called **drift**. Errors in orientation in particular grow into position errors as the vehicle proceeds. Proceeding a distance $d$ with an orientation off by $\delta\psi$ deviates sideways by about $`d \, \delta\psi`$ for small angles.
 
 **Worked example: position error caused by an orientation error.** Suppose the orientation of the map is off by 0.1° at some point. Since $0.1° = 0.1 \times \pi / 180 \approx 0.001745$ rad, the map at a place 500 m farther on deviates sideways by about $500 \times 0.001745 \approx 0.87$ m. Considering that a lane is a little over 3 m wide, this is not negligible.
 
@@ -673,7 +673,7 @@ Next, set the relation between the vehicle and the LiDAR in the Setup tab.
 
 *Figure 17. Entering the LiDAR mounting position in Baselink to Localizer of the Setup tab*
 
-Choose Velodyne as the Localizer, enter $x = 1.2$, $y = 0$, $z = 2$, yaw $= 0$, pitch $= 0$, and roll $= 0$ in Baselink to Localizer, and press the TF button. Names such as `rosparam : tf_x` above each field mean that the value is stored as the ROS parameter `tf_x` and so on. These values are $T^{\text{base}}_{\text{lidar}}$ of Section 2.3 and mean that the LiDAR is mounted 1.2 m ahead of and 2 m above the vehicle reference point without rotation. Vehicle Model and Vehicle Info are fields that load the vehicle model drawn in RViz and the vehicle's dimension information, and they are not needed for localization itself.
+Choose Velodyne as the Localizer, enter $x = 1.2$, $y = 0$, $z = 2$, yaw $= 0$, pitch $= 0$, and roll $= 0$ in Baselink to Localizer, and press the TF button. Names such as `rosparam : tf_x` above each field mean that the value is stored as the ROS parameter `tf_x` and so on. These values are $`T^{\text{base}}_{\text{lidar}}`$ of Section 2.3 and mean that the LiDAR is mounted 1.2 m ahead of and 2 m above the vehicle reference point without rotation. Vehicle Model and Vehicle Info are fields that load the vehicle model drawn in RViz and the vehicle's dimension information, and they are not needed for localization itself.
 
 ### 4.4 LiDAR Node and Point Filters
 
@@ -704,10 +704,10 @@ The output topic of `voxel_grid_filter`, `/filtered_points`, becomes the input o
 
 A **voxel grid filter** works as shown in Figure 19 [9], [10]. (a) Space is divided into cubic voxels of side length $l$ (the leaf size). (b) Each point is assigned to a voxel. (c) In each voxel, the points are replaced by their single centroid. The index of the voxel containing a point $\mathbf{p} = (x, y, z)$ is the three integers obtained by dividing each coordinate by $l$ and rounding down.
 
-$$
+```math
 (i, j, k) = \left( \left\lfloor \frac{x}{l} \right\rfloor, \left\lfloor \frac{y}{l} \right\rfloor, \left\lfloor \frac{z}{l} \right\rfloor \right), \qquad
 \bar{\mathbf{p}}_{ijk} = \frac{1}{\vert V_{ijk} \vert} \sum_{\mathbf{p} \in V_{ijk}} \mathbf{p}
-$$
+```
 
 $V_{ijk}$ is the set of points in the voxel with index $(i, j, k)$, and $\vert V_{ijk} \vert$ is the number of those points. The number of output points equals the number of voxels containing at least one point. $\lfloor a \rfloor$ is the largest integer not greater than $a$, so $\lfloor -0.3 \rfloor = -1$. Actual implementations number the voxels relative to the minimum of the point cloud, but the way the voxels divide space is the same.
 
@@ -715,12 +715,12 @@ $V_{ijk}$ is the set of points in the voxel with index $(i, j, k)$, and $\vert V
 
 | Point | Coordinates (m) | Voxel index $(\lfloor x \rfloor, \lfloor y \rfloor, \lfloor z \rfloor)$ |
 |:-----|:-----|:-----|
-| $\mathbf{p}_1$ | $(0.2, 0.3, 0.1)$ | $(0, 0, 0)$ |
-| $\mathbf{p}_2$ | $(0.6, 0.1, 0.4)$ | $(0, 0, 0)$ |
-| $\mathbf{p}_3$ | $(0.4, 0.8, 0.7)$ | $(0, 0, 0)$ |
-| $\mathbf{p}_4$ | $(1.2, 0.5, 0.2)$ | $(1, 0, 0)$ |
-| $\mathbf{p}_5$ | $(1.8, 0.9, 0.6)$ | $(1, 0, 0)$ |
-| $\mathbf{p}_6$ | $(2.5, 2.5, 0.5)$ | $(2, 2, 0)$ |
+| $`\mathbf{p}_1`$ | $(0.2, 0.3, 0.1)$ | $(0, 0, 0)$ |
+| $`\mathbf{p}_2`$ | $(0.6, 0.1, 0.4)$ | $(0, 0, 0)$ |
+| $`\mathbf{p}_3`$ | $(0.4, 0.8, 0.7)$ | $(0, 0, 0)$ |
+| $`\mathbf{p}_4`$ | $(1.2, 0.5, 0.2)$ | $(1, 0, 0)$ |
+| $`\mathbf{p}_5`$ | $(1.8, 0.9, 0.6)$ | $(1, 0, 0)$ |
+| $`\mathbf{p}_6`$ | $(2.5, 2.5, 0.5)$ | $(2, 2, 0)$ |
 
 *Table 9. Voxel indices of the six points*
 
@@ -728,7 +728,7 @@ $V_{ijk}$ is the set of points in the voxel with index $(i, j, k)$, and $\vert V
 - Voxel $(1, 0, 0)$ holds two points, so its centroid is $\left( \frac{1.2 + 1.8}{2}, \frac{0.5 + 0.9}{2}, \frac{0.2 + 0.6}{2} \right) = (1.5, 0.7, 0.4)$.
 - Voxel $(2, 2, 0)$ holds only one point, so $(2.5, 2.5, 0.5)$ remains as it is.
 
-Six points have been reduced to three. Where points are crowded (voxel $(0, 0, 0)$), more are removed, while sparse points remain, so the result is spread evenly over space. The centroid lies among the original points, so the rough shape of the surface is preserved as well.
+Six points have been reduced to three. Where points are crowded (voxel $`(0, 0, 0)`$), more are removed, while sparse points remain, so the result is spread evenly over space. The centroid lies among the original points, so the rough shape of the surface is preserved as well.
 
 Downsampling affects localization as follows.
 
@@ -744,7 +744,7 @@ In the Computing tab, run the GNSS position conversion node and the NDT matching
 
 *Figure 20. Selecting nmea2tfpose and ndt_matching in the Computing tab*
 
-**nmea2tfpose.** Check `nmea2tfpose` under Localization > gnss_localizer. This node reads the NMEA sentences (`/nmea_sentence`) output by the GNSS receiver to obtain latitude, longitude, and height, converts them into $(x, y, z)$ of a plane rectangular coordinate system defined for the region, publishes the result on `/gnss_pose`, and also publishes the relation between the `map` and `gps` frames as TF [7]. The position is read from GGA or RMC sentences, and the orientation is taken from an orientation sentence if one exists, or otherwise computed as the direction connecting two consecutive positions ($\text{atan2}(\Delta y, \Delta x)$).
+**nmea2tfpose.** Check `nmea2tfpose` under Localization > gnss_localizer. This node reads the NMEA sentences (`/nmea_sentence`) output by the GNSS receiver to obtain latitude, longitude, and height, converts them into $(x, y, z)$ of a plane rectangular coordinate system defined for the region, publishes the result on `/gnss_pose`, and also publishes the relation between the `map` and `gps` frames as TF [7]. The position is read from GGA or RMC sentences, and the orientation is taken from an orientation sentence if one exists, or otherwise computed as the direction connecting two consecutive positions ($`\text{atan2}(\Delta y, \Delta x)`$).
 
 > **Definition:** **NMEA 0183** is a standard in which navigation equipment such as GNSS receivers outputs measurements as comma-separated text sentences [11]. A sentence starts with `$`, the five characters after it indicate the sentence type (for example, `GPGGA`), and the two characters after `*` are a checksum for error detection.
 
@@ -848,7 +848,7 @@ When localization is working, the scan points overlap the building walls and roa
 
 | Statement | Judgment and Reason |
 |:-----|:-----|
-| In NDT mapping, the origin of the map frame is the vehicle reference point at the moment map building starts. | **T.** The first scan is moved by $T^{\text{base}}_{\text{lidar}}$ and taken as the map as it is. |
+| In NDT mapping, the origin of the map frame is the vehicle reference point at the moment map building starts. | **T.** The first scan is moved by $`T^{\text{base}}_{\text{lidar}}`$ and taken as the map as it is. |
 | ndt_mapping adds the downsampled scan to the map. | **F.** The downsampled scan is used only for registration; the map receives the moved scan that has passed only the range filter. |
 | The translation of the Transformation Matrix printed by ndt_mapping is the position of the vehicle reference point. | **F.** The transformation matrix is the LiDAR pose, and the position of the vehicle reference point is the $(x, y, z)$ obtained by undoing the LiDAR's mounting position from it. |
 | The number of output points of a voxel grid filter equals the number of voxels containing points. | **T.** One centroid is kept for each voxel containing at least one point. |
@@ -866,11 +866,11 @@ When localization is working, the scan points overlap the building walls and roa
 | Point cloud map and vector map | A point cloud map consists of PCD files per tile and is used for localization; a vector map consists of CSV files per road element and is used for route generation and decisions. |
 | Point cloud | An unordered set of 3D points, exchanged in ROS as `sensor_msgs/PointCloud2` and saved to files in the PCD format. |
 | Rigid-body transformation | $\mathbf{p}' = R\mathbf{p} + \mathbf{t}$, expressed by one homogeneous transformation matrix, with $R = R_z(\psi) R_y(\theta) R_x(\phi)$. |
-| Composition of transformations | $T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}$; the vehicle pose is obtained by undoing the mounting position from the LiDAR pose found by NDT. |
+| Composition of transformations | $`T^{\text{map}}_{\text{lidar}} = T^{\text{map}}_{\text{base}} T^{\text{base}}_{\text{lidar}}`$; the vehicle pose is obtained by undoing the mounting position from the LiDAR pose found by NDT. |
 | NDT mapping | A map building method that repeatedly registers a new scan to the map so far with NDT, moves it by the resulting pose, and adds it to the map. |
 | Processing of ndt_mapping | Consists of a range filter, downsampling, an initial guess from a constant-velocity model, NDT registration, and adding scans to the map based on the distance moved. |
-| Jacobian of 3D NDT | For small rotations $J = (I_3 \;\; -[\mathbf{x}]_{\times})$, and farther points contribute more to determining rotation. |
-| Drift | The bending of the map caused by accumulated registration errors; an orientation error $\delta\psi$ produces a position error of about $d\,\delta\psi$ at distance $d$, and loop closure corrects it. |
+| Jacobian of 3D NDT | For small rotations $`J = (I_3 \;\; -[\mathbf{x}]_{\times})`$, and farther points contribute more to determining rotation. |
+| Drift | The bending of the map caused by accumulated registration errors; an orientation error $\delta\psi$ produces a position error of about $`d\,\delta\psi`$ at distance $d$, and loop closure corrects it. |
 | Voxel grid filter | Divides space into voxels of the leaf size and keeps one centroid per voxel, reducing the computation of registration and making the point density uniform. |
 | nmea2tfpose | Converts the latitude, longitude, and height of NMEA sentences into plane coordinates of the map and publishes them on `/gnss_pose` and as TF, used as the initial position of NDT matching. |
 | Running localization | Run bag playback, map and TF, LiDAR and voxel_grid_filter, nmea2tfpose, and ndt_matching in this order, and check in RViz that the scan overlaps the map. |
@@ -904,7 +904,7 @@ When localization is working, the scan points overlap the building walls and roa
    <details>
    <summary>Answer</summary>
 
-   First, the LiDAR → vehicle transformation gives $\mathbf{p}^{\text{base}} = (4 + 1.0, \; 2, \; -1.5 + 1.5) = (5, 2, 0)$. $R_z(180°)$ maps $(x, y, z)$ to $(-x, -y, z)$, so $R_z(180°)\mathbf{p}^{\text{base}} = (-5, -2, 0)$, and adding the vehicle position gives $\mathbf{p}^{\text{map}} = (15, -2, 0)$. The vehicle faces the map's $-x$ direction, so a point 5 m ahead of the vehicle lands where $x$ is 5 smaller in the map.
+   First, the LiDAR → vehicle transformation gives $`\mathbf{p}^{\text{base}} = (4 + 1.0, \; 2, \; -1.5 + 1.5) = (5, 2, 0)`$. $R_z(180°)$ maps $(x, y, z)$ to $(-x, -y, z)$, so $R_z(180°)\mathbf{p}^{\text{base}} = (-5, -2, 0)$, and adding the vehicle position gives $\mathbf{p}^{\text{map}} = (15, -2, 0)$. The vehicle faces the map's $-x$ direction, so a point 5 m ahead of the vehicle lands where $x$ is 5 smaller in the map.
 
    </details>
 
@@ -931,7 +931,7 @@ When localization is working, the scan points overlap the building walls and roa
    <details>
    <summary>Answer</summary>
 
-   The transformation matrix is the LiDAR pose $T^{\text{map}}_{\text{lidar}}$ found by NDT registration, and the vehicle position is the pose of the vehicle reference point $T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} (T^{\text{base}}_{\text{lidar}})^{-1}$ obtained by undoing the LiDAR's mounting position $(1.2, 0, 2.0)$. There is almost no rotation, so the difference between the two positions is nearly equal to the mounting position.
+   The transformation matrix is the LiDAR pose $`T^{\text{map}}_{\text{lidar}}`$ found by NDT registration, and the vehicle position is the pose of the vehicle reference point $`T^{\text{map}}_{\text{base}} = T^{\text{map}}_{\text{lidar}} (T^{\text{base}}_{\text{lidar}})^{-1}`$ obtained by undoing the LiDAR's mounting position $(1.2, 0, 2.0)$. There is almost no rotation, so the difference between the two positions is nearly equal to the mounting position.
 
    </details>
 

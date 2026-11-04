@@ -633,7 +633,7 @@ angular:
 ---
 ```
 
-3주차의 pure_pursuit와 twist_filter가 주고받는 속도 명령(`twist_raw`, `twist_cmd`)의 형식 `geometry_msgs/TwistStamped`는 이 `Twist`에 시각과 좌표계를 담은 `header`를 더한 것이다. 평면을 움직이는 거북이와 차량은 모두 `linear.x`(선속도 $v$)와 `angular.z`(각속도 $\omega$) 두 값으로 움직임을 지시받는다.
+3주차의 pure_pursuit와 twist_filter가 주고받는 속도 명령(`twist_raw`, `twist_cmd`)의 형식 `geometry_msgs/TwistStamped`는 이 `Twist`에 시각과 좌표계를 담은 `header`를 더한 것이다. 평면을 움직이는 거북이와 차량은 모두 `linear.x`(선속도 $`v`$)와 `angular.z`(각속도 $`\omega`$) 두 값으로 움직임을 지시받는다.
 
 ### 4.5 노드 종료와 작업 공간의 환경 설정
 

@@ -134,17 +134,17 @@ Two representative scan matching methods are ICP (iterative closest point) and N
 NDT summarizes the points of the map as follows [1].
 
 1. Divide space into cells of a fixed edge length. This length is called the **resolution**. In 3D, a cell is also called a **voxel**.
-2. Compute the mean vector and covariance matrix of the points $\mathbf{x}_1, \dots, \mathbf{x}_n$ in each cell. Cells with too few points do not give a reliable distribution and are not used (Biber and Strasser discard cells with fewer than three points).
+2. Compute the mean vector and covariance matrix of the points $`\mathbf{x}_1, \dots, \mathbf{x}_n`$ in each cell. Cells with too few points do not give a reliable distribution and are not used (Biber and Strasser discard cells with fewer than three points).
 3. Model the likelihood of measuring a point at a location $\mathbf{x}$ in that cell by the normal distribution given by the mean and covariance.
 
-$$
+```math
 \boldsymbol{\mu} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_i, \qquad
 \Sigma = \frac{1}{n} \sum_{i=1}^{n} (\mathbf{x}_i - \boldsymbol{\mu})(\mathbf{x}_i - \boldsymbol{\mu})^{T}
-$$
+```
 
-$$
+```math
 p(\mathbf{x}) \propto \exp\left( -\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu}) \right)
-$$
+```
 
 > **[Probability and Statistics]** The density of a multivariate normal distribution is determined by the quadratic form $(\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})$ inside the $\exp$. Its square root is the **Mahalanobis distance**, which measures the same displacement as small along directions in which the points are widely spread and as large along directions in which they are tightly packed. The eigenvectors of the covariance matrix are the directions of spread, and the eigenvalues are the variances along those directions.
 
@@ -158,11 +158,11 @@ In this way the whole map becomes a collection of smooth normal distribution fun
 - The deviations from the mean are $(-1.5, -0.1)$, $(-0.5, 0.1)$, $(0.5, -0.1)$, $(1.5, 0.1)$.
 - The variance in $x$ is $(2.25 + 0.25 + 0.25 + 2.25)/4 = 1.25$, the variance in $y$ is $(0.01 \times 4)/4 = 0.01$, and the covariance is $(0.15 - 0.05 - 0.05 + 0.15)/4 = 0.05$.
 
-$$
+```math
 \Sigma = \begin{pmatrix} 1.25 & 0.05 \\ 0.05 & 0.01 \end{pmatrix}, \qquad
 \det \Sigma = 1.25 \times 0.01 - 0.05^2 = 0.01, \qquad
 \Sigma^{-1} = \frac{1}{0.01} \begin{pmatrix} 0.01 & -0.05 \\ -0.05 & 1.25 \end{pmatrix} = \begin{pmatrix} 1 & -5 \\ -5 & 125 \end{pmatrix}
-$$
+```
 
 Now compute $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$ at three locations in this cell. Here $\mathbf{q} = \mathbf{x} - \boldsymbol{\mu}$, and if $\mathbf{q} = (q_x, q_y)$ then $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = q_x^2 - 10 q_x q_y + 125 q_y^2$.
 
@@ -186,42 +186,42 @@ In Figure 4 the black dots are the four points of the cell, the red X is the mea
 
 On a plane, the transformation that moves a scan is described by three parameters $\mathbf{p} = (t_x, t_y, \phi)$: a translation $(t_x, t_y)$ and a rotation angle $\phi$. A scan point $\mathbf{x} = (x, y)$ is moved to the point $\mathbf{x}'$ in the map frame as follows.
 
-$$
+```math
 \mathbf{x}' = T(\mathbf{p}, \mathbf{x}) = \begin{pmatrix} \cos\phi & -\sin\phi \\ \sin\phi & \cos\phi \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} t_x \\ t_y \end{pmatrix}
-$$
+```
 
-For each moved point $\mathbf{x}_i'$, evaluate the normal distribution with the mean $\boldsymbol{\mu}_i$ and covariance $\Sigma_i$ of the cell the point falls into; the sum over all points is the **score** of the transformation [1].
+For each moved point $`\mathbf{x}_i'`$, evaluate the normal distribution with the mean $`\boldsymbol{\mu}_i`$ and covariance $\Sigma_i$ of the cell the point falls into; the sum over all points is the **score** of the transformation [1].
 
-$$
+```math
 \text{score}(\mathbf{p}) = \sum_{i} \exp\left( -\frac{1}{2} \mathbf{q}_i^{T} \Sigma_i^{-1} \mathbf{q}_i \right), \qquad \mathbf{q}_i = T(\mathbf{p}, \mathbf{x}_i) - \boldsymbol{\mu}_i
-$$
+```
 
 A larger score means the scan points lie better on the surfaces of the map. Optimization is usually written as minimization, so $s(\mathbf{p}) = -\text{score}(\mathbf{p})$ is minimized. NDT solves this problem with **Newton's method**. At the current estimate $\mathbf{p}$, it computes the gradient $\mathbf{g}$ and the Hessian $H$ of $s$, and solves a linear system for the update $\Delta\mathbf{p}$.
 
-$$
+```math
 H \, \Delta\mathbf{p} = -\mathbf{g}, \qquad \mathbf{p} \leftarrow \mathbf{p} + \Delta\mathbf{p}
-$$
+```
 
 > **[Calculus]** Newton's method approximates the function near the current point by the quadratic $s(\mathbf{p} + \Delta\mathbf{p}) \approx s(\mathbf{p}) + \mathbf{g}^{T} \Delta\mathbf{p} + \frac{1}{2} \Delta\mathbf{p}^{T} H \Delta\mathbf{p}$ and jumps to the minimum of this quadratic in one step. Differentiating the quadratic with respect to $\Delta\mathbf{p}$ and setting it to 0 gives $\mathbf{g} + H \Delta\mathbf{p} = \mathbf{0}$. This point is a minimum only when $H$ is positive definite.
 
 Differentiating the term of one point, $s = -\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$, with respect to a parameter $p_i$ gives the following by the chain rule, where $f = \exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$.
 
-$$
+```math
 g_i = \frac{\partial s}{\partial p_i} = \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) f
-$$
+```
 
-$$
+```math
 H_{ij} = \frac{\partial^2 s}{\partial p_i \partial p_j} = f \left( -\left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_j} \right) + \frac{\partial \mathbf{q}}{\partial p_j}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} + \mathbf{q}^{T} \Sigma^{-1} \frac{\partial^2 \mathbf{q}}{\partial p_i \partial p_j} \right)
-$$
+```
 
 The total gradient and Hessian are the sums of these values over all scan points. Differentiating the transformation gives the partial derivatives of $\mathbf{q}$ below. Among the second derivatives, only the one taken twice with respect to $\phi$ is nonzero.
 
-$$
+```math
 \frac{\partial \mathbf{q}}{\partial t_x} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial t_y} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial \phi} = \begin{pmatrix} -x \sin\phi - y \cos\phi \\ x \cos\phi - y \sin\phi \end{pmatrix}, \qquad
 \frac{\partial^2 \mathbf{q}}{\partial \phi^2} = \begin{pmatrix} -x \cos\phi + y \sin\phi \\ -x \sin\phi - y \cos\phi \end{pmatrix}
-$$
+```
 
 The whole NDT registration proceeds as follows.
 
@@ -240,18 +240,18 @@ flowchart TD
 
 **Worked example 1: the gradient.** On a map that has only the cell of Table 2, a scan point $\mathbf{x} = (2.5, 0.2)$ moved with the initial estimate $\mathbf{p} = (0, 0, 0)$ gives $\mathbf{x}' = (2.5, 0.2)$.
 
-- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$, and $\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)$.
+- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$, and $`\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)`$.
 - $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 0 \times (-0.5) + 0.1 \times 12.5 = 1.25$, so $f = e^{-0.625} = 0.5353$.
 - At $\phi = 0$, $\frac{\partial \mathbf{q}}{\partial \phi} = (-y, x) = (-0.2, 2.5)$.
 - Therefore $g_{t_x} = (-0.5)(0.5353) = -0.268$, $g_{t_y} = (12.5)(0.5353) = 6.691$, and $g_{\phi} = \big( (-0.5)(-0.2) + (12.5)(2.5) \big)(0.5353) = 31.35 \times 0.5353 = 16.78$.
 
-The direction that decreases $s$ is $-\mathbf{g} = (0.268, -6.691, -16.78)$. Decreasing $t_y$ brings the point, which is 0.1 m too high, down toward the mean, and making $\phi$ negative (a clockwise rotation) also lowers this point, which is 2.5 m from the origin. The $t_x$ component is nonzero because the distribution of the cell is slightly tilted (the off-diagonal entry 0.05 of $\Sigma$), so errors in $x$ and $y$ are correlated.
+The direction that decreases $s$ is $-\mathbf{g} = (0.268, -6.691, -16.78)$. Decreasing $t_y$ brings the point, which is 0.1 m too high, down toward the mean, and making $\phi$ negative (a clockwise rotation) also lowers this point, which is 2.5 m from the origin. The $t_x$ component is nonzero because the distribution of the cell is slightly tilted (the off-diagonal entry 0.05 of $`\Sigma`$), so errors in $x$ and $y$ are correlated.
 
 **Worked example 2: Newton iterations.** One point cannot determine all three parameters, so fix $t_x = \phi = 0$ and let only $t_y$ move. If the scan point is $(2.5, 0.15)$, then $\mathbf{q} = (0, q_y)$ with $q_y = 0.05 + t_y$, the off-diagonal term vanishes, and $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 125 q_y^2$. The equations above reduce to the following.
 
-$$
+```math
 f = e^{-62.5 q_y^2}, \qquad g = 125 \, q_y \, f, \qquad H = 125 \, f \, (1 - 125 q_y^2), \qquad \Delta t_y = -\frac{g}{H}
-$$
+```
 
 | Iteration | $t_y$ | $q_y$ | $f$ | $g$ | $H$ | $\Delta t_y$ |
 |:-----|:-----|:-----|:-----|:-----|:-----|:-----|
@@ -260,7 +260,7 @@ $$
 | 2 | $-0.0484$ | $0.0016$ | $0.9998$ | $0.196$ | $124.9$ | $-0.0016$ |
 | 3 | $-0.0500$ | $0.0000$ | $1.0000$ | $0.000$ | $125.0$ | $0.0000$ |
 
-*Table 3. Newton iterations when only $t_y$ moves*
+*Table 3. Newton iterations when only $`t_y`$ moves*
 
 The method converges to $t_y = -0.05$ in three iterations, placing the point at the mean height $y = 0.1$ of the cell. With each iteration $q_y$ shrinks rapidly, $0.05 \to -0.0227 \to 0.0016$, which is the fast (quadratic) convergence Newton's method shows near a minimum.
 
@@ -270,9 +270,9 @@ The method converges to $t_y = -0.05$ in three iterations, placing the point at 
 
 In 3D the transformation has six parameters, the translation $(t_x, t_y, t_z)$ and three rotation angles (roll, pitch, yaw), and the cells become cubic voxels. In his treatment of 3D NDT, Magnusson used a model that mixes a uniform distribution into the normal distribution so that points from objects absent from the map (outliers) do not dominate the score, and proposed a score function that approximates this model again by a Gaussian function [2].
 
-$$
+```math
 s(\mathbf{p}) = \sum_{k} d_1 \exp\left( -\frac{d_2}{2} \mathbf{q}_k^{T} \Sigma_k^{-1} \mathbf{q}_k \right)
-$$
+```
 
 Here $d_1$ and $d_2$ are constants determined by the outlier ratio and the cell size, and since $d_1 < 0$, each term is negative like the 2D $s = -\text{score}$. This score has the same form as in 2D, so the gradient and Hessian are computed in the same way, and the length of the step along the Newton direction is decided by a line search. The open-source PCL (Point Cloud Library) implements this method and uses the More-Thuente method for the line search [3], and Autoware's ndt_matching chooses between the PCL implementation and modified versions of it [4].
 
@@ -590,9 +590,9 @@ Use the frame attached to the vehicle: the origin is the vehicle's reference poi
 2. The target point is also on the circle, so its distance from the center is $R$: $x_t^2 + (y_t - R)^2 = R^2$.
 3. Expanding gives $x_t^2 + y_t^2 - 2 y_t R + R^2 = R^2$, so $l^2 - 2 y_t R = 0$.
 
-$$
+```math
 R = \frac{l^2}{2 y_t}, \qquad \kappa = \frac{1}{R} = \frac{2 y_t}{l^2}
-$$
+```
 
 If $\alpha$ is the angle between the heading and the direction to the target point, then $y_t = l \sin\alpha$, so the same formula can be written $\kappa = 2 \sin\alpha / l$. If $y_t > 0$ (target on the left), $\kappa > 0$ and the vehicle turns left; if $y_t < 0$, it turns right. If $y_t = 0$, the curvature is 0, that is, the vehicle goes straight.
 
@@ -621,9 +621,9 @@ Autoware's pure_pursuit scans the waypoints of the path in order and takes as th
 
 The lookahead distance is set in one of two ways. In Dialog mode, the fixed velocity and fixed lookahead distance entered in the dialog are used. In Waypoint mode, the velocity is taken from the target velocities of the waypoints, and the lookahead distance is set in proportion to the current velocity [5].
 
-$$
+```math
 l = \begin{cases} l_{\min} & (r \, v < l_{\min}) \\ \min(r \, v, \; 10 v) & (\text{otherwise}) \end{cases}
-$$
+```
 
 Here $r$ is lookahead_ratio, $l_{\min}$ is minimum_lookahead_distance, and $v$ is the current velocity (m/s). With the example settings $r = 2$ and $l_{\min} = 4$ m, the values are as follows.
 
@@ -644,11 +644,11 @@ At higher speed the same change of curvature produces a larger lateral accelerat
 
 ### 6.5 twist_filter and the Lateral Acceleration Limit
 
-A vehicle driving at velocity $v$ on a circle of curvature $\kappa$ experiences a lateral (centripetal) acceleration $a_y = v^2 \kappa = v \omega$ toward the center of the circle. When this value is large the passengers are uncomfortable, and when it exceeds the friction limit of the tires the vehicle skids. twist_filter computes the lateral acceleration from the target velocity and angular velocity output by pure_pursuit and limits the command when it exceeds the set limit $a_{\max}$ (lateral_accel_limit). The twist_filter of early Autoware.ai (1.8.0) kept the angular velocity $\omega$ and changed the velocity to $a_{\max} / \omega$ (with the defect that this value becomes negative when turning right with $\omega < 0$) [7]. The twist_filter of Autoware.ai 1.14.0 instead keeps the velocity, reduces the magnitude of the angular velocity to $a_{\max} / v$, and also applies a limit on the lateral jerk (the rate of change of the lateral acceleration) [5]. Either way, the curvature actually driven, $\omega / v$, differs from the curvature of the path. To keep the limit while following the path curvature $\kappa$ as it is, the velocity must satisfy the following, and this value is the upper bound of the velocity possible on a curve.
+A vehicle driving at velocity $v$ on a circle of curvature $\kappa$ experiences a lateral (centripetal) acceleration $a_y = v^2 \kappa = v \omega$ toward the center of the circle. When this value is large the passengers are uncomfortable, and when it exceeds the friction limit of the tires the vehicle skids. twist_filter computes the lateral acceleration from the target velocity and angular velocity output by pure_pursuit and limits the command when it exceeds the set limit $a_{\max}$ (lateral_accel_limit). The twist_filter of early Autoware.ai (1.8.0) kept the angular velocity $\omega$ and changed the velocity to $a_{\max} / \omega$ (with the defect that this value becomes negative when turning right with $`\omega < 0`$) [7]. The twist_filter of Autoware.ai 1.14.0 instead keeps the velocity, reduces the magnitude of the angular velocity to $a_{\max} / v$, and also applies a limit on the lateral jerk (the rate of change of the lateral acceleration) [5]. Either way, the curvature actually driven, $\omega / v$, differs from the curvature of the path. To keep the limit while following the path curvature $\kappa$ as it is, the velocity must satisfy the following, and this value is the upper bound of the velocity possible on a curve.
 
-$$
+```math
 v^2 \kappa \le a_{\max} \quad \Longrightarrow \quad v \le \sqrt{\frac{a_{\max}}{\kappa}}
-$$
+```
 
 For the target point of Section 6.3 ($\kappa = 0.1176$ m⁻¹) with the example limit $a_{\max} = 5$ m/s², $a_y = 2.94$ m/s² at $v = 5$ m/s is within the limit and passes unchanged. Driving the same curve at $v = 8$ m/s would give $\omega = 8 \times 0.1176 \approx 0.941$ rad/s and $a_y = 64 \times 0.1176 \approx 7.53$ m/s², above the limit. To keep the curvature, the velocity must be reduced to at most $\sqrt{5 / 0.1176} \approx 6.52$ m/s (about 23.5 km/h). The early implementation reduces the velocity to $5 / 0.941 \approx 5.31$ m/s, so the curvature grows to $0.941 / 5.31 \approx 0.177$ m⁻¹; the 1.14.0 implementation reduces the angular velocity to $5 / 8 = 0.625$ rad/s, so the curvature shrinks to $0.625 / 8 \approx 0.078$ m⁻¹ and the vehicle turns outside the path.
 
@@ -900,7 +900,7 @@ After the installation, update the packages and install the development environm
 | A point moved along a wall and a point moved perpendicular to the wall by the same distance get different NDT scores. | **T.** The covariance is spread along the wall, so deviations perpendicular to the wall are penalized more. |
 | Newton's method moves in a direction that increases the score from any initial estimate. | **F.** If the Hessian is not positive definite it can go the opposite way, so implementations correct the Hessian or use a line search. |
 | Increasing the NDT Resolution makes it more robust to initial estimate errors but can lower accuracy. | **T.** Large cells make the score function gentle and widen the convergence region but blur the fine shape of surfaces. |
-| In pure pursuit, if the target point is straight ahead of the vehicle ($y_t = 0$), the curvature is 0. | **T.** $\kappa = 2 y_t / l^2 = 0$, so the vehicle goes straight. |
+| In pure pursuit, if the target point is straight ahead of the vehicle ($`y_t = 0`$), the curvature is 0. | **T.** $\kappa = 2 y_t / l^2 = 0$, so the vehicle goes straight. |
 | Doubling the velocity at the same curvature doubles the lateral acceleration. | **F.** $a_y = v^2 \kappa$, so it quadruples. |
 | Choosing Erase disk and install Ubuntu in VirtualBox erases the host's Windows. | **F.** Only the virtual disk inside the virtual machine is erased. |
 
@@ -942,7 +942,7 @@ After the installation, update the packages and install the development environm
 
    </details>
 
-2. **NDT cell computation:** A cell contains the points $(0, 0)$, $(2, 0)$, $(0, 2)$, $(2, 2)$. Compute the mean vector and the covariance matrix (dividing by $n$), and compute $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$ at the location $(2, 1)$.
+2. **NDT cell computation:** A cell contains the points $(0, 0)$, $(2, 0)$, $(0, 2)$, $(2, 2)$. Compute the mean vector and the covariance matrix (dividing by $`n`$), and compute $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$ at the location $(2, 1)$.
 
    <details>
    <summary>Answer</summary>
