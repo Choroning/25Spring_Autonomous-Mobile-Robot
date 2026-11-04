@@ -134,17 +134,17 @@ Two representative scan matching methods are ICP (iterative closest point) and N
 NDT summarizes the points of the map as follows [1].
 
 1. Divide space into cells of a fixed edge length. This length is called the **resolution**. In 3D, a cell is also called a **voxel**.
-2. Compute the mean vector and covariance matrix of the points $\mathbf{x}_1, \dots, \mathbf{x}_n$ in each cell. Cells with too few points do not give a reliable distribution and are not used (Biber and Strasser discard cells with fewer than three points).
+2. Compute the mean vector and covariance matrix of the points $`\mathbf{x}_1, \dots, \mathbf{x}_n`$ in each cell. Cells with too few points do not give a reliable distribution and are not used (Biber and Strasser discard cells with fewer than three points).
 3. Model the likelihood of measuring a point at a location $\mathbf{x}$ in that cell by the normal distribution given by the mean and covariance.
 
-$$
+```math
 \boldsymbol{\mu} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_i, \qquad
 \Sigma = \frac{1}{n} \sum_{i=1}^{n} (\mathbf{x}_i - \boldsymbol{\mu})(\mathbf{x}_i - \boldsymbol{\mu})^{T}
-$$
+```
 
-$$
+```math
 p(\mathbf{x}) \propto \exp\left( -\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu}) \right)
-$$
+```
 
 > **[Probability and Statistics]** The density of a multivariate normal distribution is determined by the quadratic form $(\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})$ inside the $\exp$. Its square root is the **Mahalanobis distance**, which measures the same displacement as small along directions in which the points are widely spread and as large along directions in which they are tightly packed. The eigenvectors of the covariance matrix are the directions of spread, and the eigenvalues are the variances along those directions.
 
@@ -158,11 +158,11 @@ In this way the whole map becomes a collection of smooth normal distribution fun
 - The deviations from the mean are $(-1.5, -0.1)$, $(-0.5, 0.1)$, $(0.5, -0.1)$, $(1.5, 0.1)$.
 - The variance in $x$ is $(2.25 + 0.25 + 0.25 + 2.25)/4 = 1.25$, the variance in $y$ is $(0.01 \times 4)/4 = 0.01$, and the covariance is $(0.15 - 0.05 - 0.05 + 0.15)/4 = 0.05$.
 
-$$
+```math
 \Sigma = \begin{pmatrix} 1.25 & 0.05 \\ 0.05 & 0.01 \end{pmatrix}, \qquad
 \det \Sigma = 1.25 \times 0.01 - 0.05^2 = 0.01, \qquad
 \Sigma^{-1} = \frac{1}{0.01} \begin{pmatrix} 0.01 & -0.05 \\ -0.05 & 1.25 \end{pmatrix} = \begin{pmatrix} 1 & -5 \\ -5 & 125 \end{pmatrix}
-$$
+```
 
 Now compute $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$ at three locations in this cell. Here $\mathbf{q} = \mathbf{x} - \boldsymbol{\mu}$, and if $\mathbf{q} = (q_x, q_y)$ then $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = q_x^2 - 10 q_x q_y + 125 q_y^2$.
 
@@ -186,42 +186,42 @@ In Figure 4 the black dots are the four points of the cell, the red X is the mea
 
 On a plane, the transformation that moves a scan is described by three parameters $\mathbf{p} = (t_x, t_y, \phi)$: a translation $(t_x, t_y)$ and a rotation angle $\phi$. A scan point $\mathbf{x} = (x, y)$ is moved to the point $\mathbf{x}'$ in the map frame as follows.
 
-$$
+```math
 \mathbf{x}' = T(\mathbf{p}, \mathbf{x}) = \begin{pmatrix} \cos\phi & -\sin\phi \\ \sin\phi & \cos\phi \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} t_x \\ t_y \end{pmatrix}
-$$
+```
 
-For each moved point $\mathbf{x}_i'$, evaluate the normal distribution with the mean $\boldsymbol{\mu}_i$ and covariance $\Sigma_i$ of the cell the point falls into; the sum over all points is the **score** of the transformation [1].
+For each moved point $`\mathbf{x}_i'`$, evaluate the normal distribution with the mean $`\boldsymbol{\mu}_i`$ and covariance $\Sigma_i$ of the cell the point falls into; the sum over all points is the **score** of the transformation [1].
 
-$$
+```math
 \text{score}(\mathbf{p}) = \sum_{i} \exp\left( -\frac{1}{2} \mathbf{q}_i^{T} \Sigma_i^{-1} \mathbf{q}_i \right), \qquad \mathbf{q}_i = T(\mathbf{p}, \mathbf{x}_i) - \boldsymbol{\mu}_i
-$$
+```
 
 A larger score means the scan points lie better on the surfaces of the map. Optimization is usually written as minimization, so $s(\mathbf{p}) = -\text{score}(\mathbf{p})$ is minimized. NDT solves this problem with **Newton's method**. At the current estimate $\mathbf{p}$, it computes the gradient $\mathbf{g}$ and the Hessian $H$ of $s$, and solves a linear system for the update $\Delta\mathbf{p}$.
 
-$$
+```math
 H \, \Delta\mathbf{p} = -\mathbf{g}, \qquad \mathbf{p} \leftarrow \mathbf{p} + \Delta\mathbf{p}
-$$
+```
 
 > **[Calculus]** Newton's method approximates the function near the current point by the quadratic $s(\mathbf{p} + \Delta\mathbf{p}) \approx s(\mathbf{p}) + \mathbf{g}^{T} \Delta\mathbf{p} + \frac{1}{2} \Delta\mathbf{p}^{T} H \Delta\mathbf{p}$ and jumps to the minimum of this quadratic in one step. Differentiating the quadratic with respect to $\Delta\mathbf{p}$ and setting it to 0 gives $\mathbf{g} + H \Delta\mathbf{p} = \mathbf{0}$. This point is a minimum only when $H$ is positive definite.
 
 Differentiating the term of one point, $s = -\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$, with respect to a parameter $p_i$ gives the following by the chain rule, where $f = \exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$.
 
-$$
+```math
 g_i = \frac{\partial s}{\partial p_i} = \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) f
-$$
+```
 
-$$
+```math
 H_{ij} = \frac{\partial^2 s}{\partial p_i \partial p_j} = f \left( -\left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_j} \right) + \frac{\partial \mathbf{q}}{\partial p_j}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} + \mathbf{q}^{T} \Sigma^{-1} \frac{\partial^2 \mathbf{q}}{\partial p_i \partial p_j} \right)
-$$
+```
 
 The total gradient and Hessian are the sums of these values over all scan points. Differentiating the transformation gives the partial derivatives of $\mathbf{q}$ below. Among the second derivatives, only the one taken twice with respect to $\phi$ is nonzero.
 
-$$
+```math
 \frac{\partial \mathbf{q}}{\partial t_x} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial t_y} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial \phi} = \begin{pmatrix} -x \sin\phi - y \cos\phi \\ x \cos\phi - y \sin\phi \end{pmatrix}, \qquad
 \frac{\partial^2 \mathbf{q}}{\partial \phi^2} = \begin{pmatrix} -x \cos\phi + y \sin\phi \\ -x \sin\phi - y \cos\phi \end{pmatrix}
-$$
+```
 
 The whole NDT registration proceeds as follows.
 
@@ -240,18 +240,18 @@ flowchart TD
 
 **Worked example 1: the gradient.** On a map that has only the cell of Table 2, a scan point $\mathbf{x} = (2.5, 0.2)$ moved with the initial estimate $\mathbf{p} = (0, 0, 0)$ gives $\mathbf{x}' = (2.5, 0.2)$.
 
-- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$, and $\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)$.
+- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$, and $`\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)`$.
 - $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 0 \times (-0.5) + 0.1 \times 12.5 = 1.25$, so $f = e^{-0.625} = 0.5353$.
 - At $\phi = 0$, $\frac{\partial \mathbf{q}}{\partial \phi} = (-y, x) = (-0.2, 2.5)$.
 - Therefore $g_{t_x} = (-0.5)(0.5353) = -0.268$, $g_{t_y} = (12.5)(0.5353) = 6.691$, and $g_{\phi} = \big( (-0.5)(-0.2) + (12.5)(2.5) \big)(0.5353) = 31.35 \times 0.5353 = 16.78$.
 
-The direction that decreases $s$ is $-\mathbf{g} = (0.268, -6.691, -16.78)$. Decreasing $t_y$ brings the point, which is 0.1 m too high, down toward the mean, and making $\phi$ negative (a clockwise rotation) also lowers this point, which is 2.5 m from the origin. The $t_x$ component is nonzero because the distribution of the cell is slightly tilted (the off-diagonal entry 0.05 of $\Sigma$), so errors in $x$ and $y$ are correlated.
+The direction that decreases $s$ is $-\mathbf{g} = (0.268, -6.691, -16.78)$. Decreasing $t_y$ brings the point, which is 0.1 m too high, down toward the mean, and making $\phi$ negative (a clockwise rotation) also lowers this point, which is 2.5 m from the origin. The $t_x$ component is nonzero because the distribution of the cell is slightly tilted (the off-diagonal entry 0.05 of $`\Sigma`$), so errors in $x$ and $y$ are correlated.
 
 **Worked example 2: Newton iterations.** One point cannot determine all three parameters, so fix $t_x = \phi = 0$ and let only $t_y$ move. If the scan point is $(2.5, 0.15)$, then $\mathbf{q} = (0, q_y)$ with $q_y = 0.05 + t_y$, the off-diagonal term vanishes, and $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 125 q_y^2$. The equations above reduce to the following.
 
-$$
+```math
 f = e^{-62.5 q_y^2}, \qquad g = 125 \, q_y \, f, \qquad H = 125 \, f \, (1 - 125 q_y^2), \qquad \Delta t_y = -\frac{g}{H}
-$$
+```
 
 | Iteration | $t_y$ | $q_y$ | $f$ | $g$ | $H$ | $\Delta t_y$ |
 |:-----|:-----|:-----|:-----|:-----|:-----|:-----|
@@ -260,7 +260,7 @@ $$
 | 2 | $-0.0484$ | $0.0016$ | $0.9998$ | $0.196$ | $124.9$ | $-0.0016$ |
 | 3 | $-0.0500$ | $0.0000$ | $1.0000$ | $0.000$ | $125.0$ | $0.0000$ |
 
-*Table 3. Newton iterations when only $t_y$ moves*
+*Table 3. Newton iterations when only $`t_y`$ moves*
 
 The method converges to $t_y = -0.05$ in three iterations, placing the point at the mean height $y = 0.1$ of the cell. With each iteration $q_y$ shrinks rapidly, $0.05 \to -0.0227 \to 0.0016$, which is the fast (quadratic) convergence Newton's method shows near a minimum.
 
@@ -270,9 +270,9 @@ The method converges to $t_y = -0.05$ in three iterations, placing the point at 
 
 In 3D the transformation has six parameters, the translation $(t_x, t_y, t_z)$ and three rotation angles (roll, pitch, yaw), and the cells become cubic voxels. In his treatment of 3D NDT, Magnusson used a model that mixes a uniform distribution into the normal distribution so that points from objects absent from the map (outliers) do not dominate the score, and proposed a score function that approximates this model again by a Gaussian function [2].
 
-$$
+```math
 s(\mathbf{p}) = \sum_{k} d_1 \exp\left( -\frac{d_2}{2} \mathbf{q}_k^{T} \Sigma_k^{-1} \mathbf{q}_k \right)
-$$
+```
 
 Here $d_1$ and $d_2$ are constants determined by the outlier ratio and the cell size, and since $d_1 < 0$, each term is negative like the 2D $s = -\text{score}$. This score has the same form as in 2D, so the gradient and Hessian are computed in the same way, and the length of the step along the Newton direction is decided by a line search. The open-source PCL (Point Cloud Library) implements this method and uses the More-Thuente method for the line search [3], and Autoware's ndt_matching chooses between the PCL implementation and modified versions of it [4].
 
@@ -356,7 +356,7 @@ The **Runtime Manager** is a graphical tool for launching and configuring Autowa
 
 What NDT registration directly computes is the pose of the LiDAR in the map. If, as in the example, the LiDAR is mounted 1.2 m ahead of and 2.0 m above the vehicle's reference point, this offset must be undone from the LiDAR pose to obtain the pose of the vehicle's reference point. If these values are wrong, the vehicle is drawn ahead of or above its true place on the map, and the later path following goes wrong as well.
 
-The Simulation tab in Figure 7 shows information about the rosbag to be played. The example file is the Moriyama (Nagoya, Japan) driving data distributed with Autoware; it is 234 seconds long and 8.7 GB in size, and contains 3516 camera images on `/image_raw` (`sensor_msgs/Image`) and 2342 LiDAR point clouds on `/velodyne_points` (`sensor_msgs/PointCloud2`). Since 2342 / 234 ≈ 10, the LiDAR produces about 10 scans per second, and since 3516 / 234 ≈ 15, the camera recorded images at about 15 Hz. Localization performs one registration for each of these 10 Hz scans.
+The Simulation tab in Figure 7 shows information about the rosbag to be played. The example file is driving data recorded on June 11, 2015 in the Moriyama area of Nagoya, Japan; it is 234 seconds long and 8.7 GB in size, and contains 3516 camera images on `/image_raw` (`sensor_msgs/Image`) and 2342 LiDAR point clouds on `/velodyne_points` (`sensor_msgs/PointCloud2`). Since 2342 / 234 ≈ 10, the LiDAR produces about 10 scans per second, and since 3516 / 234 ≈ 15, the camera recorded images at about 15 Hz. Localization performs one registration for each of these 10 Hz scans.
 
 ![Figure 8. ndt_matching settings, rosbag playback, and the localization result shown in RViz](../../images/Week03_3-12_p06.png)
 
@@ -372,7 +372,7 @@ The Simulation tab in Figure 7 shows information about the rosbag to be played. 
 
 *Table 6. Main items of the ndt_matching dialog*
 
-The dialog also has an Error Threshold item (example value 1). With Predict Pose on, registration starts from a pose predicted by assuming that the vehicle keeps moving as it just did, so even at high speed the initial estimate stays close to the true value, the number of iterations falls, and the risk of failing to converge drops. In the RViz view of Figure 8, the white points are the point cloud map, and the colored points in the middle of the map are the registered current scan.
+The dialog also has an Error Threshold item (example value 1). With Predict Pose on, registration starts from a pose predicted by assuming that the vehicle keeps moving as it just did, so even at high speed the initial estimate stays close to the true value, the number of iterations falls, and the risk of failing to converge drops. In the RViz view of Figure 8, the white points are the point cloud map, and the colored points in the middle of the map are the registered current scan. When a real vehicle drives with localization and path following running together, the RViz view, shown alongside the road seen from the driver's seat, updates in real time as the vehicle moves: the lanes of the vector map (yellow lines), the planned path (green), and the LiDAR points from surrounding objects (red and yellow).
 
 ### 3.3 Node Connections Seen in rqt_graph
 
@@ -458,7 +458,7 @@ vector_map_loader reads the vector map files and publishes them on the `/vector_
 
 *Figure 12. A path created by clicking a start point and an end point in RViz*
 
-The left side of Figure 12 shows Publish Point chosen on the toolbar, and the right side shows the created path (Generated path). The created path is saved to a file with waypoint_saver and loaded again with waypoint_loader in the path planning stage.
+The left side of Figure 12 shows Publish Point chosen on the toolbar, and the right side shows the created path (Generated path). As soon as the second point is clicked, waypoint_clicker saves the computed path as a waypoint file (CSV, default path `/tmp/lane_waypoint.csv`) with a set velocity (default 40 km/h), and waypoint_loader loads this file again in the path planning stage [5].
 
 ---
 
@@ -508,7 +508,7 @@ flowchart LR
 
 *Table 8. Roles of the path planning nodes*
 
-The red-light waypoints form a path whose velocity drops to 0 before the stop line, and the green-light waypoints form a path that passes the stop line. With both paths prepared in advance, lane_stop only needs to switch the chosen path when the light changes, so the response is fast. The `/vscan_points` used by velocity_set are points extracted from the LiDAR point cloud as obstacle candidates.
+The red-light waypoints form a path whose velocity drops to 0 before the stop line, and the green-light waypoints form a path that passes the stop line. With both paths prepared in advance, lane_stop only needs to switch the chosen path when the light changes, so the response is fast. The `/vscan_points` used by velocity_set is a virtual scan (Week 2, Section 1.8) that reduces the LiDAR point cloud by keeping only the points of the nearest obstacle at each horizontal angle.
 
 ![Figure 14. Path planning result shown in RViz with the target velocity of each waypoint](../../images/Week03_3-12_p11.png)
 
@@ -527,7 +527,7 @@ Path planning is launched in the following order. Each node subscribes to the ou
 7. Launch path_select.
 8. Check the path in RViz.
 
-The main values set in the [app] dialog of each node are as follows.
+The main values set in the [app] dialog of each node are as follows. In addition, the lane_select dialog has an item for choosing between Driving and Passing (Driving in the example), and the lane_stop dialog has, besides the light buttons, lane change buttons (Left Lane, Right Lane) and the Keep at (60 km/h) and Stop in (5.0 m) items for the current lane.
 
 | Node | Item | Example value | Meaning |
 |:-----|:-----|:-----|:-----|
@@ -535,15 +535,17 @@ The main values set in the [app] dialog of each node are as follows.
 | lane_rule | Number of Zeros Ahead, Behind | 10, 10 | Number of waypoints before and after a stop line whose target velocity is set to 0 |
 | lane_stop | Red Light, Green Light | Buttons | Set the light state by hand. Turning on Use traffic light recognition result uses the traffic light recognition result |
 | velocity_set | Others Distance | 15 m | Distance at which to stop in front of a detected obstacle |
-| velocity_set | Detection Range | 1.3 m | Range on both sides of the path in which obstacles are searched for |
+| velocity_set | Detection Range | 1.3 m | Horizontal radius around each waypoint in which obstacle points are searched for, which corresponds to the detection width on both sides of the path |
+| velocity_set | Deceleration Range | 0 m | If many points lie within this width outside the Detection Range, the vehicle only decelerates instead of stopping. With 0, no deceleration judgment is made |
 | velocity_set | Points Threshold | 10 | Points within the range are judged an obstacle when there are more than this many |
 | velocity_set | Detection Height Top, Bottom | 0.1 m, -1.8 m | Height range of points regarded as obstacles (relative to the LiDAR) |
 | velocity_set | Deceleration | 1 m/s² | Deceleration used when stopping in front of an obstacle |
 | velocity_set | Velocity Change Limit | 15 km/h | Maximum amount by which the target velocity may change at once |
+| velocity_set | Use Crosswalk Detection | Off | When on, obstacles are also searched for on the crosswalks of the vector map |
 
 *Table 9. Main settings of the path planning nodes*
 
-The obstacle judgment of velocity_set is a simple rule. For each waypoint ahead on the path, it counts the LiDAR points within the Detection Range and between Detection Height Bottom and Top, and if there are more than Points Threshold of them, it considers an obstacle to be there. It then reassigns to the waypoints before that point target velocities that drop at the Deceleration rate, so that the vehicle stops at the waypoint Others Distance ahead of the obstacle. With the LiDAR mounted about 2 m above the ground as in the example, the top of the height range (0.1 m) is slightly above the LiDAR and the bottom (-1.8 m) is slightly above the ground, so ground points and high signs or branches are not counted as obstacles.
+The obstacle judgment of velocity_set is a simple rule. For each waypoint ahead on the path, it counts the LiDAR points within the Detection Range and between Detection Height Bottom and Top, and if there are more than Points Threshold of them, it considers an obstacle to be there [5]. It then reassigns to the waypoints before that point target velocities that drop at the Deceleration rate, so that the vehicle stops at the waypoint Others Distance ahead of the obstacle. With the LiDAR mounted about 2 m above the ground as in the example, the top of the height range (0.1 m) is slightly above the LiDAR and the bottom (-1.8 m) is slightly above the ground, so ground points and high signs or branches are not counted as obstacles.
 
 > **Note:** The distance needed to stop from velocity $v$ at deceleration $a$ is $v^2 / (2a)$. For example, with $v = 10$ km/h $\approx 2.78$ m/s and $a = 1$ m/s², $2.78^2 / 2 \approx 3.9$ m is needed. The waypoint where deceleration starts must be at least this far ahead of the stopping point.
 
@@ -567,7 +569,7 @@ flowchart LR
     CV(["current_velocity"]) --> PP
     FW(["final_waypoints"]) --> PP
     PP --> TR(["twist_raw"])
-    TR --> TF["twist_filter<br>computes the lateral acceleration<br>and slows down above the limit"]
+    TR --> TF["twist_filter<br>computes the lateral acceleration<br>and caps the command above the limit"]
     TF --> TC(["twist_cmd"])
     TC --> V["Pass (v, ω) to the vehicle"]
 ```
@@ -578,7 +580,7 @@ flowchart LR
 
 ### 6.2 The Geometry of Pure Pursuit
 
-**Pure pursuit** is a path following method that takes as the target point a point on the path a fixed distance ahead of the vehicle and sets the curvature so that the vehicle drives along the arc that reaches that point [5]. The target point is chosen anew every cycle, so the vehicle keeps chasing a point that runs ahead of it on the path. The name comes from the pursuit strategy of aiming straight at a target moving ahead (pure pursuit).
+**Pure pursuit** is a path following method that takes as the target point a point on the path a fixed distance ahead of the vehicle and sets the curvature so that the vehicle drives along the arc that reaches that point [6]. The target point is chosen anew every cycle, so the vehicle keeps chasing a point that runs ahead of it on the path. The name comes from the pursuit strategy of aiming straight at a target moving ahead (pure pursuit).
 
 > **Definition:** The **curvature** $\kappa$ measures how much a path bends; a circle of radius $R$ has curvature $\kappa = 1/R$. The **lookahead distance** $l$ is the distance from the vehicle to the target point.
 
@@ -588,9 +590,9 @@ Use the frame attached to the vehicle: the origin is the vehicle's reference poi
 2. The target point is also on the circle, so its distance from the center is $R$: $x_t^2 + (y_t - R)^2 = R^2$.
 3. Expanding gives $x_t^2 + y_t^2 - 2 y_t R + R^2 = R^2$, so $l^2 - 2 y_t R = 0$.
 
-$$
+```math
 R = \frac{l^2}{2 y_t}, \qquad \kappa = \frac{1}{R} = \frac{2 y_t}{l^2}
-$$
+```
 
 If $\alpha$ is the angle between the heading and the direction to the target point, then $y_t = l \sin\alpha$, so the same formula can be written $\kappa = 2 \sin\alpha / l$. If $y_t > 0$ (target on the left), $\kappa > 0$ and the vehicle turns left; if $y_t < 0$, it turns right. If $y_t = 0$, the curvature is 0, that is, the vehicle goes straight.
 
@@ -615,13 +617,13 @@ The `twist_raw` published by the pure_pursuit node carries $v = 5$ m/s and $\ome
 
 ### 6.4 Choosing the Target Point and the Lookahead Distance
 
-Autoware's pure_pursuit scans the waypoints of the path in order and takes as the target point the first waypoint farther from the current position than the lookahead distance. With Linear Interpolate on, it computes the point where the segment between that waypoint and the preceding one meets the circle of radius $l$ and uses it as the target point. Even when waypoints are far apart, the target point then lies exactly at distance $l$, which makes the curvature computation smooth [6].
+Autoware's pure_pursuit scans the waypoints of the path in order and takes as the target point the first waypoint farther from the current position than the lookahead distance. With Linear Interpolate on, it computes the point where the segment between that waypoint and the preceding one meets the circle of radius $l$ and uses it as the target point. Even when waypoints are far apart, the target point then lies exactly at distance $l$, which makes the curvature computation smooth [5].
 
-The lookahead distance is set in one of two ways. In Dialog mode, the fixed velocity and fixed lookahead distance entered in the dialog are used. In Waypoint mode, the velocity is taken from the target velocities of the waypoints, and the lookahead distance is set in proportion to the current velocity [6].
+The lookahead distance is set in one of two ways. In Dialog mode, the fixed velocity and fixed lookahead distance entered in the dialog are used. In Waypoint mode, the velocity is taken from the target velocities of the waypoints, and the lookahead distance is set in proportion to the current velocity [5].
 
-$$
+```math
 l = \begin{cases} l_{\min} & (r \, v < l_{\min}) \\ \min(r \, v, \; 10 v) & (\text{otherwise}) \end{cases}
-$$
+```
 
 Here $r$ is lookahead_ratio, $l_{\min}$ is minimum_lookahead_distance, and $v$ is the current velocity (m/s). With the example settings $r = 2$ and $l_{\min} = 4$ m, the values are as follows.
 
@@ -633,7 +635,7 @@ Here $r$ is lookahead_ratio, $l_{\min}$ is minimum_lookahead_distance, and $v$ i
 
 *Table 10. Lookahead distance by velocity under the example settings*
 
-The distance is set in proportion to the velocity because the lookahead distance strongly affects tracking performance [5].
+The distance is set in proportion to the velocity because the lookahead distance strongly affects tracking performance [6].
 
 - **If it is short,** the target point is close and the vehicle follows the path tightly, but even a small deviation from the path makes it turn sharply with a large curvature, so the vehicle easily sways from side to side (oscillation).
 - **If it is long,** the motion is smooth and stable, but on curves the target point is pulled toward the inside of the bend, so the vehicle cuts the corner and takes long to return to the path.
@@ -642,13 +644,13 @@ At higher speed the same change of curvature produces a larger lateral accelerat
 
 ### 6.5 twist_filter and the Lateral Acceleration Limit
 
-A vehicle driving at velocity $v$ on a circle of curvature $\kappa$ experiences a lateral (centripetal) acceleration $a_y = v^2 \kappa = v \omega$ toward the center of the circle. When this value is large the passengers are uncomfortable, and when it exceeds the friction limit of the tires the vehicle skids. twist_filter computes the lateral acceleration from the target velocity and angular velocity output by pure_pursuit and reduces the target velocity when it exceeds the set limit (lateral_accel_limit). To keep the limit $a_{\max}$ while holding the curvature, the velocity must satisfy the following.
+A vehicle driving at velocity $v$ on a circle of curvature $\kappa$ experiences a lateral (centripetal) acceleration $a_y = v^2 \kappa = v \omega$ toward the center of the circle. When this value is large the passengers are uncomfortable, and when it exceeds the friction limit of the tires the vehicle skids. twist_filter computes the lateral acceleration from the target velocity and angular velocity output by pure_pursuit and limits the command when it exceeds the set limit $a_{\max}$ (lateral_accel_limit). The twist_filter of early Autoware.ai (1.8.0) kept the angular velocity $\omega$ and changed the velocity to $a_{\max} / \omega$ (with the defect that this value becomes negative when turning right with $`\omega < 0`$) [7]. The twist_filter of Autoware.ai 1.14.0 instead keeps the velocity, reduces the magnitude of the angular velocity to $a_{\max} / v$, and also applies a limit on the lateral jerk (the rate of change of the lateral acceleration) [5]. Either way, the curvature actually driven, $\omega / v$, differs from the curvature of the path. To keep the limit while following the path curvature $\kappa$ as it is, the velocity must satisfy the following, and this value is the upper bound of the velocity possible on a curve.
 
-$$
+```math
 v^2 \kappa \le a_{\max} \quad \Longrightarrow \quad v \le \sqrt{\frac{a_{\max}}{\kappa}}
-$$
+```
 
-For the target point of Section 6.3 ($\kappa = 0.1176$ m⁻¹) with the example limit $a_{\max} = 5$ m/s², $a_y = 2.94$ m/s² at $v = 5$ m/s is within the limit and passes unchanged. Driving the same curve at $v = 8$ m/s would give $a_y = 64 \times 0.1176 \approx 7.53$ m/s², above the limit, so the velocity must be reduced to at most $\sqrt{5 / 0.1176} \approx 6.52$ m/s (about 23.5 km/h).
+For the target point of Section 6.3 ($\kappa = 0.1176$ m⁻¹) with the example limit $a_{\max} = 5$ m/s², $a_y = 2.94$ m/s² at $v = 5$ m/s is within the limit and passes unchanged. Driving the same curve at $v = 8$ m/s would give $\omega = 8 \times 0.1176 \approx 0.941$ rad/s and $a_y = 64 \times 0.1176 \approx 7.53$ m/s², above the limit. To keep the curvature, the velocity must be reduced to at most $\sqrt{5 / 0.1176} \approx 6.52$ m/s (about 23.5 km/h). The early implementation reduces the velocity to $5 / 0.941 \approx 5.31$ m/s, so the curvature grows to $0.941 / 5.31 \approx 0.177$ m⁻¹; the 1.14.0 implementation reduces the angular velocity to $5 / 8 = 0.625$ rad/s, so the curvature shrinks to $0.625 / 8 \approx 0.078$ m⁻¹ and the vehicle turns outside the path.
 
 ### 6.6 Launch Procedure
 
@@ -656,7 +658,7 @@ Path following is launched in the following order.
 
 1. Under waypoint_follower in the Computing tab, open the [app] dialog of pure_pursuit, set the details, and launch it.
 2. Set the details in the [app] dialog of twist_filter and launch it.
-3. Check in RViz that velocity and curve targets are generated.
+3. Check in RViz that velocity and curve targets are generated. Choosing `/twist_cmd` in the Topics tab of Runtime Manager and turning on Echo also shows the final command sent to the vehicle. In the example screen, `/twist_cmd` has the type `geometry_msgs/TwistStamped`, twist_filter is among its publishers, `linear.x` is 11.11 m/s (40 km/h), and `angular.z` is -0.0130 rad/s. This is a gentle right turn with a turning radius of $v / \vert \omega \vert \approx 856$ m, so the lateral acceleration $v \vert \omega \vert \approx 0.14$ m/s² is far below the limit of 5 m/s².
 
 | Node | Item | Example value | Meaning |
 |:-----|:-----|:-----|:-----|
@@ -699,7 +701,7 @@ This is a case that applied the functions of the previous sections to a real veh
 
 ### 7.2 Station Stops
 
-Station stops were implemented with Autoware's Traffic Signal and Stop Line functions. A station node and CAN send and receive nodes were added to the Runtime Manager, and the station node receives information such as the vehicle speed and the distance to a stop line in the vector map. With the station placed as a stop line, lane_stop chooses the path that stops before the stop line while the light is red, so the vehicle stops at the station. When it is time to depart after the stop, the station node changes the light to green and the vehicle starts again. The design reuses the existing traffic light handling instead of building a new function from scratch.
+Station stops were implemented with Autoware's Traffic Signal and Stop Line functions. A station node (`katech_station`) and CAN send and receive nodes were added to the Runtime Manager, and the station node receives information such as the vehicle speed (`/sonata_velocity`) output by the CAN conversion node (`katech_converting_CAN`) and the distance to a stop line in the vector map. The light state decided by the station node is passed to lane_stop on the `/light_color_managed` topic. With the station placed as a stop line, lane_stop chooses the path that stops before the stop line while the light is red, so the vehicle stops at the station. When it is time to depart after the stop, the station node changes the light to green and the vehicle starts again. The design reuses the existing traffic light handling instead of building a new function from scratch.
 
 ### 7.3 LiDAR-Based Obstacle Recognition and Avoidance
 
@@ -737,13 +739,13 @@ CAN communication and the Autoware CAN node are covered in Weeks 13-14.
 
 ### 7.5 Use Cases
 
-This technology can be used for unmanned shuttles on campus, autonomous delivery robots, and personal mobility.
+This technology can be used for unmanned shuttles on campus, autonomous delivery robots, and personal mobility. As real examples, a small four-wheeled delivery robot carrying a laptop drives across a plaza used by pedestrians along a path planned on the map in RViz (green line), and an electric wheelchair fitted with a LiDAR and a laptop drives autonomously on campus roads with a person on board.
 
 ![Figure 20. A satellite map marking the start and goal of a campus unmanned shuttle and the point cloud map of the same area](../../images/Week03_3-12_p23.png)
 
 *Figure 20. A satellite map marking the start and goal of a campus unmanned shuttle and the point cloud map of the same area*
 
-The satellite map on the left of Figure 20 shows in green the driving route from the start (Start) to the goal (Goal), and the right side is the point cloud map of the same area built with a LiDAR. For each real service area, a map is built first in this way, and the localization, path planning, and path following of this unit are performed on it.
+The satellite map on the left of Figure 20 shows in green the driving route from the start (Start) to the goal (Goal), and the right side is the point cloud map of the same area built with a LiDAR. For each real service area, a map is built first in this way, and the localization, path planning, and path following of this unit are performed on it. The point cloud map of the whole campus shows the outlines of buildings, stairs, flower beds, and trees in fine detail.
 
 ---
 
@@ -753,9 +755,9 @@ The satellite map on the left of Figure 20 shows in green the driving route from
 
 The later ROS and Autoware practice uses Ubuntu 18.04 LTS (code name Bionic Beaver). Each ROS 1 distribution is built for a specific Ubuntu version, and the ROS Melodic and Autoware.ai 1.14.0 used in the practice target Ubuntu 18.04 (see Week 4).
 
-> **Definition:** **LTS (long term support)** marks a long-term support release; Ubuntu LTS releases receive standard security updates for five years [7]. An **ISO image** is a single file that holds the contents of an installation disc.
+> **Definition:** **LTS (long term support)** marks a long-term support release; Ubuntu LTS releases receive standard security updates for five years [8]. An **ISO image** is a single file that holds the contents of an installation disc.
 
-> **Caution:** Standard support for Ubuntu 18.04 ended in 2023 [7], and support for ROS Melodic also ended in 2023 [8]. This environment reproduces the versions of the course materials, and it lacks the security updates needed for long-term use on machines directly connected to the internet.
+> **Caution:** Standard support for Ubuntu 18.04 ended in 2023 [8], and support for ROS Melodic also ended in 2023 [9]. This environment reproduces the versions used in this course (ROS Melodic, Autoware.ai 1.14.0), and it lacks the security updates needed for long-term use on machines directly connected to the internet.
 
 ### 8.1 Choosing an Installation Method
 
@@ -782,7 +784,7 @@ If the two values differ, the file was corrupted on the way, so download it agai
 
 ### 8.3 Installing from a USB Stick
 
-1. Follow the official Ubuntu tutorial (creating a bootable USB stick on Windows) and write the ISO image to a USB stick with a tool such as Rufus [9]. All existing data on the USB stick is erased.
+1. Follow the official Ubuntu tutorial (creating a bootable USB stick on Windows) and write the ISO image to a USB stick with a tool such as Rufus [10]. All existing data on the USB stick is erased.
 2. Restart the computer, open the boot menu (F12, F11, Esc, and so on, depending on the manufacturer), and boot from the USB stick.
 3. When the installer appears, install in the same order as Section 8.5.
 4. Install in English and add Korean input after installation if needed (Week 4, Section 1.3). Installing in Korean creates the default folders under the home folder (Documents, Downloads, and so on) with Korean names, which makes typing paths in the terminal inconvenient, and error messages also appear in Korean, which makes them hard to search.
@@ -892,13 +894,13 @@ After the installation, update the packages and install the development environm
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | NDT pairs each scan point with the nearest map point. | **F.** That is how ICP works. NDT computes the score with per-cell normal distributions and does not look for point correspondences. |
 | A point moved along a wall and a point moved perpendicular to the wall by the same distance get different NDT scores. | **T.** The covariance is spread along the wall, so deviations perpendicular to the wall are penalized more. |
 | Newton's method moves in a direction that increases the score from any initial estimate. | **F.** If the Hessian is not positive definite it can go the opposite way, so implementations correct the Hessian or use a line search. |
 | Increasing the NDT Resolution makes it more robust to initial estimate errors but can lower accuracy. | **T.** Large cells make the score function gentle and widen the convergence region but blur the fine shape of surfaces. |
-| In pure pursuit, if the target point is straight ahead of the vehicle ($y_t = 0$), the curvature is 0. | **T.** $\kappa = 2 y_t / l^2 = 0$, so the vehicle goes straight. |
+| In pure pursuit, if the target point is straight ahead of the vehicle ($`y_t = 0`$), the curvature is 0. | **T.** $\kappa = 2 y_t / l^2 = 0$, so the vehicle goes straight. |
 | Doubling the velocity at the same curvature doubles the lateral acceleration. | **F.** $a_y = v^2 \kappa$, so it quadruples. |
 | Choosing Erase disk and install Ubuntu in VirtualBox erases the host's Windows. | **F.** Only the virtual disk inside the virtual machine is erased. |
 
@@ -921,7 +923,7 @@ After the installation, update the packages and install the development environm
 | Path planning | lane_rule, lane_stop, lane_select, velocity_set, and path_select in turn assign velocities and reflect traffic lights, lanes, and obstacles. |
 | Pure pursuit | Computes the curvature $\kappa = 2 y_t / l^2$ of the arc through the target point $(x_t, y_t)$ at lookahead distance $l$ and outputs $\omega = v \kappa$. |
 | Lookahead distance | Too short causes oscillation, too long cuts corners. Autoware multiplies the current velocity by lookahead_ratio and bounds it below by a minimum. |
-| twist_filter | When the lateral acceleration $a_y = v^2 \kappa$ exceeds the limit, it reduces the target velocity to at most $\sqrt{a_{\max} / \kappa}$. |
+| twist_filter | When the lateral acceleration $a_y = v \omega$ exceeds the limit, it limits the command (1.8.0 reduces the velocity, 1.14.0 reduces the angular velocity). The upper bound of the velocity that keeps the path curvature is $\sqrt{a_{\max} / \kappa}$. |
 | Real vehicle application | A Sonata with a LiDAR and GNSS was used to test localization, path planning, path following, station stops, and obstacle recognition. Large maps and sensor fusion remain as tasks. |
 | Installing Ubuntu 18.04 | Download the ISO and install from a USB stick or in a VirtualBox virtual machine. Install in English and allocate generous resources. |
 
@@ -940,7 +942,7 @@ After the installation, update the packages and install the development environm
 
    </details>
 
-2. **NDT cell computation:** A cell contains the points $(0, 0)$, $(2, 0)$, $(0, 2)$, $(2, 2)$. Compute the mean vector and the covariance matrix (dividing by $n$), and compute $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$ at the location $(2, 1)$.
+2. **NDT cell computation:** A cell contains the points $(0, 0)$, $(2, 0)$, $(0, 2)$, $(2, 2)$. Compute the mean vector and the covariance matrix (dividing by $`n`$), and compute $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$ at the location $(2, 1)$.
 
    <details>
    <summary>Answer</summary>
@@ -1003,7 +1005,7 @@ After the installation, update the packages and install the development environm
 
    </details>
 
-9. **Lateral acceleration limit:** Find, in m/s and km/h, the maximum velocity twist_filter allows on a curve of radius 20 m with lateral_accel_limit 5 m/s².
+9. **Lateral acceleration limit:** Find, in m/s and km/h, the maximum velocity at which a vehicle can follow a curve of radius 20 m with its curvature unchanged while keeping the lateral acceleration within lateral_accel_limit 5 m/s².
 
    <details>
    <summary>Answer</summary>
@@ -1040,8 +1042,9 @@ After the installation, update the packages and install the development environm
 2. M. Magnusson, "The three-dimensional normal-distributions transform: An efficient representation for registration, surface analysis, and loop detection," Ph.D. dissertation, Örebro Univ., Örebro, Sweden, 2009.
 3. Point Cloud Library, "How to use Normal Distributions Transform," PCL Tutorials. https://pcl.readthedocs.io/projects/tutorials/en/latest/normal_distributions_transform.html
 4. Autoware Foundation, "core_perception: lidar_localizer (ndt_matching)," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_perception
-5. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Inst., Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
-6. Autoware Foundation, "core_planning: pure_pursuit," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_planning
-7. Canonical, "Ubuntu release cycle." https://ubuntu.com/about/release-cycle
-8. Open Robotics, "Distributions," ROS Wiki. https://wiki.ros.org/Distributions
-9. Canonical, "Create a bootable USB stick on Windows," Ubuntu Tutorials. https://ubuntu.com/tutorials/create-a-usb-stick-on-windows
+5. Autoware Foundation, "core_planning: waypoint_maker, waypoint_planner, pure_pursuit, twist_filter," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_planning
+6. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Inst., Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
+7. Autoware Foundation, "autoware_ai 1.8.0: waypoint_follower/twist_filter," GitHub repository, Autoware.ai. https://github.com/autowarefoundation/autoware_ai/tree/1.8.0
+8. Canonical, "Ubuntu release cycle." https://ubuntu.com/about/release-cycle
+9. Open Robotics, "Distributions," ROS Wiki. https://wiki.ros.org/Distributions
+10. Canonical, "Create a bootable USB stick on Windows," Ubuntu Tutorials. https://ubuntu.com/tutorials/create-a-usb-stick-on-windows

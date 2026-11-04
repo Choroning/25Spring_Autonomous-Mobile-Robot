@@ -131,7 +131,7 @@
 | Main Textbook | To be announced; class handouts (lecture notes) |
 | Lecture Materials | Slides provided by the instructor |
 | Reference Book | R. Rajamani, *Vehicle Dynamics and Control*, 2nd ed. New York, NY, USA: Springer, 2012. |
-| Reference Literature | L. C. Chen, S. H. Huang, and B. H. Huang, "Precise 6DOF Localization of Robot End Effectors Using 3D Vision and Registration without Referencing Targets," in *Vision Sensors - Recent Advances*. London, U.K.: IntechOpen, 2022. |
+| Reference Literature | L. C. Chen, S. H. Huang, and B. H. Huang, "Precise 6DOF Localization of Robot End Effectors Using 3D Vision and Registration without Referencing Targets," in *Vision Sensors - Recent Advances*, F. J. Gallegos-Funes, Ed. London, U.K.: IntechOpen, 2022, doi: 10.5772/intechopen.107968. |
 | Online Resources | Autoware(<https://www.autoware.org>), TIER IV MapTools(<https://tools.tier4.jp>), ROS Wiki(<https://wiki.ros.org>), Point Cloud Library(<https://pointclouds.org>), PathFinding.js(<https://qiao.github.io/PathFinding.js/visual/>), Kvaser(<https://www.kvaser.com>) |
 | Lab Materials | The ROS Melodic installation script (`install_ros_melodic.sh`) and the Moriyama sample data for the Autoware demo (`sample_moriyama_data.tar.gz`, `sample_moriyama_150324.tar.gz`) distributed through the LMS, and the ROS node example code of the Week 5-7 materials (`hello_dsc.cpp`, `controller.cpp`, `thread_prac.cpp`) |
 

@@ -120,7 +120,7 @@ flowchart TD
 **MARVEL**은 KAIST가 개발한 사족 보행 로봇으로, 철로 된 벽과 천장을 걸어 다닌다 [3], [4]. 발에는 두 가지 소재를 결합했다.
 
 - **전기 영구 자석(EPM, electro-permanent magnet):** 짧은 전류 펄스로 자화 상태를 켜고 끌 수 있는 자석이다. 자화된 상태에서는 전류 없이도 자력을 유지하므로, 발을 붙이고 있는 동안 전력을 거의 쓰지 않는다.
-- **자기 유변 탄성체(MRE, magnetorheological elastomer):** 자성 입자를 섞은 고무 소재로, 강철 표면보다 마찰 계수가 커서 발이 미끄러지지 않게 한다.
+- **자기 유변 탄성체(MRE, magnetorheological elastomer):** 자성 입자를 섞은 고무 소재로, 강철 표면과의 마찰 계수가 커서 발이 미끄러지지 않게 한다.
 
 MARVEL은 모델 예측 제어(MPC, model predictive control)로 자세를 안정시키며, 실험에서 수직 벽을 최대 0.7 m/s, 천장을 0.5 m/s로 이동하고, 10 cm 폭의 틈을 건너고, 5 cm 높이의 장애물을 넘었다 [4]. 녹과 먼지로 덮인 곡면 저장 탱크도 0.35 m/s로 오른다 [3]. 이런 로봇은 선박, 교량, 저장 탱크처럼 사람이 올라가기 위험한 철 구조물을 점검하는 데 쓸 수 있다.
 
@@ -128,7 +128,7 @@ MARVEL은 모델 예측 제어(MPC, model predictive control)로 자세를 안�
 
 *그림 3. 녹슨 저장 탱크와 수직 벽을 오르는 MARVEL*
 
-사족 보행 로봇은 산업 현장의 **자율 점검(autonomous inspection)** 에도 쓰이기 시작했다. Oxford Robotics Institute(ORI)는 2022년 3월 벨기에 겐트에 있는 Chevron의 혼합 공장(blending plant)에서 ANYbotics의 ANYmal과 Boston Dynamics의 Spot으로 현장 시험을 했다 [5]. 시험은 두 부분으로 이루어졌다.
+사족 보행 로봇은 산업 현장의 **자율 점검(autonomous inspection)** 에도 쓰이기 시작했다. Oxford Robotics Institute(ORI)는 2022년 3월 벨기에 겐트에 있는 Chevron의 혼합 공장(blending plant)에서 ANYbotics의 ANYmal과 Boston Dynamics의 Spot으로 현장 시험을 했다 [5]. 이 시험은 에너지 산업용 로봇 응용을 개발하기 위해 Net Zero Technology Centre의 지원으로 이루어졌다. ANYmal은 물에 들어가도 동작하는 완전 방수 구조이며, 최신 모델은 폭발 위험이 있는 환경에서 쓸 수 있는 장비에 주는 유럽 연합의 ATEX 인증을 받았다 [5]. 시험은 두 부분으로 이루어졌다.
 
 1. **험지 보행(ANYmal):** 학습 기반 보행 제어 알고리즘(RLOC)이 주변 지형을 지도로 만들고, 그 지도를 이용하여 계단과 거친 바닥을 지난다.
 2. **자율 점검 임무(Spot, ANYmal):** 먼저 실시간 지도 작성 기술로 공장의 3D 지도를 만든 다음, 로봇이 지도 위의 웨이포인트(waypoint) 사이를 스스로 이동하며 멈춰 서서 압력계를 촬영하고 정밀 스캔을 한다. 팬-틸트-줌(PTZ) 카메라와 열화상 카메라로 계기와 설비의 상태를 기록하며, 같은 대상을 반복해서 같은 구도로 촬영할 수 있다. 가는 길이 막히면 이전 웨이포인트로 돌아가 새 경로를 받고, 실패한 경로는 일정 시간이 지난 뒤에만 다시 시도한다.
@@ -144,7 +144,7 @@ MARVEL은 모델 예측 제어(MPC, model predictive control)로 자세를 안�
 스페인의 Robotnik는 실내외 물류, 운송, 연구용 **자율 이동 로봇(AMR, autonomous mobile robot)** 을 만든다 [6]. 제품마다 용도에 따라 바퀴 구성과 크기가 다르다.
 
 - **RB-CAR:** 다목적 소형 차량을 자율주행 차량으로 개조한 플랫폼으로, 차체 앞에 LiDAR를 달았다.
-- **RB-VO:** 상자를 싣고 실외 보도를 주행하는 배송형 로봇이다.
+- **RB-VO:** 상자를 싣고 공원 같은 실외 길을 주행하는 배송형 로봇이다.
 - **SUMMIT-XL:** 네 바퀴 로봇으로, 메카넘 휠을 달면 제자리에서 옆으로도 움직이는 홀로노믹 주행을 한다.
 - **RB-1 BASE:** 실내에서 짐을 나르거나 다른 장비를 올리는 원통형 이동 플랫폼이다.
 - **RB-ROBOUT:** 컨베이어 같은 무거운 장비를 위에 싣고 공장 안을 이동하는 대형 AMR이다.
@@ -208,7 +208,7 @@ GITAI는 미국 로스앤젤레스 지역에 개발 거점을 둔, 우주에서 
 
 ### 2.1 ROS란 무엇인가
 
-**ROS(Robot Operating System)** 는 로봇 소프트웨어를 작성하기 위한 유연한 프레임워크로, 다양한 로봇 플랫폼에서 복잡하고 견고한 로봇 동작을 만드는 일을 단순하게 하려는 도구, 라이브러리, 관례의 모음이다. 이름에 운영체제가 들어 있지만 Windows나 Linux 같은 운영체제가 아니라, Linux(주로 Ubuntu) 같은 운영체제 위에서 동작하면서 운영체제와 비슷한 서비스를 로봇에 제공하는 **메타 운영체제(meta-operating system)** 이다 [13]. ROS가 제공하는 서비스는 하드웨어 추상화, 저수준 장치 제어, 자주 쓰는 기능의 구현, 프로세스 간 메시지 전달, 패키지 관리이다. ROS는 2007년 스탠퍼드 대학교에서 시작되어 Willow Garage가 개발을 이어 갔고, 2010년 첫 배포판이 나온 뒤 오픈 소스로 발전해 왔다 [14]. 이 정리본에서 ROS는 ROS 1을 말한다.
+**ROS(Robot Operating System)** 는 로봇 소프트웨어를 작성하기 위한 유연한 프레임워크로, 다양한 로봇 플랫폼에서 복잡하고 견고한 로봇 동작을 만드는 일을 단순하게 하려는 도구, 라이브러리, 관례의 모음이다. 이름에 운영체제가 들어 있지만 Windows나 Linux 같은 운영체제가 아니라, Linux(주로 Ubuntu) 같은 운영체제 위에서 동작하면서 운영체제와 비슷한 서비스를 로봇에 제공하는 **메타 운영체제(meta-operating system)** 이다 [13]. ROS가 제공하는 서비스는 하드웨어 추상화, 저수준 장치 제어, 자주 쓰는 기능의 구현, 프로세스 간 메시지 전달, 패키지 관리이다. ROS는 2007년 스탠퍼드 대학교에서 시작되어 Willow Garage가 개발을 이어 갔고 [14], 2010년 첫 배포판 Box Turtle(2.6절)이 나온 뒤 오픈 소스로 발전해 왔다. 이 단원에서 ROS는 ROS 1을 가리킨다.
 
 ROS를 이루는 요소는 다음 네 가지로 정리된다.
 
@@ -300,7 +300,7 @@ ROS의 가장 중요한 기능은 노드 사이의 데이터 통신이다. 이 �
 
 *표 5. ROS의 클라이언트 라이브러리와 언어*
 
-`roscpp`와 `rospy`가 ROS가 공식적으로 지원하는 주요 클라이언트 라이브러리이고, 나머지는 사용자 공동체가 만든 실험적인 라이브러리이다 [16]. 이 과목의 노드는 `roscpp`로 C++로 작성한다(5\~7주차).
+`roscpp`, `rospy`, `roslisp`가 주요 클라이언트 라이브러리이고, 나머지는 실험적인 클라이언트 라이브러리이다 [16]. 그 가운데 `roscpp`가 가장 널리 쓰이며, 마스터와 `roslaunch` 같은 ROS 도구는 `rospy`로 작성되어 있다. 이 과목의 노드는 `roscpp`로 C++로 작성한다(5\~7주차).
 
 > **주의:** 매개변수 서버는 고속 통신용이 아니다. 노드가 시작할 때 설정값을 읽는 용도에 알맞으며, 노드가 이미 읽어 둔 값은 매개변수를 바꾸어도 노드가 다시 읽기 전에는 바뀌지 않는다. 계속 변하는 데이터는 토픽으로 보낸다.
 
@@ -328,7 +328,7 @@ ROS는 통신 기반 위에 로봇 개발에 공통으로 필요한 기능을 �
 
 그림 14의 왼쪽은 인간형 로봇의 링크마다 붙은 좌표계를 빨강(x축), 초록(y축), 파랑(z축) 화살표로 보여 준다. TF는 이 좌표계들을 부모와 자식 관계의 트리로 관리하므로, 예를 들어 머리의 카메라가 본 물체의 위치를 발 기준 좌표로 바로 바꿀 수 있다. 오른쪽은 지도(회색 격자) 위에서 로봇의 위치를 추정하고 목적지까지 가는 내비게이션 화면이다.
 
-> **[컴퓨터그래픽스]** 한 좌표계의 점을 다른 좌표계로 옮기는 좌표 변환은 회전과 평행 이동으로 이루어지며, 동차 좌표를 쓰면 하나의 4 × 4 행렬로 나타낼 수 있다. 트리를 따라 부모에서 자식으로 가며 변환 행렬을 차례로 곱하면 멀리 떨어진 두 좌표계 사이의 변환을 얻는다. TF는 이 계산을 자동으로 해 준다.
+> **[컴퓨터그래픽스]** 한 좌표계의 점을 다른 좌표계로 옮기는 좌표 변환은 회전과 평행 이동으로 이루어지며, 동차 좌표를 쓰면 하나의 4 × 4 행렬로 나타낼 수 있다. 트리에서 두 좌표계를 잇는 경로를 따라 변환 행렬을 차례로 곱하면(자식에서 부모 쪽으로 거슬러 올라가는 구간에서는 역행렬을 곱한다) 멀리 떨어진 두 좌표계 사이의 변환을 얻는다. TF는 이 계산을 자동으로 해 준다.
 
 ### 2.5 개발 도구
 
@@ -367,7 +367,7 @@ ROS는 일정한 시기마다 패키지 묶음을 **배포판(distribution)** �
 | 배포판 | 출시일 | 지원 종료(EOL) |
 |:-----|:-----|:-----|
 | Noetic Ninjemys | 2020-05-23 | 2025년 5월 (Ubuntu 20.04 Focal 지원 종료와 같음) |
-| Melodic Morenia | 2018-05-23 | 2023년 5월 (Ubuntu 18.04 Bionic 지원 종료와 같음) |
+| Melodic Morenia | 2018-05-23 | 2023년 6월 27일 (Ubuntu 18.04 Bionic 지원 종료 시기) |
 | Lunar Loggerhead | 2017-05-23 | 2019년 5월 |
 | Kinetic Kame | 2016-05-23 | 2021년 4월 (Ubuntu 16.04 Xenial 지원 종료와 같음) |
 | Jade Turtle | 2015-05-23 | 2017년 5월 |
@@ -385,10 +385,10 @@ ROS는 일정한 시기마다 패키지 묶음을 **배포판(distribution)** �
 배포판을 고를 때는 다음을 고려한다.
 
 1. **운영체제와의 짝:** 배포판마다 지원하는 Ubuntu 버전이 정해져 있다. Melodic은 Ubuntu 18.04, Noetic은 Ubuntu 20.04를 주 대상으로 한다 [18]. 다른 버전의 Ubuntu에는 바이너리 패키지가 없어 설치가 어렵다.
-2. **장기 지원(LTS):** 짝수 해에 나온 Indigo, Kinetic, Melodic, Noetic은 Ubuntu LTS와 짝을 이루어 5년 동안 지원되는 장기 지원 배포판이다. 그 사이의 배포판은 지원 기간이 2년 정도로 짧다.
+2. **장기 지원(LTS):** Indigo부터는 짝수 해에 나온 배포판(Indigo, Kinetic, Melodic, Noetic)이 Ubuntu LTS와 짝을 이루어 5년 동안 지원되는 장기 지원 배포판이다. 그 사이 홀수 해에 나온 Jade와 Lunar는 지원 기간이 2년으로 짧다.
 3. **사용할 소프트웨어의 요구:** 이 과목에서 쓰는 Autoware.ai 1.14.0은 ROS Melodic을 기준으로 하므로, 이 과목은 Ubuntu 18.04와 ROS Melodic을 쓴다(4주차).
 
-> **참고:** Noetic은 ROS 1의 마지막 배포판이며 2025년 5월에 지원이 끝났다. 이후 ROS 개발은 통신 계층을 DDS로 바꾸고 마스터 없이 노드가 서로를 찾는 **ROS 2**로 옮겨 갔고, Autoware도 ROS 2 기반으로 다시 개발되었다. 그러나 노드, 토픽, 메시지, 서비스, 패키지라는 개념은 ROS 2에서도 그대로이므로 ROS 1로 익힌 개념은 ROS 2에도 적용된다.
+> **참고:** Melodic의 지원 종료는 처음에 2023년 5월로 예정되었다가 2023년 6월 27일로 정해졌다 [17], [18]. Noetic은 ROS 1의 마지막 배포판이며 2025년 5월에 지원이 끝났다. 이후 ROS 개발은 통신 계층을 DDS로 바꾸고 마스터 없이 노드가 서로를 찾는 **ROS 2**로 옮겨 갔고, Autoware도 ROS 2 기반으로 다시 개발되었다. 그러나 노드, 토픽, 메시지, 서비스, 패키지라는 개념은 ROS 2에서도 그대로이므로 ROS 1로 익힌 개념은 ROS 2에도 적용된다.
 
 ### 2.7 설치와 환경 설정
 
@@ -397,6 +397,7 @@ ROS Melodic은 Ubuntu 18.04에 ROS 저장소를 등록하고 `apt`로 설치한�
 ```bash
 # 1. ROS 패키지 저장소를 등록하고 저장소의 서명 키를 추가한다
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt install curl    # curl이 설치되어 있지 않으면 먼저 설치한다
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
 # 2. 패키지 목록을 갱신하고 ROS, rqt, RViz, Gazebo 등을 모두 포함한 desktop-full을 설치한다
@@ -565,7 +566,7 @@ sequenceDiagram
 
 *표 10. 토픽 연결 과정의 단계별 방향, 프로토콜, 정보*
 
-> **참고:** 공식 문서의 XMLRPC 함수 이름으로 쓰면 2단계는 `registerSubscriber`, 3단계는 `registerPublisher`, 4단계는 마스터가 노드2의 XMLRPC 서버를 호출하는 `publisherUpdate`, 5\~6단계는 노드2가 노드1의 XMLRPC 서버를 호출하는 `requestTopic`과 그 반환값(`TCPROS`, 호스트, 포트)이다 [22]. 그림에서 노드2를 "XMLRPC: 클라이언트"로 적은 것은 마스터와 노드1을 호출하는 역할을 가리키며, 4단계처럼 마스터가 호출할 때는 노드2의 XMLRPC 서버가 그 호출을 받는다. 또한 순서가 반대로 퍼블리셔가 먼저 등록되어 있으면, 서브스크라이버가 등록할 때 마스터가 이미 있는 퍼블리셔 목록을 반환값으로 돌려주므로 4단계의 알림 없이 바로 5단계로 넘어간다.
+> **참고:** 공식 문서의 XMLRPC 함수 이름으로 쓰면 2단계는 `registerSubscriber`, 3단계는 `registerPublisher`, 4단계는 마스터가 노드2의 XMLRPC 서버를 호출하는 `publisherUpdate`, 5\~6단계는 노드2가 노드1의 XMLRPC 서버를 호출하는 `requestTopic`과 그 반환값(`TCPROS`, 호스트, 포트)이다 [22]. 2단계에서 노드2를 XMLRPC 클라이언트라고 한 것은 마스터와 노드1을 호출하는 역할을 가리키며, 4단계처럼 마스터가 호출할 때는 노드2의 XMLRPC 서버가 그 호출을 받는다. 또한 순서가 반대로 퍼블리셔가 먼저 등록되어 있으면, 서브스크라이버가 등록할 때 마스터가 이미 있는 퍼블리셔 목록을 반환값으로 돌려주므로 4단계의 알림 없이 바로 5단계로 넘어간다.
 
 ### 3.4 서비스 요청과 응답
 
@@ -636,7 +637,7 @@ sequenceDiagram
 |:-----|:------------|
 | 계단이 많은 건물 안에서 소포를 배달하는 로봇을 설계한다. | **다리형이나 바퀴-다리 결합형이 알맞다.** 바퀴형은 계단을 오를 수 없고, 다리 끝에 바퀴를 단 로봇은 복도에서는 빠르게 달리고 계단에서는 걸을 수 있다. |
 | 자동차를 제자리에서 바로 옆으로 움직이려 한다. | **움직일 수 없다.** 자동차는 비홀로노믹 제약 때문에 옆 방향 속도를 바로 낼 수 없으므로 앞뒤로 움직이며 방향을 바꾸어야 한다. |
-| `roscore`를 실행하지 않고 `rosrun turtlesim turtlesim_node`를 실행한다. | **노드가 마스터를 찾지 못한다.** 노드는 시작할 때 `ROS_MASTER_URI`의 마스터에 자신을 등록해야 하므로, 마스터가 실행될 때까지 등록을 다시 시도하며 경고를 출력한다. |
+| `roscore`를 실행하지 않고 `rosrun turtlesim turtlesim_node`를 실행한다. | **노드가 마스터를 찾지 못한다.** 노드는 시작할 때 `ROS_MASTER_URI`의 마스터에 자신을 등록해야 하므로, 마스터에 연결할 수 없다는 오류 메시지(`Failed to contact master`)를 출력하며 마스터가 실행될 때까지 등록을 다시 시도한다. |
 | 토픽 연결이 맺어진 뒤 `roscore`를 종료한다. | **이미 맺어진 토픽 통신은 계속된다.** 메시지는 노드끼리 TCPROS로 직접 오가기 때문이다. 다만 새로 실행한 노드는 상대를 찾을 수 없다. |
 | LiDAR 포인트 클라우드를 초당 10번 위치 인식 노드에 보낸다. | **토픽을 쓴다.** 주기적으로 흐르는 데이터이고 받는 노드가 여럿일 수 있으며, 보내는 쪽이 응답을 기다릴 필요가 없다. |
 | 지도 파일을 다시 읽으라고 지도 노드에 명령하고 성공 여부를 받는다. | **서비스를 쓴다.** 한 번의 요청에 대한 결과가 필요한 일회성 작업이기 때문이다. |
@@ -792,7 +793,7 @@ sequenceDiagram
 7. Fraunhofer IML, "evoBOT als Ladeassistenz," YouTube. https://www.youtube.com/watch?v=Qb1Ly7vCOSA
 8. K. Lu Stout, "Tech For Good: A transformer robot designed for last-mile delivery," YouTube. https://www.youtube.com/watch?v=f4Au-n0IhYE
 9. Volocopter, "Christmas tree flying high this year," YouTube. https://www.youtube.com/watch?v=x0tuSf_ErFg
-10. Vertical Flight Society, "Volocopter VoloDrone (prototype)," *eVTOL News*. https://evtol.news/aircraft/volocopter-volodrone/
+10. Vertical Flight Society, "Volocopter VoloDrone (prototype)," *eVTOL News*. https://evtol.news/volocopter-volodrone/
 11. Skydio, "Introducing Skydio Dock and Skydio Remote Ops," YouTube. https://www.youtube.com/watch?v=BrfeUgGtLCY
 12. GITAI, "GITAI LA office is a hub for space robot innovation!," YouTube. https://www.youtube.com/watch?v=24aAGzqa1yQ
 13. ROS Wiki, "ROS/Introduction." https://wiki.ros.org/ROS/Introduction

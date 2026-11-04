@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
         ROS_INFO("%s", msg.data.c_str());
 
-        // 퍼블리쉬
+        // 퍼블리시
         // hello_dsc_test라는 토픽 이름으로 데이터 획득 가능
         hello_dsc_pub.publish(msg);
 

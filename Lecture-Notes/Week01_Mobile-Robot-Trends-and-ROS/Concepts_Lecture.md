@@ -120,7 +120,7 @@ Each locomotion type has clear strengths and weaknesses. Wheels are the most eff
 **MARVEL** is a quadruped developed at KAIST that walks on steel walls and ceilings [3], [4]. Its feet combine two materials.
 
 - **Electro-permanent magnet (EPM):** A magnet whose magnetization can be switched on and off with a short current pulse. In the magnetized state it keeps its magnetic force without current, so it uses almost no power while the foot stays attached.
-- **Magnetorheological elastomer (MRE):** A rubber material mixed with magnetic particles. Its friction coefficient is higher than that of a steel surface, so it keeps the foot from slipping.
+- **Magnetorheological elastomer (MRE):** A rubber material mixed with magnetic particles. Its friction coefficient against a steel surface is high, so it keeps the foot from slipping.
 
 MARVEL stabilizes its posture with model predictive control (MPC), and in experiments it moved at up to 0.7 m/s on vertical walls and 0.5 m/s on ceilings, crossed 10 cm wide gaps, and stepped over 5 cm high obstacles [4]. It also climbs a curved storage tank covered with rust and dust at 0.35 m/s [3]. Such robots can inspect steel structures that are dangerous for people to climb, such as ships, bridges, and storage tanks.
 
@@ -128,7 +128,7 @@ MARVEL stabilizes its posture with model predictive control (MPC), and in experi
 
 *Figure 3. MARVEL climbing a rusty storage tank and a vertical wall*
 
-Quadrupeds have also begun to be used for **autonomous inspection** at industrial sites. In March 2022, the Oxford Robotics Institute (ORI) ran field trials with ANYbotics' ANYmal and Boston Dynamics' Spot at Chevron's blending plant in Ghent, Belgium [5]. The trials consisted of two parts.
+Quadrupeds have also begun to be used for **autonomous inspection** at industrial sites. In March 2022, the Oxford Robotics Institute (ORI) ran field trials with ANYbotics' ANYmal and Boston Dynamics' Spot at Chevron's blending plant in Ghent, Belgium [5]. The trials were funded by the Net Zero Technology Centre to develop robotic applications for the energy industry. ANYmal is fully waterproof and keeps working in water, and a more recent model has ATEX certification, the European Union certification for equipment used in potentially explosive atmospheres [5]. The trials consisted of two parts.
 
 1. **Walking over rough terrain (ANYmal):** A learning-based locomotion control algorithm (RLOC) maps the surrounding terrain and uses that map to pass stairs and rough ground.
 2. **Autonomous inspection missions (Spot, ANYmal):** First a 3D map of the plant is built with real-time mapping technology; then the robot moves by itself between waypoints on the map, stopping to photograph pressure gauges and take detailed scans. It records the state of gauges and equipment with a pan-tilt-zoom (PTZ) camera and a thermal camera, and can photograph the same object repeatedly from the same viewpoint. When the way is blocked, it returns to the previous waypoint and receives a new route, and it retries a failed route only after a timeout.
@@ -144,7 +144,7 @@ Quadrupeds have also begun to be used for **autonomous inspection** at industria
 The Spanish company Robotnik builds **autonomous mobile robots (AMRs)** for indoor and outdoor logistics, transport, and research [6]. Each product has a wheel configuration and size suited to its purpose.
 
 - **RB-CAR:** A platform that converts a small utility vehicle into an autonomous vehicle, with a LiDAR mounted at the front of the body.
-- **RB-VO:** A delivery robot that carries boxes and drives on outdoor sidewalks.
+- **RB-VO:** A delivery robot that carries boxes and drives on outdoor paths such as those in a park.
 - **SUMMIT-XL:** A four-wheeled robot that, when fitted with mecanum wheels, drives holonomically and can move sideways on the spot.
 - **RB-1 BASE:** A cylindrical mobile platform that carries loads indoors or carries other equipment on top.
 - **RB-ROBOUT:** A large AMR that carries heavy equipment such as a conveyor on top and moves inside a factory.
@@ -208,7 +208,7 @@ The functions that make up this autonomy, namely perception, localization, path 
 
 ### 2.1 What ROS Is
 
-**ROS (Robot Operating System)** is a flexible framework for writing robot software, a collection of tools, libraries, and conventions that aim to simplify the task of creating complex and robust robot behavior across a wide variety of robotic platforms. Although its name contains "operating system," it is not an operating system like Windows or Linux; it is a **meta-operating system** that runs on top of an operating system such as Linux (mainly Ubuntu) and provides the robot with services similar to those of an operating system [13]. The services ROS provides are hardware abstraction, low-level device control, implementation of commonly used functionality, message passing between processes, and package management. ROS started at Stanford University in 2007, its development was continued by Willow Garage, and it has grown as open source since its first distribution in 2010 [14]. In this note, ROS means ROS 1.
+**ROS (Robot Operating System)** is a flexible framework for writing robot software, a collection of tools, libraries, and conventions that aim to simplify the task of creating complex and robust robot behavior across a wide variety of robotic platforms. Although its name contains "operating system," it is not an operating system like Windows or Linux; it is a **meta-operating system** that runs on top of an operating system such as Linux (mainly Ubuntu) and provides the robot with services similar to those of an operating system [13]. The services ROS provides are hardware abstraction, low-level device control, implementation of commonly used functionality, message passing between processes, and package management. ROS started at Stanford University in 2007 and its development was continued by Willow Garage [14]; it has grown as open source since its first distribution, Box Turtle, in 2010 (Section 2.6). In this unit, ROS means ROS 1.
 
 The elements that make up ROS are summarized as the following four.
 
@@ -300,7 +300,7 @@ The most important feature of ROS is data communication between nodes. This feat
 
 *Table 5. ROS client libraries and their languages*
 
-`roscpp` and `rospy` are the main client libraries officially supported by ROS, and the rest are experimental libraries built by the user community [16]. The nodes of this course are written in C++ with `roscpp` (Weeks 5-7).
+`roscpp`, `rospy`, and `roslisp` are the main client libraries, and the rest are experimental client libraries [16]. Of these, `roscpp` is the most widely used, and ROS tools such as the master and `roslaunch` are written with `rospy`. The nodes of this course are written in C++ with `roscpp` (Weeks 5-7).
 
 > **Caution:** The parameter server is not designed for high-speed communication. It suits reading configuration values when a node starts; a value a node has already read does not change, even if the parameter is changed, until the node reads it again. Continuously changing data is sent over topics.
 
@@ -328,7 +328,7 @@ On top of its communication infrastructure, ROS provides libraries for functions
 
 The left side of Figure 14 shows the coordinate frame attached to each link of a humanoid robot as red (x axis), green (y axis), and blue (z axis) arrows. TF manages these frames as a tree of parent and child relations, so, for example, the position of an object seen by the camera in the head can be converted directly into coordinates relative to the foot. The right side is a navigation view that estimates the robot's position on a map (gray grid) and moves it to a destination.
 
-> **[Computer Graphics]** A coordinate transform that moves a point from one frame to another consists of a rotation and a translation, and with homogeneous coordinates it can be represented by a single 4 × 4 matrix. Multiplying the transform matrices in turn while going from parent to child along the tree gives the transform between two frames that are far apart. TF performs this computation automatically.
+> **[Computer Graphics]** A coordinate transform that moves a point from one frame to another consists of a rotation and a translation, and with homogeneous coordinates it can be represented by a single 4 × 4 matrix. Multiplying the transform matrices in turn along the path that connects two frames in the tree (using the inverse matrix on the parts that go up from a child to its parent) gives the transform between two frames that are far apart. TF performs this computation automatically.
 
 ### 2.5 Development Tools
 
@@ -367,7 +367,7 @@ ROS releases its packages as a bundle, a **distribution**, at regular intervals.
 | Distribution | Release date | End of life (EOL) |
 |:-----|:-----|:-----|
 | Noetic Ninjemys | 2020-05-23 | May 2025 (same as the EOL of Ubuntu 20.04 Focal) |
-| Melodic Morenia | 2018-05-23 | May 2023 (same as the EOL of Ubuntu 18.04 Bionic) |
+| Melodic Morenia | 2018-05-23 | June 27, 2023 (around the EOL of Ubuntu 18.04 Bionic) |
 | Lunar Loggerhead | 2017-05-23 | May 2019 |
 | Kinetic Kame | 2016-05-23 | April 2021 (same as the EOL of Ubuntu 16.04 Xenial) |
 | Jade Turtle | 2015-05-23 | May 2017 |
@@ -385,10 +385,10 @@ ROS releases its packages as a bundle, a **distribution**, at regular intervals.
 When choosing a distribution, consider the following.
 
 1. **Pairing with the operating system:** Each distribution supports specific Ubuntu versions. Melodic mainly targets Ubuntu 18.04, and Noetic targets Ubuntu 20.04 [18]. Other Ubuntu versions have no binary packages, which makes installation difficult.
-2. **Long-term support (LTS):** Indigo, Kinetic, Melodic, and Noetic, released in even years, pair with Ubuntu LTS releases and are long-term support distributions supported for five years. The distributions in between have short support periods of about two years.
+2. **Long-term support (LTS):** From Indigo on, the distributions released in even years (Indigo, Kinetic, Melodic, Noetic) pair with Ubuntu LTS releases and are long-term support distributions supported for five years. Jade and Lunar, released in the odd years between them, have short support periods of two years.
 3. **Requirements of the software to be used:** Autoware.ai 1.14.0, used in this course, is based on ROS Melodic, so this course uses Ubuntu 18.04 and ROS Melodic (Week 4).
 
-> **Note:** Noetic is the last distribution of ROS 1, and its support ended in May 2025. ROS development has since moved to **ROS 2**, which replaces the communication layer with DDS and lets nodes discover one another without a master, and Autoware has also been redeveloped on ROS 2. The concepts of node, topic, message, service, and package remain the same in ROS 2, however, so concepts learned with ROS 1 also apply to ROS 2.
+> **Note:** The end of support of Melodic was first planned for May 2023 and was then set to June 27, 2023 [17], [18]. Noetic is the last distribution of ROS 1, and its support ended in May 2025. ROS development has since moved to **ROS 2**, which replaces the communication layer with DDS and lets nodes discover one another without a master, and Autoware has also been redeveloped on ROS 2. The concepts of node, topic, message, service, and package remain the same in ROS 2, however, so concepts learned with ROS 1 also apply to ROS 2.
 
 ### 2.7 Installation and Environment Setup
 
@@ -397,6 +397,7 @@ ROS Melodic is installed on Ubuntu 18.04 with `apt` after registering the ROS re
 ```bash
 # 1. Register the ROS package repository and add the repository's signing key
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt install curl    # install curl first if it is not installed
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
 # 2. Update the package list and install desktop-full, which includes ROS, rqt, RViz, Gazebo, and more
@@ -565,7 +566,7 @@ sequenceDiagram
 
 *Table 10. Direction, protocol, and information of each step of the topic connection*
 
-> **Note:** In terms of the XMLRPC function names of the official documentation, step 2 is `registerSubscriber`, step 3 is `registerPublisher`, step 4 is `publisherUpdate`, in which the master calls node 2's XMLRPC server, and steps 5-6 are `requestTopic`, in which node 2 calls node 1's XMLRPC server, and its return value (`TCPROS`, host, port) [22]. Labeling node 2 as "XMLRPC: client" in the figure refers to its role of calling the master and node 1; when the master calls, as in step 4, node 2's XMLRPC server receives the call. Also, if the order is reversed and the publisher is registered first, the master returns the list of existing publishers when the subscriber registers, so the subscriber goes directly to step 5 without the notification of step 4.
+> **Note:** In terms of the XMLRPC function names of the official documentation, step 2 is `registerSubscriber`, step 3 is `registerPublisher`, step 4 is `publisherUpdate`, in which the master calls node 2's XMLRPC server, and steps 5-6 are `requestTopic`, in which node 2 calls node 1's XMLRPC server, and its return value (`TCPROS`, host, port) [22]. Calling node 2 an XMLRPC client in step 2 refers to its role of calling the master and node 1; when the master calls, as in step 4, node 2's XMLRPC server receives the call. Also, if the order is reversed and the publisher is registered first, the master returns the list of existing publishers when the subscriber registers, so the subscriber goes directly to step 5 without the notification of step 4.
 
 ### 3.4 Service Request and Response
 
@@ -636,7 +637,7 @@ sequenceDiagram
 |:-----|:------------|
 | Design a robot that delivers parcels inside a building with many stairs. | **A legged or combined wheeled-legged robot is suitable.** A wheeled robot cannot climb stairs, whereas a robot with wheels at the ends of its legs can run fast in corridors and walk on stairs. |
 | Try to move a car directly sideways on the spot. | **It cannot move.** Because of its nonholonomic constraint, a car cannot produce a sideways velocity directly, so it must change direction while moving forward and backward. |
-| Run `rosrun turtlesim turtlesim_node` without running `roscore`. | **The node cannot find the master.** A node must register itself with the master at `ROS_MASTER_URI` when it starts, so it keeps retrying the registration and prints warnings until the master starts. |
+| Run `rosrun turtlesim turtlesim_node` without running `roscore`. | **The node cannot find the master.** A node must register itself with the master at `ROS_MASTER_URI` when it starts, so it prints an error message saying that it failed to contact the master (`Failed to contact master`) and keeps retrying the registration until the master starts. |
 | Shut down `roscore` after a topic connection has been established. | **Topic communication already established continues.** Messages flow directly between nodes over TCPROS. A newly started node, however, cannot find its peers. |
 | Send LiDAR point clouds to a localization node ten times a second. | **Use a topic.** The data flows periodically, there may be several receiving nodes, and the sender does not need to wait for a response. |
 | Command a map node to reload its map file and receive whether it succeeded. | **Use a service.** It is a one-off task that needs the result of a single request. |
@@ -647,7 +648,7 @@ sequenceDiagram
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | ROS is a robot-specific operating system that replaces Linux. | **F.** ROS is a meta-operating system and middleware that runs on top of an operating system such as Linux. |
 | Topic messages pass through the master on their way to subscribers. | **F.** The master only brokers connection information; messages flow directly between nodes over TCPROS. |
@@ -792,7 +793,7 @@ sequenceDiagram
 7. Fraunhofer IML, "evoBOT als Ladeassistenz," YouTube. https://www.youtube.com/watch?v=Qb1Ly7vCOSA
 8. K. Lu Stout, "Tech For Good: A transformer robot designed for last-mile delivery," YouTube. https://www.youtube.com/watch?v=f4Au-n0IhYE
 9. Volocopter, "Christmas tree flying high this year," YouTube. https://www.youtube.com/watch?v=x0tuSf_ErFg
-10. Vertical Flight Society, "Volocopter VoloDrone (prototype)," *eVTOL News*. https://evtol.news/aircraft/volocopter-volodrone/
+10. Vertical Flight Society, "Volocopter VoloDrone (prototype)," *eVTOL News*. https://evtol.news/volocopter-volodrone/
 11. Skydio, "Introducing Skydio Dock and Skydio Remote Ops," YouTube. https://www.youtube.com/watch?v=BrfeUgGtLCY
 12. GITAI, "GITAI LA office is a hub for space robot innovation!," YouTube. https://www.youtube.com/watch?v=24aAGzqa1yQ
 13. ROS Wiki, "ROS/Introduction." https://wiki.ros.org/ROS/Introduction

@@ -131,7 +131,7 @@
 | 주교재 | 추후 안내, 수업 유인물(Lecture Note) |
 | 강의자료 | 교수자가 제공한 슬라이드 |
 | 참고 도서 | R. Rajamani, *Vehicle Dynamics and Control*, 2nd ed. New York, NY, USA: Springer, 2012. |
-| 참고 문헌 | L. C. Chen, S. H. Huang, and B. H. Huang, "Precise 6DOF Localization of Robot End Effectors Using 3D Vision and Registration without Referencing Targets," in *Vision Sensors - Recent Advances*. London, U.K.: IntechOpen, 2022. |
+| 참고 문헌 | L. C. Chen, S. H. Huang, and B. H. Huang, "Precise 6DOF Localization of Robot End Effectors Using 3D Vision and Registration without Referencing Targets," in *Vision Sensors - Recent Advances*, F. J. Gallegos-Funes, Ed. London, U.K.: IntechOpen, 2022, doi: 10.5772/intechopen.107968. |
 | 온라인 자료 | Autoware(<https://www.autoware.org>), TIER IV MapTools(<https://tools.tier4.jp>), ROS Wiki(<https://wiki.ros.org>), Point Cloud Library(<https://pointclouds.org>), PathFinding.js(<https://qiao.github.io/PathFinding.js/visual/>), Kvaser(<https://www.kvaser.com>) |
 | 실습 자료 | LMS로 배포한 ROS Melodic 설치 스크립트(`install_ros_melodic.sh`)와 Autoware 데모용 Moriyama 샘플 데이터(`sample_moriyama_data.tar.gz`, `sample_moriyama_150324.tar.gz`), 5\~7주차 강의자료의 ROS 노드 예제 코드(`hello_dsc.cpp`, `controller.cpp`, `thread_prac.cpp`) |
 

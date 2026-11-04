@@ -80,7 +80,9 @@ For an autonomous vehicle to find itself on a map, it needs a position in coordi
 
 Each satellite broadcasts its orbit information and the time at which it sent the signal. The receiver subtracts the transmission time from the arrival time to get the travel time $\Delta t$ of the signal and multiplies it by the speed of light $c \approx 3 \times 10^{8}$ m/s to compute the distance to the satellite. The satellites, however, carry atomic clocks while the receiver uses an inexpensive quartz clock, so the two clocks disagree and the computed distance contains a term caused by the receiver clock error. A distance that includes this clock error is called a **pseudorange** [1].
 
-$$\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i$$
+```math
+\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i
+```
 
 Here $\rho_i$ is the pseudorange to the $i$-th satellite, $(x_i, y_i, z_i)$ is the satellite position known from the orbit information, $(x, y, z)$ is the receiver position to be found, $\delta t_r$ is the receiver clock error, and $\varepsilon_i$ collects the remaining errors discussed in Section 1.3. There are four unknowns, $x, y, z, \delta t_r$, so **at least four satellites must be visible** to obtain a position. Without the clock error, the intersection of three spheres built from the distances to three satellites would be the receiver position; the fourth satellite is needed to solve for the clock error.
 
@@ -136,11 +138,15 @@ Among the errors in Table 2, the satellite clock, satellite orbit, ionospheric, 
 - The reference station builds correction information from the difference between its known coordinates $(x_1, y_1, z_1)$ and the coordinates $(x_1', y_1', z_1')$ measured with GNSS, and sends it to vehicles within an effective radius, which are called **rovers**.
 - A rover that receives the correction information adds it to its own measured coordinates $(x_2', y_2', z_2')$ to correct the error.
 
-$$(dx,\ dy,\ dz) = (x_1 - x_1',\ y_1 - y_1',\ z_1 - z_1')$$
+```math
+(dx,\ dy,\ dz) = (x_1 - x_1',\ y_1 - y_1',\ z_1 - z_1')
+```
 
-$$(x_2,\ y_2,\ z_2) = (x_2' + dx,\ y_2' + dy,\ z_2' + dz)$$
+```math
+(x_2,\ y_2,\ z_2) = (x_2' + dx,\ y_2' + dy,\ z_2' + dz)
+```
 
-For example, in a local coordinate system (in m), if the true coordinates of the reference station are $(1000.0, 2000.0, 50.0)$ and its measured coordinates are $(1002.3, 1998.6, 53.1)$, the correction is $(1000.0 - 1002.3,\ 2000.0 - 1998.6,\ 50.0 - 53.1) = (-2.3, +1.4, -3.1)$. If the rover measures $(1502.1, 2501.2, 55.0)$ at the same moment, its corrected coordinates are $(1502.1 - 2.3,\ 2501.2 + 1.4,\ 55.0 - 3.1) = (1499.8, 2502.6, 51.9)$.
+For example, in a local coordinate system (in m), if the true coordinates of the reference station are $(1000.0, 2000.0, 50.0)$ and its measured coordinates are $(1002.3, 1998.6, 53.1)$, the correction is $`(1000.0 - 1002.3,\ 2000.0 - 1998.6,\ 50.0 - 53.1) = (-2.3, +1.4, -3.1)`$. If the rover measures $(1502.1, 2501.2, 55.0)$ at the same moment, its corrected coordinates are $`(1502.1 - 2.3,\ 2501.2 + 1.4,\ 55.0 - 3.1) = (1499.8, 2502.6, 51.9)`$.
 
 This method can reduce only the **errors common to both receivers**. Multipath and receiver noise arise separately at each receiver, so correction information cannot remove them. Also, the farther apart the reference station and the rover are, the more the atmosphere along their signal paths differs and the smaller the share of common error becomes, so correction information has an effective radius.
 
@@ -172,7 +178,9 @@ DGPS measures range with the **time-difference observation method**. A satellite
 
 One bit of the code is called a **chip**, and the GPS C/A code is sent at $1.023 \times 10^{6}$ chips per second [6]. The length that one chip occupies along the direction of propagation, that is, the "wavelength" of the code, is as follows.
 
-$$\lambda_{\text{C/A}} = \frac{c}{f_{\text{C/A}}} = \frac{299{,}792{,}458\ \text{m/s}}{1.023 \times 10^{6}\ \text{Hz}} \approx 293\ \text{m}$$
+```math
+\lambda_{\text{C/A}} = \frac{c}{f_{\text{C/A}}} = \frac{299{,}792{,}458\ \text{m/s}}{1.023 \times 10^{6}\ \text{Hz}} \approx 293\ \text{m}
+```
 
 Rounding the chip rate to 1 MHz gives $3 \times 10^{8} / 10^{6} = 300$ m. Because the receiver aligns arrival times against chips several hundred meters long, measurement noise of a few meters remains no matter how well it reads the position within a chip. The accuracy of DGPS with corrections applied is about **1-5 m**.
 
@@ -184,13 +192,17 @@ Rounding the chip rate to 1 MHz gives $3 \times 10^{8} / 10^{6} = 300$ m. Becaus
 
 The code is transmitted on a high-frequency sine wave called the **carrier**. RTK uses this carrier itself as a ruler instead of the code, in the **phase-difference observation method**: it observes how many carrier wavelengths fit between the satellite and the receiver (rover) to obtain the distance. The carrier frequency of the GPS L1 signal is 1575.42 MHz, so its wavelength is as follows [6].
 
-$$\lambda_{L1} = \frac{c}{f_{L1}} = \frac{299{,}792{,}458\ \text{m/s}}{1575.42 \times 10^{6}\ \text{Hz}} \approx 0.190\ \text{m} = 19\ \text{cm}$$
+```math
+\lambda_{L1} = \frac{c}{f_{L1}} = \frac{299{,}792{,}458\ \text{m/s}}{1575.42 \times 10^{6}\ \text{Hz}} \approx 0.190\ \text{m} = 19\ \text{cm}
+```
 
 Comparing the two rulers gives $1575.42 / 1.023 = 1540$, so the carrier wavelength is 1/1540 of the C/A code chip length. If both measurements read the position within one wavelength (chip) with the same relative precision, say 1%, the code measurement noise is $293 \times 0.01 \approx 2.9$ m while the carrier measurement noise is $0.19 \times 0.01 \approx 0.0019$ m, about 2 mm. This is why carrier-phase ranging is far more precise than code ranging.
 
 The problem is that the receiver measures the phase within one wavelength (the fractional part) precisely but cannot know **how many whole wavelengths** lie between it and the satellite. This unknown integer $N$ is called the **integer ambiguity**, and the range measured with the carrier phase can be written as follows.
 
-$$\Phi = \lambda \left( N + \frac{\phi}{2\pi} \right)$$
+```math
+\Phi = \lambda \left( N + \frac{\phi}{2\pi} \right)
+```
 
 Here $\phi$ is the phase (in radians) measured by the receiver. RTK determines $N$ with **differencing techniques** [1], [2].
 
@@ -233,7 +245,9 @@ Whereas a camera is a **passive sensor** that only receives ambient light, LiDAR
 
 Both sensors measure the time the wave takes to reach the object and come back, the **time of flight (ToF)** $t$, and since the wave makes the round trip at the speed of light $c$, the distance $d$ to the object is as follows.
 
-$$d = \frac{c \cdot t}{2}$$
+```math
+d = \frac{c \cdot t}{2}
+```
 
 The division by 2 is needed because $t$ is a round-trip time. For example, if the reflection returns after 200 ns, $d = (3 \times 10^{8} \times 200 \times 10^{-9}) / 2 = 60 / 2 = 30$ m. Conversely, distinguishing distances in steps of 1 cm requires resolving time differences of $t = 2 \times 0.01 / (3 \times 10^{8}) \approx 6.7 \times 10^{-11}$ s, about 67 ps, so these sensors contain very precise timing circuits.
 
@@ -247,9 +261,11 @@ A LiDAR fires short pulses of near-infrared laser light (commonly at a wavelengt
 
 In Figure 8, $\varphi$ is the azimuth measured from the X axis in the horizontal plane and $\theta$ is the elevation measured upward from the horizontal plane [8]. The coordinates of the reflection point are as follows.
 
-$$x = d \cos\theta \cos\varphi, \qquad y = d \cos\theta \sin\varphi, \qquad z = d \sin\theta$$
+```math
+x = d \cos\theta \cos\varphi, \qquad y = d \cos\theta \sin\varphi, \qquad z = d \sin\theta
+```
 
-For example, with $d = 20$ m, $\theta = 5°$, and $\varphi = 30°$, we have $\cos 5° \approx 0.9962$, $\sin 5° \approx 0.0872$, $\cos 30° \approx 0.8660$, and $\sin 30° = 0.5$, so $x = 20 \times 0.9962 \times 0.8660 \approx 17.25$ m, $y = 20 \times 0.9962 \times 0.5 \approx 9.96$ m, and $z = 20 \times 0.0872 \approx 1.74$ m. Hundreds of thousands of such points collected every second form the **point cloud** used for map building and NDT matching in Weeks 2 and 9.
+For example, with $d = 20$ m, $\theta = 5°$, and $\varphi = 30°$, the values $\cos 5° \approx 0.9962$, $\sin 5° \approx 0.0872$, $\cos 30° \approx 0.8660$, and $\sin 30° = 0.5$ give $x = 20 \times 0.9962 \times 0.8660 \approx 17.25$ m, $y = 20 \times 0.9962 \times 0.5 \approx 9.96$ m, and $z = 20 \times 0.0872 \approx 1.74$ m. Hundreds of thousands of such points collected every second form the **point cloud** used for map building and NDT matching in Weeks 2 and 9.
 
 > **Definition:** A **3D LiDAR** measures the whole space by stacking several laser layers vertically or by steering the beam in two directions with mirrors. The rotating LiDAR in Figure 7 arranges several lasers vertically and spins its body through 360°, while the study that is the source of Figure 8 steers the beam with a MEMS mirror [8]. A **2D LiDAR** sweeps only one plane with a single laser layer and obtains a range profile in that plane.
 
@@ -295,7 +311,9 @@ The ranging principle is the time of flight of Section 2.1, but most automotive 
 
 A major advantage of radar is that it **measures relative velocity directly**. A radio wave reflected from an approaching or receding object changes frequency through the **Doppler effect**, and the change $f_D$ is proportional to the radial velocity $v$ [12].
 
-$$f_D = \frac{2v}{\lambda}$$
+```math
+f_D = \frac{2v}{\lambda}
+```
 
 For example, if a car in front of a 77 GHz radar ($\lambda \approx 0.00389$ m) approaches at 20 m/s, $f_D = 2 \times 20 / 0.00389 \approx 10{,}300$ Hz, a frequency change of about 10.3 kHz. LiDAR and cameras must estimate velocity from the change in position over several measurements, but radar obtains velocity from a single measurement.
 
@@ -413,7 +431,7 @@ The reasons CAN is used can be summarized in four points.
 
 *Table 7. Characteristics of CAN*
 
-A CAN message carries no address of the receiving controller. Instead, the **identifier (ID)** at the start of the message describes **the content of the message**, such as "engine speed" or "wheel speed", and each controller accepts only the messages whose IDs it needs. This is called **acceptance filtering** [18]. Adding a new controller to the bus therefore requires no change to the settings of existing controllers.
+A CAN message carries no address of the receiving controller. Instead, the **identifier (ID)** at the start of the message describes **the content of the message**, such as engine speed or wheel speed, and each controller accepts only the messages whose IDs it needs. This is called **acceptance filtering** [18]. Adding a new controller to the bus therefore requires no change to the settings of existing controllers.
 
 **Asynchronous** means that the transmitter and the receivers do not share a clock signal. Each controller runs at a bit rate agreed on in advance, aligns its timing at the first bit of a frame, and realigns it at every moment the bit value changes. If the same value continues for a long time there is no chance to realign, so CAN uses **bit stuffing**, inserting one bit of the opposite value after five identical consecutive bits [18].
 
@@ -515,9 +533,11 @@ The identifier and the RTR bit together are called the **arbitration field**. Th
 
 The length of a frame carrying 8 bytes of data is computed as follows.
 
-$$1 + 11 + 1 + 6 + 64 + 15 + 1 + 1 + 1 + 7 = 108 \text{ bits}, \qquad 108 + 3 = 111 \text{ bits (including the interframe space)}$$
+```math
+1 + 11 + 1 + 6 + 64 + 15 + 1 + 1 + 1 + 7 = 108 \text{ bits}, \qquad 108 + 3 = 111 \text{ bits (including the interframe space)}
+```
 
-At a bit rate of 500 kbit/s, one bit takes $1 / (500 \times 10^{3}) = 2$ µs, so one frame takes $111 \times 2 = 222$ µs and the bus carries at most $1 / (222 \times 10^{-6}) \approx 4{,}500$ frames per second. Of the 111 bits, 64 are data, so the efficiency is $64 / 111 \approx 57.7\%$. In practice bit stuffing adds more bits; in the standard format, an 8-byte frame can contain up to 24 stuff bits [21].
+At a bit rate of 500 kbit/s, one bit takes $1 / (500 \times 10^{3}) = 2$ µs, so one frame takes $111 \times 2 = 222$ µs and the bus carries at most $1 / (222 \times 10^{-6}) \approx 4{,}500$ frames per second. Of the 111 bits, 64 are data, so the efficiency is $`64 / 111 \approx 57.7\%`$. In practice bit stuffing adds more bits; in the standard format, an 8-byte frame can contain up to 24 stuff bits [21].
 
 ### 3.6 Arbitration and Priority
 
@@ -572,7 +592,7 @@ By ISO standard, CAN is divided as follows.
 
 *Table 13. ISO standards for CAN*
 
-Today ISO 11898 is divided into several parts: Part 1 covers the data link layer and physical signaling, Part 2 the physical layer of high-speed CAN, and Part 3 the physical layer of low-speed fault-tolerant CAN, which keeps communicating even if one wire breaks [19], [22], [23]. The content of ISO 11519-2, which used to define low-speed CAN, was carried over into ISO 11898-3 [24].
+Today ISO 11898 is divided into several parts: Part 1 covers the data link layer and physical signaling, Part 2 the physical layer of high-speed CAN, and Part 3 the physical layer of low-speed fault-tolerant CAN, which keeps communicating even if one wire breaks [22], [23], [24]. The content of ISO 11519-2, which used to define low-speed CAN, was carried over into ISO 11898-3 [25].
 
 > **Note:** High-speed CAN under ISO 11898 communicates **up to 1 Mbit/s**, not "1 Mbit/s or more". Speeds above 1 Mbit/s are obtained with CAN FD in Section 3.9 by raising the bit rate of the data phase.
 
@@ -596,7 +616,7 @@ A controller that detects an error immediately sends an **error frame** that beg
 
 The data rate of CAN is limited to 1 Mbit/s, so as the number of ECUs grows and the exchanged data increases, its efficiency drops. Its limits are as follows.
 
-- **Speed and length:** For arbitration to work, the time for a bit to travel to the farthest controller on the bus and back must be shorter than the moment at which each controller reads the bit value. Raising the bit rate therefore requires a shorter bus, and at 1 Mbit/s the bus length is limited to about 40 m [20].
+- **Speed and length:** For arbitration to work, the time for a bit to travel to the farthest controller on the bus and back must be shorter than the time from the start of the bit to the moment at which each controller reads the bit value (the sample point). Raising the bit rate therefore requires a shorter bus, and at 1 Mbit/s the bus length is limited to about 40 m [20].
 - **Small payloads:** A frame can carry at most 8 bytes, and as the calculation in Section 3.5 shows, nearly half of the frame consists of control bits.
 - **High-volume data:** Data reaching tens of megabytes per second, such as camera video or LiDAR point clouds, cannot be carried over CAN.
 
@@ -604,14 +624,14 @@ The data rate of CAN is limited to 1 Mbit/s, so as the number of ECUs grows and 
 
 *Figure 22. Comparison of classic CAN and CAN FD, and the various networks used in vehicles*
 
-**CAN FD (CAN with Flexible Data-rate)** is an extension published by Bosch in 2012 to ease these limits. It sends the arbitration phase at the classic speed to keep the arbitration scheme, raises the bit rate only in the data phase, and carries up to 64 bytes per frame [25]. The data-phase speed reaches up to about 8-10 Mbit/s. The top of Figure 22 shows a CAN FD frame finishing sooner than a classic CAN frame when sending the same data.
+**CAN FD (CAN with Flexible Data-rate)** is an extension published by Bosch in 2012 to ease these limits. It sends the arbitration phase at the classic speed to keep the arbitration scheme, raises the bit rate only in the data phase, and carries up to 64 bytes per frame [26]. The data-phase speed reaches up to about 8-10 Mbit/s. The top of Figure 22 shows a CAN FD frame finishing sooner than a classic CAN frame when sending the same data.
 
-As the bottom of Figure 22 shows, vehicles use several networks with different purposes alongside CAN [26].
+As the bottom of Figure 22 shows, vehicles use several networks with different purposes alongside CAN [27].
 
 | Network | Characteristics | Main Uses |
 |:-----|:-----|:-----|
 | LIN (Local Interconnect Network) | Low-cost, low-speed single-wire bus (up to about 20 kbit/s) managed by one master | Convenience devices such as smart keys, switches, and windows |
-| CAN | Up to 1 Mbit/s, multi-master, priority arbitration | Powertrain, chassis, and body control in general |
+| CAN | Up to 1 Mbit/s, multi-master, priority arbitration | Powertrain, chassis, and body control in general, collision detection systems |
 | CAN FD | Several Mbit/s in the data phase, up to 64 bytes | Controllers that need more data than CAN |
 | FlexRay | 10 Mbit/s, time-deterministic communication in fixed time slots | Control that needs constant latency, such as brake-by-wire |
 | MOST (Media Oriented Systems Transport) | Multimedia data transmission | Audio, video, infotainment |
@@ -619,10 +639,10 @@ As the bottom of Figure 22 shows, vehicles use several networks with different p
 
 *Table 15. Comparison of networks used in vehicles*
 
-Recently, communication has been shifting toward using Ethernet together with CAN. Automotive Ethernet is defined by standards such as 100BASE-T1, which carries 100 Mbit/s over a single twisted pair [27]. The strengths and weaknesses of Ethernet are as follows.
+Recently, communication has been shifting toward using Ethernet together with CAN. Automotive Ethernet is defined by standards such as 100BASE-T1, which carries 100 Mbit/s over a single twisted pair [28]. The strengths and weaknesses of Ethernet are as follows.
 
 - It handles high-volume data from cameras and LiDARs easily.
-- Its vehicle status can be checked easily by connecting from outside, so it suits future vehicles that are becoming centered on software services.
+- The vehicle status can be checked easily by connecting from outside, so it suits future vehicles that are becoming centered on software services.
 - Its drawbacks are the relatively expensive physical layer interfaces and the cost of installing switches.
 
 ![Figure 23. A vehicle network that ties functional domains together with an Ethernet backbone and connects to the cloud](../../images/Week13_13-3_p11.png)
@@ -635,7 +655,11 @@ Figure 23 is an example of such a structure. The body and comfort, chassis and s
 
 ### 3.10 Connecting a PC to the CAN Bus
 
-Autonomous driving software usually runs on a PC in the vehicle, so putting the commands generated by the PC onto the vehicle's CAN bus requires a **CAN interface device** that connects a PC port such as USB to the CAN bus. Manufacturers such as Kvaser provide USB-to-CAN interfaces and software libraries to drive them [28]. A ROS node on the PC uses such a library to build and send CAN frames, and the controllers on the bus receive the frames and move the actuators. Week 14 covers how to build this node.
+Autonomous driving software usually runs on a PC in the vehicle, so putting the commands generated by the PC onto the vehicle's CAN bus requires a **CAN interface device** that connects a PC port such as USB to the CAN bus. Manufacturers such as Kvaser provide USB-to-CAN interfaces and software libraries to drive them [29]. A ROS node on the PC uses such a library to build and send CAN frames, and the controllers on the bus receive the frames and move the actuators. Week 14 covers how to build this node.
+
+![Figure 24. A two-channel USB-to-CAN interface that connects a PC's USB port to the CAN bus](../../images/Week13_13-3_p12.png)
+
+*Figure 24. A two-channel USB-to-CAN interface that connects a PC's USB port to the CAN bus*
 
 ---
 
@@ -658,7 +682,7 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
 
 **True/False Check:**
 
-| Statement | Verdict and Reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | Since only the receiver position (x, y, z) is unknown, three visible satellites are enough to compute a position. | **F.** The receiver clock error is also unknown, so at least four satellites are needed. |
 | DGPS correction information can remove multipath errors. | **F.** Multipath arises separately at each receiver depending on its surroundings, so it is not common with the reference station. |
@@ -708,7 +732,7 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
    <details>
    <summary>Answer</summary>
 
-   At least four are needed. In the pseudorange equation $\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i$, the unknowns are the receiver position $x, y, z$ and the receiver clock error $\delta t_r$, four in total. With four unknowns, at least four independent equations, that is, pseudoranges to four different satellites, are needed.
+   At least four are needed. In the pseudorange equation $`\rho_i = \sqrt{(x_i - x)^2 + (y_i - y)^2 + (z_i - z)^2} + c\,\delta t_r + \varepsilon_i`$, the unknowns are the receiver position $x, y, z$ and the receiver clock error $\delta t_r$, four in total. With four unknowns, at least four independent equations, that is, pseudoranges to four different satellites, are needed.
 
    </details>
 
@@ -726,7 +750,7 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
    <details>
    <summary>Answer</summary>
 
-   The correction is the true coordinates minus the measured coordinates: $(500.0 - 497.5,\ 800.0 - 801.2,\ 30.0 - 34.0) = (+2.5, -1.2, -4.0)$. Adding it to the rover's measured coordinates gives $(620.4 + 2.5,\ 905.0 - 1.2,\ 36.5 - 4.0) = (622.9, 903.8, 32.5)$. This correction holds under the assumption that the two receivers use the same satellites and their errors are common.
+   The correction is the true coordinates minus the measured coordinates: $`(500.0 - 497.5,\ 800.0 - 801.2,\ 30.0 - 34.0) = (+2.5, -1.2, -4.0)`$. Adding it to the rover's measured coordinates gives $`(620.4 + 2.5,\ 905.0 - 1.2,\ 36.5 - 4.0) = (622.9, 903.8, 32.5)`$. This correction holds under the assumption that the two receivers use the same satellites and their errors are common.
 
    </details>
 
@@ -798,7 +822,7 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
     <details>
     <summary>Answer</summary>
 
-    During arbitration, each controller must compare the bit it sent with the bus value within the same bit time, so the round-trip time of a signal to the farthest controller must be shorter than the bit time. Raising the bit rate shortens the bit time and requires a shorter bus, with about 40 m as the limit at 1 Mbit/s. CAN FD sends the arbitration phase at the classic speed so that arbitration works as before, raises the bit rate only in the data phase, where a single transmitter remains after arbitration, and carries up to 64 bytes per frame.
+    During arbitration, each controller must compare the bit it sent with the bus value within the same bit time, so the round-trip time of a signal to the farthest controller must be shorter than the bit time, or more precisely, than the time to the sample point at which the bit value is read. Raising the bit rate shortens the bit time and requires a shorter bus, with about 40 m as the limit at 1 Mbit/s. CAN FD sends the arbitration phase at the classic speed so that arbitration works as before, raises the bit rate only in the data phase, where a single transmitter remains after arbitration, and carries up to 64 bytes per frame.
 
     </details>
 
@@ -820,19 +844,20 @@ Autonomous driving software usually runs on a PC in the vehicle, so putting the 
 10. Canadian Metalworking, "Technology spotlight: Safety laser scanner." https://www.canadianmetalworking.com/canadianmetalworking/article/management/technology-spotlight-safety-laser-scanner
 11. C. Iovescu and S. Rao, "The fundamentals of millimeter wave radar sensors," Texas Instruments, White Paper SPYY005A, 2020.
 12. M. I. Skolnik, *Introduction to Radar Systems*, 3rd ed. New York, NY, USA: McGraw-Hill, 2001.
-13. Fierce Electronics, "Lidar vs. radar." https://www.fierceelectronics.com/components/lidar-vs-radar
+13. Fierce Electronics. https://www.fierceelectronics.com/components/lidar-vs-radar
 14. Waymo. https://waymo.com
 15. Tesla. https://www.tesla.com
 16. Tesla, "Tesla Vision Update: Replacing Ultrasonic Sensors with Tesla Vision," Tesla Support. https://www.tesla.com/support/transitioning-tesla-vision
 17. B. Baker, "Finding the correct LiDAR application," *Microcontroller Tips*, Jun. 10, 2022. https://www.microcontrollertips.com/finding-the-correct-lidar-application/
 18. Robert Bosch GmbH, "CAN Specification, Version 2.0," Stuttgart, Germany, 1991.
-19. ISO 11898-1:2015, "Road vehicles - Controller area network (CAN) - Part 1: Data link layer and physical signalling," International Organization for Standardization, Geneva, Switzerland, 2015.
+19. CAN in Automation (CiA), "History of CAN technology." https://www.can-cia.org/can-knowledge/history-of-can-technology
 20. S. Corrigan, "Introduction to the Controller Area Network (CAN)," Texas Instruments, Application Report SLOA101B, 2016.
 21. R. I. Davis, A. Burns, R. J. Bril, and J. J. Lukkien, "Controller Area Network (CAN) schedulability analysis: Refuted, revisited and revised," *Real-Time Systems*, vol. 35, no. 3, pp. 239-272, 2007.
-22. ISO 11898-2:2016, "Road vehicles - Controller area network (CAN) - Part 2: High-speed medium access unit," International Organization for Standardization, Geneva, Switzerland, 2016.
-23. ISO 11898-3:2006, "Road vehicles - Controller area network (CAN) - Part 3: Low-speed, fault-tolerant, medium-dependent interface," International Organization for Standardization, Geneva, Switzerland, 2006.
-24. ISO 11519-2:1994, "Road vehicles - Low-speed serial data communication - Part 2: Low-speed controller area network (CAN)," International Organization for Standardization, Geneva, Switzerland, 1994.
-25. F. Hartwich, "CAN with flexible data-rate," in *Proc. 13th International CAN Conference (iCC)*, Hambach Castle, Germany, 2012.
-26. N. Navet, Y. Song, F. Simonot-Lion, and C. Wilwert, "Trends in automotive communication systems," *Proceedings of the IEEE*, vol. 93, no. 6, pp. 1204-1223, 2005.
-27. IEEE Std 802.3bw-2015, "IEEE Standard for Ethernet Amendment 1: Physical Layer Specifications and Management Parameters for 100 Mb/s Operation over a Single Balanced Twisted Pair Cable (100BASE-T1)," 2016.
-28. Kvaser, "CAN Hardware and Software." https://www.kvaser.com
+22. ISO 11898-1:2015, "Road vehicles - Controller area network (CAN) - Part 1: Data link layer and physical signalling," International Organization for Standardization, Geneva, Switzerland, 2015.
+23. ISO 11898-2:2016, "Road vehicles - Controller area network (CAN) - Part 2: High-speed medium access unit," International Organization for Standardization, Geneva, Switzerland, 2016.
+24. ISO 11898-3:2006, "Road vehicles - Controller area network (CAN) - Part 3: Low-speed, fault-tolerant, medium-dependent interface," International Organization for Standardization, Geneva, Switzerland, 2006.
+25. ISO 11519-2:1994, "Road vehicles - Low-speed serial data communication - Part 2: Low-speed controller area network (CAN)," International Organization for Standardization, Geneva, Switzerland, 1994. https://www.iso.org/standard/19470.html
+26. F. Hartwich, "CAN with flexible data-rate," in *Proc. 13th International CAN Conference (iCC)*, Hambach Castle, Germany, 2012.
+27. N. Navet, Y. Song, F. Simonot-Lion, and C. Wilwert, "Trends in automotive communication systems," *Proceedings of the IEEE*, vol. 93, no. 6, pp. 1204-1223, 2005.
+28. IEEE Std 802.3bw-2015, "IEEE Standard for Ethernet Amendment 1: Physical Layer Specifications and Management Parameters for 100 Mb/s Operation over a Single Balanced Twisted Pair Cable (100BASE-T1)," 2016.
+29. Kvaser AB. https://www.kvaser.com

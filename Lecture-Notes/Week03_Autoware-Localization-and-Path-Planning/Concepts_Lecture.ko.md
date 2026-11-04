@@ -134,17 +134,17 @@ GNSS(위성 항법 시스템) 수신기만으로도 위치를 알 수 있지만,
 NDT는 지도의 점들을 다음과 같이 요약한다 [1].
 
 1. 공간을 한 변의 길이가 일정한 셀(cell)로 나눈다. 이 길이를 **해상도(resolution)** 라고 한다. 3차원에서는 셀을 **복셀(voxel)** 이라고도 부른다.
-2. 각 셀에 들어 있는 점 $\mathbf{x}_1, \dots, \mathbf{x}_n$의 평균 벡터와 공분산 행렬을 구한다. 점이 너무 적은 셀은 분포를 믿을 수 없으므로 쓰지 않는다(Biber와 Strasser는 점이 3개 미만인 셀을 버린다).
+2. 각 셀에 들어 있는 점 $`\mathbf{x}_1, \dots, \mathbf{x}_n`$의 평균 벡터와 공분산 행렬을 구한다. 점이 너무 적은 셀은 분포를 믿을 수 없으므로 쓰지 않는다(Biber와 Strasser는 점이 3개 미만인 셀을 버린다).
 3. 그 셀 안의 한 위치 $\mathbf{x}$에서 점이 측정될 가능성을 평균과 공분산으로 정한 정규 분포로 모델링한다.
 
-$$
+```math
 \boldsymbol{\mu} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_i, \qquad
 \Sigma = \frac{1}{n} \sum_{i=1}^{n} (\mathbf{x}_i - \boldsymbol{\mu})(\mathbf{x}_i - \boldsymbol{\mu})^{T}
-$$
+```
 
-$$
+```math
 p(\mathbf{x}) \propto \exp\left( -\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu}) \right)
-$$
+```
 
 > **[확률및통계]** 다변량 정규 분포의 밀도는 $\exp$ 안의 이차 형식 $(\mathbf{x} - \boldsymbol{\mu})^{T} \Sigma^{-1} (\mathbf{x} - \boldsymbol{\mu})$으로 정해진다. 이 값의 제곱근을 **마할라노비스 거리(Mahalanobis distance)** 라고 하며, 점들이 넓게 퍼진 방향으로는 같은 거리라도 작게, 좁게 모인 방향으로는 크게 잰다. 공분산 행렬의 고유벡터는 분포가 퍼진 방향, 고윳값은 그 방향의 분산이다.
 
@@ -158,11 +158,11 @@ $$
 - 평균을 뺀 편차는 $(-1.5, -0.1)$, $(-0.5, 0.1)$, $(0.5, -0.1)$, $(1.5, 0.1)$이다.
 - $x$ 방향 분산은 $(2.25 + 0.25 + 0.25 + 2.25)/4 = 1.25$, $y$ 방향 분산은 $(0.01 \times 4)/4 = 0.01$, 공분산은 $(0.15 - 0.05 - 0.05 + 0.15)/4 = 0.05$이다.
 
-$$
+```math
 \Sigma = \begin{pmatrix} 1.25 & 0.05 \\ 0.05 & 0.01 \end{pmatrix}, \qquad
 \det \Sigma = 1.25 \times 0.01 - 0.05^2 = 0.01, \qquad
 \Sigma^{-1} = \frac{1}{0.01} \begin{pmatrix} 0.01 & -0.05 \\ -0.05 & 1.25 \end{pmatrix} = \begin{pmatrix} 1 & -5 \\ -5 & 125 \end{pmatrix}
-$$
+```
 
 이제 이 셀에 놓인 세 위치에서 $\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$를 계산한다. 여기서 $\mathbf{q} = \mathbf{x} - \boldsymbol{\mu}$이고, $\mathbf{q} = (q_x, q_y)$이면 $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = q_x^2 - 10 q_x q_y + 125 q_y^2$이다.
 
@@ -186,42 +186,42 @@ $$
 
 평면에서 스캔을 옮기는 변환은 평행 이동 $(t_x, t_y)$와 회전각 $\phi$의 세 매개변수 $\mathbf{p} = (t_x, t_y, \phi)$로 나타낸다. 스캔의 점 $\mathbf{x} = (x, y)$는 다음과 같이 지도 좌표계의 점 $\mathbf{x}'$로 옮겨진다.
 
-$$
+```math
 \mathbf{x}' = T(\mathbf{p}, \mathbf{x}) = \begin{pmatrix} \cos\phi & -\sin\phi \\ \sin\phi & \cos\phi \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} + \begin{pmatrix} t_x \\ t_y \end{pmatrix}
-$$
+```
 
-옮겨진 점 $\mathbf{x}_i'$마다 그 점이 들어간 셀의 평균 $\boldsymbol{\mu}_i$와 공분산 $\Sigma_i$로 정규 분포 값을 구하고, 모든 점에 대해 더한 것이 그 변환의 **점수(score)** 이다 [1].
+옮겨진 점 $`\mathbf{x}_i'`$마다 그 점이 들어간 셀의 평균 $`\boldsymbol{\mu}_i`$와 공분산 $\Sigma_i$로 정규 분포 값을 구하고, 모든 점에 대해 더한 것이 그 변환의 **점수(score)** 이다 [1].
 
-$$
+```math
 \text{score}(\mathbf{p}) = \sum_{i} \exp\left( -\frac{1}{2} \mathbf{q}_i^{T} \Sigma_i^{-1} \mathbf{q}_i \right), \qquad \mathbf{q}_i = T(\mathbf{p}, \mathbf{x}_i) - \boldsymbol{\mu}_i
-$$
+```
 
 점수가 클수록 스캔의 점들이 지도의 표면 위에 잘 놓인 것이다. 최적화는 보통 최소화 문제로 쓰므로 $s(\mathbf{p}) = -\text{score}(\mathbf{p})$를 최소화한다. NDT는 이 문제를 **뉴턴 방법(Newton's method)** 으로 푼다. 현재 추정값 $\mathbf{p}$에서 $s$의 기울기 $\mathbf{g}$와 헤세 행렬 $H$를 구하고, 연립 방정식을 풀어 갱신량 $\Delta\mathbf{p}$를 얻는다.
 
-$$
+```math
 H \, \Delta\mathbf{p} = -\mathbf{g}, \qquad \mathbf{p} \leftarrow \mathbf{p} + \Delta\mathbf{p}
-$$
+```
 
 > **[미적분학]** 뉴턴 방법은 현재 점 근처에서 함수를 이차 함수 $s(\mathbf{p} + \Delta\mathbf{p}) \approx s(\mathbf{p}) + \mathbf{g}^{T} \Delta\mathbf{p} + \frac{1}{2} \Delta\mathbf{p}^{T} H \Delta\mathbf{p}$로 근사하고, 이 이차 함수의 최솟값으로 한 번에 옮겨 간다. 이차 함수를 $\Delta\mathbf{p}$로 미분하여 0으로 두면 $\mathbf{g} + H \Delta\mathbf{p} = \mathbf{0}$이 된다. $H$가 양의 정부호일 때만 이 점이 최솟값이다.
 
 점 하나의 항 $s = -\exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$를 매개변수 $p_i$로 미분하면 연쇄 법칙에 따라 다음을 얻는다. 여기서 $f = \exp(-\frac{1}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q})$이다.
 
-$$
+```math
 g_i = \frac{\partial s}{\partial p_i} = \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) f
-$$
+```
 
-$$
+```math
 H_{ij} = \frac{\partial^2 s}{\partial p_i \partial p_j} = f \left( -\left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_j} \right) + \frac{\partial \mathbf{q}}{\partial p_j}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} + \mathbf{q}^{T} \Sigma^{-1} \frac{\partial^2 \mathbf{q}}{\partial p_i \partial p_j} \right)
-$$
+```
 
 전체 기울기와 헤세 행렬은 스캔의 모든 점에 대해 이 값을 더한 것이다. 변환식을 미분하면 $\mathbf{q}$의 편미분은 다음과 같다. 두 번 미분하여 0이 아닌 것은 $\phi$로 두 번 미분한 항 하나뿐이다.
 
-$$
+```math
 \frac{\partial \mathbf{q}}{\partial t_x} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial t_y} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}, \qquad
 \frac{\partial \mathbf{q}}{\partial \phi} = \begin{pmatrix} -x \sin\phi - y \cos\phi \\ x \cos\phi - y \sin\phi \end{pmatrix}, \qquad
 \frac{\partial^2 \mathbf{q}}{\partial \phi^2} = \begin{pmatrix} -x \cos\phi + y \sin\phi \\ -x \sin\phi - y \cos\phi \end{pmatrix}
-$$
+```
 
 NDT 정합 전체의 흐름은 다음과 같다.
 
@@ -240,7 +240,7 @@ flowchart TD
 
 **계산 예 1: 기울기.** 표 2의 셀만 있는 지도에서, 스캔의 한 점 $\mathbf{x} = (2.5, 0.2)$를 초기 추정 $\mathbf{p} = (0, 0, 0)$으로 옮기면 $\mathbf{x}' = (2.5, 0.2)$이다.
 
-- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$이고, $\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)$이다.
+- $\mathbf{q} = (2.5, 0.2) - (2.5, 0.1) = (0, 0.1)$이고, $`\Sigma^{-1} \mathbf{q} = (1 \times 0 - 5 \times 0.1, \; -5 \times 0 + 125 \times 0.1) = (-0.5, 12.5)`$이다.
 - $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 0 \times (-0.5) + 0.1 \times 12.5 = 1.25$이므로 $f = e^{-0.625} = 0.5353$이다.
 - $\phi = 0$에서 $\frac{\partial \mathbf{q}}{\partial \phi} = (-y, x) = (-0.2, 2.5)$이다.
 - 따라서 $g_{t_x} = (-0.5)(0.5353) = -0.268$, $g_{t_y} = (12.5)(0.5353) = 6.691$, $g_{\phi} = \big( (-0.5)(-0.2) + (12.5)(2.5) \big)(0.5353) = 31.35 \times 0.5353 = 16.78$이다.
@@ -249,9 +249,9 @@ $s$를 줄이는 방향은 $-\mathbf{g} = (0.268, -6.691, -16.78)$이다. $t_y$�
 
 **계산 예 2: 뉴턴 방법의 반복.** 점 하나로는 세 매개변수를 모두 정할 수 없으므로, $t_x = \phi = 0$으로 두고 $t_y$만 움직이는 경우를 본다. 스캔의 점이 $(2.5, 0.15)$이면 $\mathbf{q} = (0, q_y)$, $q_y = 0.05 + t_y$이고, 비대각 항이 사라져 $\mathbf{q}^{T} \Sigma^{-1} \mathbf{q} = 125 q_y^2$이다. 이때 위 식은 다음과 같이 줄어든다.
 
-$$
+```math
 f = e^{-62.5 q_y^2}, \qquad g = 125 \, q_y \, f, \qquad H = 125 \, f \, (1 - 125 q_y^2), \qquad \Delta t_y = -\frac{g}{H}
-$$
+```
 
 | 반복 | $t_y$ | $q_y$ | $f$ | $g$ | $H$ | $\Delta t_y$ |
 |:-----|:-----|:-----|:-----|:-----|:-----|:-----|
@@ -260,7 +260,7 @@ $$
 | 2 | $-0.0484$ | $0.0016$ | $0.9998$ | $0.196$ | $124.9$ | $-0.0016$ |
 | 3 | $-0.0500$ | $0.0000$ | $1.0000$ | $0.000$ | $125.0$ | $0.0000$ |
 
-*표 3. $t_y$ 하나만 움직일 때 뉴턴 방법의 반복*
+*표 3. $`t_y`$ 하나만 움직일 때 뉴턴 방법의 반복*
 
 세 번 만에 $t_y = -0.05$로 수렴하여 점이 셀의 평균 높이 $y = 0.1$에 놓인다. 반복할수록 $q_y$가 $0.05 \to -0.0227 \to 0.0016$으로 빠르게 줄어드는데, 이는 최솟값 근처에서 뉴턴 방법이 보이는 빠른(이차) 수렴이다.
 
@@ -270,9 +270,9 @@ $$
 
 3차원에서는 변환의 매개변수가 평행 이동 $(t_x, t_y, t_z)$와 세 회전각(roll, pitch, yaw)의 6개로 늘고, 셀은 정육면체 복셀이 된다. Magnusson은 이 3차원 NDT를 정리하면서, 지도에 없는 물체에서 온 점(이상점, outlier)이 점수를 지배하지 않도록 정규 분포에 균일 분포를 섞은 모델을 쓰고, 이를 다시 가우스 함수로 근사한 점수 함수를 제안하였다 [2].
 
-$$
+```math
 s(\mathbf{p}) = \sum_{k} d_1 \exp\left( -\frac{d_2}{2} \mathbf{q}_k^{T} \Sigma_k^{-1} \mathbf{q}_k \right)
-$$
+```
 
 여기서 $d_1$, $d_2$는 이상점의 비율과 셀 크기에서 정해지는 상수이고 $d_1 < 0$이므로, 각 항은 2차원의 $s = -\text{score}$처럼 음수이다. 이 점수는 2차원의 경우와 같은 꼴이므로 기울기와 헤세 행렬도 같은 방식으로 구하고, 뉴턴 방향으로 움직일 걸음의 크기는 선 탐색으로 정한다. 오픈 소스 포인트 클라우드 라이브러리 PCL(Point Cloud Library)이 이 방법을 구현하며 선 탐색에는 More-Thuente 방법을 쓰고 [3], Autoware의 ndt_matching은 PCL의 구현이나 이를 고친 구현을 골라 쓴다 [4].
 
@@ -356,7 +356,7 @@ flowchart LR
 
 NDT 정합이 직접 구하는 것은 지도 안에서 LiDAR의 포즈이다. 예시처럼 LiDAR가 차량 기준점보다 앞쪽으로 1.2 m, 위쪽으로 2.0 m에 달려 있으면, LiDAR의 포즈에서 이 오프셋을 되돌려야 차량 기준점의 포즈가 된다. 이 값이 틀리면 지도 위에서 차량이 실제보다 앞이나 위에 그려지고, 이후의 경로 추종도 틀어진다.
 
-그림 7의 Simulation 탭은 재생할 rosbag의 정보를 보여 준다. 예시 파일은 Autoware가 배포하는 Moriyama(일본 나고야) 주행 데이터로, 길이 234초, 크기 8.7 GB이며, 카메라 영상 `/image_raw`(`sensor_msgs/Image`) 3516개와 LiDAR 포인트 클라우드 `/velodyne_points`(`sensor_msgs/PointCloud2`) 2342개를 담고 있다. 2342 / 234 ≈ 10이므로 LiDAR는 1초에 약 10번 스캔을 만들고, 3516 / 234 ≈ 15이므로 카메라는 약 15 Hz로 영상을 기록하였다. 위치 인식은 이 10 Hz의 스캔마다 한 번씩 정합을 수행한다.
+그림 7의 Simulation 탭은 재생할 rosbag의 정보를 보여 준다. 예시 파일은 2015년 6월 11일 일본 나고야의 모리야마(Moriyama) 지역에서 기록한 주행 데이터로, 길이 234초, 크기 8.7 GB이며, 카메라 영상 `/image_raw`(`sensor_msgs/Image`) 3516개와 LiDAR 포인트 클라우드 `/velodyne_points`(`sensor_msgs/PointCloud2`) 2342개를 담고 있다. 2342 / 234 ≈ 10이므로 LiDAR는 1초에 약 10번 스캔을 만들고, 3516 / 234 ≈ 15이므로 카메라는 약 15 Hz로 영상을 기록하였다. 위치 인식은 이 10 Hz의 스캔마다 한 번씩 정합을 수행한다.
 
 ![그림 8. ndt_matching 설정, rosbag 재생, RViz에 표시된 위치 인식 결과](../../images/Week03_3-12_p06.png)
 
@@ -372,7 +372,7 @@ NDT 정합이 직접 구하는 것은 지도 안에서 LiDAR의 포즈이다. �
 
 *표 6. ndt_matching 대화 상자의 주요 항목*
 
-대화 상자에는 이 밖에 Error Threshold 항목(예시 값 1)도 있다. Predict Pose를 켜면, 차량이 직전과 비슷하게 움직인다고 보고 예측한 포즈에서 정합을 시작하므로, 빠르게 달릴 때에도 초기 추정이 참값에 가까워져 반복 횟수가 줄고 수렴에 실패할 위험이 낮아진다. 그림 8의 RViz 화면에서 흰 점은 포인트 클라우드 지도이고, 지도 가운데의 색 있는 점들이 정합된 현재 스캔이다.
+대화 상자에는 이 밖에 Error Threshold 항목(예시 값 1)도 있다. Predict Pose를 켜면, 차량이 직전과 비슷하게 움직인다고 보고 예측한 포즈에서 정합을 시작하므로, 빠르게 달릴 때에도 초기 추정이 참값에 가까워져 반복 횟수가 줄고 수렴에 실패할 위험이 낮아진다. 그림 8의 RViz 화면에서 흰 점은 포인트 클라우드 지도이고, 지도 가운데의 색 있는 점들이 정합된 현재 스캔이다. 실제 차량에서 위치 인식과 경로 추종을 함께 실행하며 달리면, 운전석에서 본 도로와 같은 시점의 RViz 화면에 벡터 지도의 차선(노란 선), 계획된 경로(초록색), 주변 물체에서 온 LiDAR 점(빨간색과 노란색)이 차량의 움직임에 맞추어 실시간으로 갱신된다.
 
 ### 3.3 rqt_graph로 본 노드 연결
 
@@ -458,7 +458,7 @@ vector_map_loader가 벡터 지도 파일을 읽어 `/vector_map_info` 토픽들
 
 *그림 12. RViz에서 시작점과 끝점을 클릭하여 만든 경로*
 
-그림 12의 왼쪽은 도구 막대에서 Publish Point를 고른 상태이고, 오른쪽은 만들어진 경로(Generated path)이다. 만든 경로는 waypoint_saver로 파일에 저장해 두고, 경로 계획 단계에서 waypoint_loader로 다시 불러온다.
+그림 12의 왼쪽은 도구 막대에서 Publish Point를 고른 상태이고, 오른쪽은 만들어진 경로(Generated path)이다. waypoint_clicker는 두 번째 점이 찍히는 순간 계산한 경로를 정해진 속도(기본값 40 km/h)를 붙인 웨이포인트 파일(CSV, 기본 경로 `/tmp/lane_waypoint.csv`)로 저장하며, 경로 계획 단계에서 waypoint_loader로 이 파일을 다시 불러온다 [5].
 
 ---
 
@@ -508,7 +508,7 @@ flowchart LR
 
 *표 8. 경로 계획 노드의 역할*
 
-적색 신호용 웨이포인트는 정지선 앞에서 속도가 0으로 줄어드는 경로이고, 녹색 신호용 웨이포인트는 정지선을 그대로 지나가는 경로이다. 두 경로를 미리 만들어 두면 신호가 바뀌었을 때 lane_stop이 경로만 바꾸어 고르면 되므로 빠르게 대응할 수 있다. velocity_set이 쓰는 `/vscan_points`는 LiDAR 포인트 클라우드에서 장애물 후보를 뽑아낸 점들이다.
+적색 신호용 웨이포인트는 정지선 앞에서 속도가 0으로 줄어드는 경로이고, 녹색 신호용 웨이포인트는 정지선을 그대로 지나가는 경로이다. 두 경로를 미리 만들어 두면 신호가 바뀌었을 때 lane_stop이 경로만 바꾸어 고르면 되므로 빠르게 대응할 수 있다. velocity_set이 쓰는 `/vscan_points`는 LiDAR 포인트 클라우드를 수평 각도마다 가장 가까운 장애물의 점만 남겨 줄인 가상 스캔(2주차 1.8절)이다.
 
 ![그림 14. RViz에 표시된 경로 계획 결과와 웨이포인트별 목표 속도](../../images/Week03_3-12_p11.png)
 
@@ -527,7 +527,7 @@ flowchart LR
 7. path_select를 실행한다.
 8. RViz에서 경로를 확인한다.
 
-각 노드의 [app] 대화 상자에서 정하는 주요 값은 다음과 같다.
+각 노드의 [app] 대화 상자에서 정하는 주요 값은 다음과 같다. 이 밖에 lane_select의 대화 상자에는 Driving과 Passing 가운데 하나를 고르는 항목(예시는 Driving)이 있고, lane_stop의 대화 상자에는 신호 버튼 외에 차선 변경 버튼(Left Lane, Right Lane)과 현재 차선의 Keep at(60 km/h), Stop in(5.0 m) 항목이 있다.
 
 | 노드 | 항목 | 예시 값 | 의미 |
 |:-----|:-----|:-----|:-----|
@@ -535,15 +535,17 @@ flowchart LR
 | lane_rule | Number of Zeros Ahead, Behind | 10, 10 | 정지선 앞뒤로 목표 속도를 0으로 둘 웨이포인트의 수 |
 | lane_stop | Red Light, Green Light | 버튼 | 신호 상태를 손으로 지정한다. Use traffic light recognition result를 켜면 신호등 인식 결과를 쓴다 |
 | velocity_set | Others Distance | 15 m | 감지한 장애물 앞에서 멈출 거리 |
-| velocity_set | Detection Range | 1.3 m | 경로 양옆으로 장애물을 찾는 범위 |
+| velocity_set | Detection Range | 1.3 m | 각 웨이포인트를 중심으로 장애물 점을 찾는 수평 반경으로, 경로 양옆의 탐지 폭에 해당한다 |
+| velocity_set | Deceleration Range | 0 m | Detection Range 바깥으로 이 폭 안에 점이 많으면 멈추지 않고 감속만 한다. 0이면 감속 판단을 하지 않는다 |
 | velocity_set | Points Threshold | 10 | 범위 안의 점이 이 수보다 많으면 장애물로 판단한다 |
 | velocity_set | Detection Height Top, Bottom | 0.1 m, -1.8 m | 장애물로 볼 점의 높이 범위 (LiDAR 기준) |
 | velocity_set | Deceleration | 1 m/s² | 장애물 앞에서 멈출 때의 감속도 |
 | velocity_set | Velocity Change Limit | 15 km/h | 목표 속도를 한 번에 바꿀 수 있는 최대 폭 |
+| velocity_set | Use Crosswalk Detection | 끔 | 켜면 벡터 지도의 횡단보도 위에서도 장애물을 찾는다 |
 
 *표 9. 경로 계획 노드의 주요 설정*
 
-velocity_set의 장애물 판단은 단순한 규칙이다. 경로 위 앞쪽의 웨이포인트마다 Detection Range 안, 그리고 Detection Height Bottom과 Top 사이에 있는 LiDAR 점의 수를 세어 Points Threshold보다 많으면 그 자리에 장애물이 있다고 본다. 그러면 장애물보다 Others Distance만큼 앞의 웨이포인트에서 멈추도록, Deceleration의 감속도로 줄어드는 목표 속도를 그 앞 웨이포인트들에 다시 매긴다. 예시처럼 LiDAR가 지면에서 약 2 m 높이에 달려 있으면 높이 범위의 위쪽 끝(0.1 m)은 LiDAR보다 조금 높고 아래쪽 끝(-1.8 m)은 지면보다 조금 위이므로, 지면의 점과 높은 곳의 표지판이나 나뭇가지는 장애물로 세지 않는다.
+velocity_set의 장애물 판단은 단순한 규칙이다. 경로 위 앞쪽의 웨이포인트마다 Detection Range 안, 그리고 Detection Height Bottom과 Top 사이에 있는 LiDAR 점의 수를 세어 Points Threshold보다 많으면 그 자리에 장애물이 있다고 본다 [5]. 그러면 장애물보다 Others Distance만큼 앞의 웨이포인트에서 멈추도록, Deceleration의 감속도로 줄어드는 목표 속도를 그 앞 웨이포인트들에 다시 매긴다. 예시처럼 LiDAR가 지면에서 약 2 m 높이에 달려 있으면 높이 범위의 위쪽 끝(0.1 m)은 LiDAR보다 조금 높고 아래쪽 끝(-1.8 m)은 지면보다 조금 위이므로, 지면의 점과 높은 곳의 표지판이나 나뭇가지는 장애물로 세지 않는다.
 
 > **참고:** 감속도 $a$로 속도 $v$에서 멈추는 데 필요한 거리는 $v^2 / (2a)$이다. 예를 들어 $v = 10$ km/h $\approx 2.78$ m/s, $a = 1$ m/s²이면 $2.78^2 / 2 \approx 3.9$ m가 필요하다. 감속을 시작하는 웨이포인트는 정지 지점보다 적어도 이만큼 앞에 있어야 한다.
 
@@ -567,7 +569,7 @@ flowchart LR
     CV(["current_velocity"]) --> PP
     FW(["final_waypoints"]) --> PP
     PP --> TR(["twist_raw"])
-    TR --> TF["twist_filter<br>횡방향 가속도를 계산하고<br>한도를 넘으면 감속"]
+    TR --> TF["twist_filter<br>횡방향 가속도를 계산하고<br>한도를 넘으면 명령 제한"]
     TF --> TC(["twist_cmd"])
     TC --> V["차량에 (v, ω) 전달"]
 ```
@@ -578,7 +580,7 @@ flowchart LR
 
 ### 6.2 pure pursuit의 기하학
 
-**Pure pursuit**는 경로 위에서 차량보다 일정 거리 앞에 있는 점을 목표점으로 잡고, 그 점에 닿는 원호를 따라 달리도록 곡률을 정하는 경로 추종 방법이다 [5]. 목표점은 매 주기 새로 잡히므로, 차량은 경로 위를 앞서 달리는 점을 계속 쫓아가게 된다. 이 이름은 앞서 가는 대상을 그대로 겨냥하여 쫓는 추적 방식(pure pursuit)에서 왔다.
+**Pure pursuit**는 경로 위에서 차량보다 일정 거리 앞에 있는 점을 목표점으로 잡고, 그 점에 닿는 원호를 따라 달리도록 곡률을 정하는 경로 추종 방법이다 [6]. 목표점은 매 주기 새로 잡히므로, 차량은 경로 위를 앞서 달리는 점을 계속 쫓아가게 된다. 이 이름은 앞서 가는 대상을 그대로 겨냥하여 쫓는 추적 방식(pure pursuit)에서 왔다.
 
 > **용어 정의:** **곡률(curvature)** $\kappa$는 경로가 휘는 정도로, 반지름 $R$인 원의 곡률은 $\kappa = 1/R$이다. **전방 주시 거리(lookahead distance)** $l$은 차량에서 목표점까지의 거리이다.
 
@@ -588,9 +590,9 @@ flowchart LR
 2. 목표점도 원 위에 있으므로 중심까지의 거리가 $R$이다: $x_t^2 + (y_t - R)^2 = R^2$.
 3. 전개하면 $x_t^2 + y_t^2 - 2 y_t R + R^2 = R^2$이므로 $l^2 - 2 y_t R = 0$이다.
 
-$$
+```math
 R = \frac{l^2}{2 y_t}, \qquad \kappa = \frac{1}{R} = \frac{2 y_t}{l^2}
-$$
+```
 
 목표점이 진행 방향과 이루는 각을 $\alpha$라 하면 $y_t = l \sin\alpha$이므로 같은 식을 $\kappa = 2 \sin\alpha / l$로도 쓸 수 있다. $y_t > 0$(목표점이 왼쪽)이면 $\kappa > 0$으로 왼쪽으로, $y_t < 0$이면 오른쪽으로 돈다. $y_t = 0$이면 곡률이 0, 즉 직진이다.
 
@@ -615,13 +617,13 @@ pure_pursuit 노드가 발행하는 `twist_raw`에는 $v = 5$ m/s와 $\omega = 0
 
 ### 6.4 목표점과 전방 주시 거리의 선택
 
-Autoware의 pure_pursuit는 경로의 웨이포인트를 차례로 보며 현재 위치에서 전방 주시 거리보다 멀리 있는 첫 웨이포인트를 목표점으로 잡는다. Linear Interpolate를 켜면, 그 웨이포인트와 바로 앞 웨이포인트를 잇는 선분이 반지름 $l$인 원과 만나는 점을 계산하여 목표점으로 쓴다. 웨이포인트 사이가 멀어도 목표점이 정확히 거리 $l$에 놓이므로 곡률 계산이 매끄러워진다 [6].
+Autoware의 pure_pursuit는 경로의 웨이포인트를 차례로 보며 현재 위치에서 전방 주시 거리보다 멀리 있는 첫 웨이포인트를 목표점으로 잡는다. Linear Interpolate를 켜면, 그 웨이포인트와 바로 앞 웨이포인트를 잇는 선분이 반지름 $l$인 원과 만나는 점을 계산하여 목표점으로 쓴다. 웨이포인트 사이가 멀어도 목표점이 정확히 거리 $l$에 놓이므로 곡률 계산이 매끄러워진다 [5].
 
-전방 주시 거리는 두 가지 방식으로 정한다. Dialog 모드에서는 대화 상자에 입력한 고정 속도와 고정 전방 주시 거리를 쓴다. Waypoint 모드에서는 속도를 웨이포인트의 목표 속도에서 가져오고, 전방 주시 거리를 현재 속도에 비례하게 정한다 [6].
+전방 주시 거리는 두 가지 방식으로 정한다. Dialog 모드에서는 대화 상자에 입력한 고정 속도와 고정 전방 주시 거리를 쓴다. Waypoint 모드에서는 속도를 웨이포인트의 목표 속도에서 가져오고, 전방 주시 거리를 현재 속도에 비례하게 정한다 [5].
 
-$$
+```math
 l = \begin{cases} l_{\min} & (r \, v < l_{\min}) \\ \min(r \, v, \; 10 v) & (\text{otherwise}) \end{cases}
-$$
+```
 
 여기서 $r$은 lookahead_ratio, $l_{\min}$은 minimum_lookahead_distance, $v$는 현재 속도(m/s)이다. 예시 설정 $r = 2$, $l_{\min} = 4$ m에서는 다음과 같다.
 
@@ -633,7 +635,7 @@ $$
 
 *표 10. 예시 설정에서 속도에 따른 전방 주시 거리*
 
-속도에 비례하게 정하는 까닭은 전방 주시 거리가 추종 성능을 크게 좌우하기 때문이다 [5].
+속도에 비례하게 정하는 까닭은 전방 주시 거리가 추종 성능을 크게 좌우하기 때문이다 [6].
 
 - **짧으면** 목표점이 가까워 경로를 바짝 따르지만, 경로에서 조금만 벗어나도 큰 곡률로 급하게 꺾으므로 차량이 경로 양옆으로 흔들리기(진동) 쉽다.
 - **길면** 움직임이 부드럽고 안정적이지만, 곡선 구간에서 목표점이 커브 안쪽으로 당겨져 코너를 안쪽으로 질러가고(corner cutting), 경로로 돌아오는 데 오래 걸린다.
@@ -642,13 +644,13 @@ $$
 
 ### 6.5 twist_filter와 횡방향 가속도 제한
 
-곡률 $\kappa$인 원을 속도 $v$로 달리는 차량은 원의 중심 쪽으로 $a_y = v^2 \kappa = v \omega$의 횡방향 가속도(구심 가속도)를 받는다. 이 값이 크면 승객이 불편하고, 타이어의 마찰 한계를 넘으면 차량이 미끄러진다. twist_filter는 pure_pursuit가 낸 목표 속도와 각속도로 횡방향 가속도를 계산하여, 정한 한도(lateral_accel_limit)를 넘으면 목표 속도를 줄인다. 곡률을 유지하며 한도 $a_{\max}$를 지키려면 속도가 다음을 만족해야 한다.
+곡률 $\kappa$인 원을 속도 $v$로 달리는 차량은 원의 중심 쪽으로 $a_y = v^2 \kappa = v \omega$의 횡방향 가속도(구심 가속도)를 받는다. 이 값이 크면 승객이 불편하고, 타이어의 마찰 한계를 넘으면 차량이 미끄러진다. twist_filter는 pure_pursuit가 낸 목표 속도와 각속도로 횡방향 가속도를 계산하여, 정한 한도 $a_{\max}$(lateral_accel_limit)를 넘으면 명령을 제한한다. 초기 Autoware.ai(1.8.0)의 twist_filter는 각속도 $\omega$를 그대로 두고 속도를 $a_{\max} / \omega$로 바꾸었다(오른쪽으로 돌아 $\omega < 0$이면 이 값이 음수가 되는 결함이 있다) [7]. Autoware.ai 1.14.0의 twist_filter는 반대로 속도를 그대로 두고 각속도의 크기를 $a_{\max} / v$로 줄이며, 횡방향 저크(jerk, 횡방향 가속도의 변화율)의 한도도 함께 적용한다 [5]. 어느 방식이든 실제로 그리는 곡률 $\omega / v$가 경로의 곡률과 달라진다. 경로의 곡률 $\kappa$를 그대로 따르면서 한도를 지키려면 속도가 다음을 만족해야 하며, 이 값이 곡선 구간에서 낼 수 있는 속도의 상한이다.
 
-$$
+```math
 v^2 \kappa \le a_{\max} \quad \Longrightarrow \quad v \le \sqrt{\frac{a_{\max}}{\kappa}}
-$$
+```
 
-6.3절의 목표점($\kappa = 0.1176$ m⁻¹)에서 한도가 예시 설정의 $a_{\max} = 5$ m/s²이면, $v = 5$ m/s의 $a_y = 2.94$ m/s²는 한도 안이므로 그대로 통과한다. 같은 곡선을 $v = 8$ m/s로 달리려 하면 $a_y = 64 \times 0.1176 \approx 7.53$ m/s²로 한도를 넘으므로, 속도를 $\sqrt{5 / 0.1176} \approx 6.52$ m/s(약 23.5 km/h) 이하로 줄여야 한다.
+6.3절의 목표점($\kappa = 0.1176$ m⁻¹)에서 한도가 예시 설정의 $a_{\max} = 5$ m/s²이면, $v = 5$ m/s의 $a_y = 2.94$ m/s²는 한도 안이므로 그대로 통과한다. 같은 곡선을 $v = 8$ m/s로 달리려 하면 $\omega = 8 \times 0.1176 \approx 0.941$ rad/s, $a_y = 64 \times 0.1176 \approx 7.53$ m/s²로 한도를 넘는다. 곡률을 지키려면 속도를 $\sqrt{5 / 0.1176} \approx 6.52$ m/s(약 23.5 km/h) 이하로 줄여야 한다. 초기 구현은 속도를 $5 / 0.941 \approx 5.31$ m/s로 줄이므로 곡률이 $0.941 / 5.31 \approx 0.177$ m⁻¹로 커지고, 1.14.0의 구현은 각속도를 $5 / 8 = 0.625$ rad/s로 줄이므로 곡률이 $0.625 / 8 \approx 0.078$ m⁻¹로 작아져 경로보다 바깥쪽을 돈다.
 
 ### 6.6 실행 절차
 
@@ -656,7 +658,7 @@ $$
 
 1. Computing 탭의 waypoint_follower 아래에서 pure_pursuit의 [app] 대화 상자를 열어 세부 설정을 한 뒤 실행한다.
 2. twist_filter의 [app] 대화 상자에서 세부 설정을 한 뒤 실행한다.
-3. RViz에서 속도와 커브 목표값이 생성되는지 확인한다.
+3. RViz에서 속도와 커브 목표값이 생성되는지 확인한다. Runtime Manager의 Topics 탭에서 `/twist_cmd`를 고르고 Echo를 켜면 차량으로 가는 최종 명령도 볼 수 있다. 예시 화면의 `/twist_cmd`는 `geometry_msgs/TwistStamped` 형식이고 퍼블리셔에 twist_filter가 있으며, `linear.x`가 11.11 m/s(40 km/h), `angular.z`가 -0.0130 rad/s이다. 회전 반경 $v / \vert \omega \vert \approx 856$ m의 완만한 우회전이므로 횡방향 가속도 $v \vert \omega \vert \approx 0.14$ m/s²는 한도 5 m/s²보다 훨씬 작다.
 
 | 노드 | 항목 | 예시 값 | 의미 |
 |:-----|:-----|:-----|:-----|
@@ -699,7 +701,7 @@ $$
 
 ### 7.2 정류장 정차
 
-정류장 정차는 Autoware의 신호(Traffic Signal)와 정지선(Stop Line) 기능을 활용하여 구현하였다. Runtime Manager에 station 노드와 CAN 송수신 노드를 추가하고, station 노드가 차량 속도와 벡터 지도의 정지선까지의 거리 같은 정보를 받는다. 정류장 위치를 정지선으로 두면 적색 신호일 때 lane_stop이 정지선 앞에서 멈추는 경로를 고르므로 차량이 정류장에 선다. 정차 후 출발할 때 station 노드가 신호를 녹색으로 바꾸면 차량이 다시 출발한다. 새 기능을 처음부터 만들지 않고 기존 신호 처리 경로를 재사용한 설계이다.
+정류장 정차는 Autoware의 신호(Traffic Signal)와 정지선(Stop Line) 기능을 활용하여 구현하였다. Runtime Manager에 station 노드(`katech_station`)와 CAN 송수신 노드를 추가하고, station 노드가 CAN 변환 노드(`katech_converting_CAN`)가 낸 차량 속도(`/sonata_velocity`)와 벡터 지도의 정지선까지의 거리 같은 정보를 받는다. station 노드가 정한 신호 상태는 `/light_color_managed` 토픽으로 lane_stop에 전달된다. 정류장 위치를 정지선으로 두면 적색 신호일 때 lane_stop이 정지선 앞에서 멈추는 경로를 고르므로 차량이 정류장에 선다. 정차 후 출발할 때 station 노드가 신호를 녹색으로 바꾸면 차량이 다시 출발한다. 새 기능을 처음부터 만들지 않고 기존 신호 처리 경로를 재사용한 설계이다.
 
 ### 7.3 LiDAR 기반 장애물 인식과 회피
 
@@ -737,13 +739,13 @@ CAN 통신과 Autoware의 CAN 노드는 13\~14주차에서 다룬다.
 
 ### 7.5 활용 사례
 
-이 기술은 캠퍼스 안의 무인 셔틀, 자율주행 배송 로봇, 퍼스널 모빌리티에 활용할 수 있다.
+이 기술은 캠퍼스 안의 무인 셔틀, 자율주행 배송 로봇, 퍼스널 모빌리티에 활용할 수 있다. 실제 예로, 노트북을 얹은 소형 4륜 배송 로봇이 보행자가 다니는 광장에서 RViz의 지도 위에 계획한 경로(초록색 선)를 따라 달리고, LiDAR와 노트북을 단 전동 휠체어가 사람을 태운 채 캠퍼스 도로를 자율주행한다.
 
 ![그림 20. 캠퍼스 무인 셔틀의 출발점과 도착점을 표시한 위성 지도와 같은 영역의 포인트 클라우드 지도](../../images/Week03_3-12_p23.png)
 
 *그림 20. 캠퍼스 무인 셔틀의 출발점과 도착점을 표시한 위성 지도와 같은 영역의 포인트 클라우드 지도*
 
-그림 20의 왼쪽 위성 지도에는 출발점(Start)에서 도착점(Goal)까지의 주행 경로가 초록색으로 표시되어 있고, 오른쪽은 같은 영역을 LiDAR로 매핑한 포인트 클라우드 지도이다. 실제 서비스 영역마다 이처럼 지도를 먼저 만들고, 그 위에서 이 단원의 위치 인식, 경로 계획, 경로 추종을 수행한다.
+그림 20의 왼쪽 위성 지도에는 출발점(Start)에서 도착점(Goal)까지의 주행 경로가 초록색으로 표시되어 있고, 오른쪽은 같은 영역을 LiDAR로 매핑한 포인트 클라우드 지도이다. 실제 서비스 영역마다 이처럼 지도를 먼저 만들고, 그 위에서 이 단원의 위치 인식, 경로 계획, 경로 추종을 수행한다. 캠퍼스 전체를 매핑한 포인트 클라우드 지도에는 건물, 계단, 화단, 나무의 윤곽이 점으로 세밀하게 드러난다.
 
 ---
 
@@ -753,9 +755,9 @@ CAN 통신과 Autoware의 CAN 노드는 13\~14주차에서 다룬다.
 
 이후의 ROS와 Autoware 실습은 Ubuntu 18.04 LTS(코드명 Bionic Beaver)에서 진행한다. ROS 1의 배포판은 특정 Ubuntu 버전에 맞추어 만들어지며, 실습에 쓰는 ROS Melodic과 Autoware.ai 1.14.0이 Ubuntu 18.04를 대상으로 한다(4주차 참고).
 
-> **용어 정의:** **LTS(long term support)** 는 장기 지원 버전으로, Ubuntu의 LTS 버전은 5년 동안 표준 보안 업데이트를 받는다 [7]. **ISO 이미지(ISO image)** 는 설치 디스크의 내용을 파일 하나에 담은 것이다.
+> **용어 정의:** **LTS(long term support)** 는 장기 지원 버전으로, Ubuntu의 LTS 버전은 5년 동안 표준 보안 업데이트를 받는다 [8]. **ISO 이미지(ISO image)** 는 설치 디스크의 내용을 파일 하나에 담은 것이다.
 
-> **주의:** Ubuntu 18.04의 표준 지원은 2023년에 끝났고 [7], ROS Melodic도 2023년에 지원이 끝났다 [8]. 이 환경은 실습 자료와 같은 버전을 재현하기 위한 것이며, 인터넷에 직접 연결되는 장비에 오래 쓰기에는 보안 업데이트가 부족하다.
+> **주의:** Ubuntu 18.04의 표준 지원은 2023년에 끝났고 [8], ROS Melodic도 2023년에 지원이 끝났다 [9]. 이 환경은 이 과목이 쓰는 버전(ROS Melodic, Autoware.ai 1.14.0)을 재현하기 위한 것이며, 인터넷에 직접 연결되는 장비에 오래 쓰기에는 보안 업데이트가 부족하다.
 
 ### 8.1 설치 방식 고르기
 
@@ -782,7 +784,7 @@ shasum -a 256 ubuntu-18.04.6-desktop-amd64.iso    # macOS
 
 ### 8.3 USB 메모리로 설치하기
 
-1. Ubuntu 공식 튜토리얼(Windows에서 부팅 가능한 USB 메모리 만들기)을 따라 Rufus 같은 도구로 ISO 이미지를 USB 메모리에 기록한다 [9]. 이때 USB 메모리의 기존 자료는 모두 지워진다.
+1. Ubuntu 공식 튜토리얼(Windows에서 부팅 가능한 USB 메모리 만들기)을 따라 Rufus 같은 도구로 ISO 이미지를 USB 메모리에 기록한다 [10]. 이때 USB 메모리의 기존 자료는 모두 지워진다.
 2. 컴퓨터를 다시 켜면서 부팅 메뉴(제조사에 따라 F12, F11, Esc 등)를 열어 USB 메모리로 부팅한다.
 3. 설치 화면이 나오면 8.5절과 같은 순서로 설치한다.
 4. 설치 언어는 영어로 하고, 필요하면 설치 뒤에 한글 입력을 추가한다(4주차 1.3절). 한국어로 설치하면 홈 폴더 아래의 기본 폴더 이름(문서, 다운로드 등)이 한국어로 만들어져 터미널에서 경로를 입력하기 불편하고, 오류 메시지도 한국어로 나와 검색하기 어렵다.
@@ -898,7 +900,7 @@ shasum -a 256 ubuntu-18.04.6-desktop-amd64.iso    # macOS
 | 벽을 따라 움직인 점과 벽에 수직으로 움직인 점은 같은 거리라도 NDT 점수가 다르다. | **T.** 공분산이 벽 방향으로 길게 퍼져 있으므로 벽에 수직인 방향의 이탈을 더 크게 벌한다. |
 | 뉴턴 방법은 어떤 초기 추정에서 시작해도 점수를 높이는 방향으로 움직인다. | **F.** 헤세 행렬이 양의 정부호가 아니면 반대 방향으로 갈 수 있으므로 구현은 헤세 행렬을 보정하거나 선 탐색을 쓴다. |
 | NDT의 Resolution을 키우면 초기 추정 오차에 더 강해지지만 정확도는 떨어질 수 있다. | **T.** 셀이 크면 점수 함수가 완만해져 수렴 범위가 넓어지지만 표면의 세부 모양이 뭉개진다. |
-| pure pursuit에서 목표점이 차량의 바로 앞($y_t = 0$)에 있으면 곡률은 0이다. | **T.** $\kappa = 2 y_t / l^2 = 0$이므로 직진한다. |
+| pure pursuit에서 목표점이 차량의 바로 앞($`y_t = 0`$)에 있으면 곡률은 0이다. | **T.** $\kappa = 2 y_t / l^2 = 0$이므로 직진한다. |
 | 같은 곡률에서 속도를 두 배로 하면 횡방향 가속도도 두 배가 된다. | **F.** $a_y = v^2 \kappa$이므로 네 배가 된다. |
 | VirtualBox에서 Erase disk and install Ubuntu를 고르면 호스트의 Windows가 지워진다. | **F.** 가상 머신 안의 가상 디스크만 지워진다. |
 
@@ -921,7 +923,7 @@ shasum -a 256 ubuntu-18.04.6-desktop-amd64.iso    # macOS
 | 경로 계획 | lane_rule, lane_stop, lane_select, velocity_set, path_select가 차례로 속도를 매기고 신호, 차선, 장애물을 반영한다. |
 | pure pursuit | 전방 주시 거리 $l$의 목표점 $(x_t, y_t)$를 지나는 원호의 곡률 $\kappa = 2 y_t / l^2$를 구하고 $\omega = v \kappa$를 낸다. |
 | 전방 주시 거리 | 짧으면 진동하고 길면 코너를 질러간다. Autoware는 현재 속도에 lookahead_ratio를 곱하고 최솟값으로 제한한다. |
-| twist_filter | 횡방향 가속도 $a_y = v^2 \kappa$가 한도를 넘으면 목표 속도를 $\sqrt{a_{\max} / \kappa}$ 이하로 줄인다. |
+| twist_filter | 횡방향 가속도 $a_y = v \omega$가 한도를 넘으면 명령을 제한한다(1.8.0은 속도를, 1.14.0은 각속도를 줄인다). 경로의 곡률을 지키며 낼 수 있는 속도의 상한은 $\sqrt{a_{\max} / \kappa}$이다. |
 | 실차 적용 | 쏘나타에 LiDAR와 GNSS를 달아 위치 인식, 경로 계획, 경로 추종, 정류장 정차, 장애물 인식을 시험하였다. 대용량 지도와 센서 융합이 과제로 남았다. |
 | Ubuntu 18.04 설치 | ISO를 내려받아 USB 메모리나 VirtualBox 가상 머신으로 설치한다. 영어로 설치하고 자원을 넉넉히 할당한다. |
 
@@ -1003,7 +1005,7 @@ shasum -a 256 ubuntu-18.04.6-desktop-amd64.iso    # macOS
 
    </details>
 
-9. **횡방향 가속도 제한:** 반지름 20 m인 커브를 lateral_accel_limit 5 m/s²로 달릴 때 twist_filter가 허용하는 최대 속도를 m/s와 km/h로 구하라.
+9. **횡방향 가속도 제한:** 반지름 20 m인 커브를 곡률 그대로 따라 달리면서 횡방향 가속도를 lateral_accel_limit 5 m/s² 이하로 유지할 수 있는 최대 속도를 m/s와 km/h로 구하라.
 
    <details>
    <summary>정답</summary>
@@ -1040,8 +1042,9 @@ shasum -a 256 ubuntu-18.04.6-desktop-amd64.iso    # macOS
 2. M. Magnusson, "The three-dimensional normal-distributions transform: An efficient representation for registration, surface analysis, and loop detection," Ph.D. dissertation, Örebro Univ., Örebro, Sweden, 2009.
 3. Point Cloud Library, "How to use Normal Distributions Transform," PCL Tutorials. https://pcl.readthedocs.io/projects/tutorials/en/latest/normal_distributions_transform.html
 4. Autoware Foundation, "core_perception: lidar_localizer (ndt_matching)," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_perception
-5. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Inst., Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
-6. Autoware Foundation, "core_planning: pure_pursuit," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_planning
-7. Canonical, "Ubuntu release cycle." https://ubuntu.com/about/release-cycle
-8. Open Robotics, "Distributions," ROS Wiki. https://wiki.ros.org/Distributions
-9. Canonical, "Create a bootable USB stick on Windows," Ubuntu Tutorials. https://ubuntu.com/tutorials/create-a-usb-stick-on-windows
+5. Autoware Foundation, "core_planning: waypoint_maker, waypoint_planner, pure_pursuit, twist_filter," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_planning
+6. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Inst., Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
+7. Autoware Foundation, "autoware_ai 1.8.0: waypoint_follower/twist_filter," GitHub repository, Autoware.ai. https://github.com/autowarefoundation/autoware_ai/tree/1.8.0
+8. Canonical, "Ubuntu release cycle." https://ubuntu.com/about/release-cycle
+9. Open Robotics, "Distributions," ROS Wiki. https://wiki.ros.org/Distributions
+10. Canonical, "Create a bootable USB stick on Windows," Ubuntu Tutorials. https://ubuntu.com/tutorials/create-a-usb-stick-on-windows

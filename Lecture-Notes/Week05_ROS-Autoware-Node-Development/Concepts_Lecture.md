@@ -58,7 +58,7 @@
 
 ### 1.1 Installation Order and Prerequisites
 
-Autoware.ai is open-source autonomous driving software that runs on top of ROS 1 (Week 2), and version 1.14.0, which this course uses, is built directly from its downloaded source code on Ubuntu 18.04 with ROS Melodic. The installation proceeds in the following order, and the detailed commands and explanations of each step are in the places listed in the table.
+Autoware.ai is open-source autonomous driving software that runs on top of ROS 1 (Week 2), and version 1.14.0 is built directly from its downloaded source code on Ubuntu 18.04 with ROS Melodic. The installation proceeds in the following order, and the detailed commands and explanations of each step are in the places listed in the table.
 
 | Step | Content | Covered in |
 |:-----|:-----|:-----|
@@ -72,7 +72,7 @@ Autoware.ai is open-source autonomous driving software that runs on top of ROS 1
 
 *Table 1. Installation order up to using Autoware.ai*
 
-The Autoware.ai source build documentation requires ROS Melodic and Qt 5.9.5 or later on Ubuntu 18.04, and optionally CUDA 10.0 for GPU acceleration [1]. Qt is needed because Autoware.ai contains packages, such as RViz plugins, that draw their screens with the Qt library, and this course installs Qt 5.12.12, a long-term support (LTS) release, separately.
+The Autoware.ai source build documentation requires ROS Melodic and Qt 5.9.5 or later on Ubuntu 18.04, and optionally CUDA 10.0 for GPU acceleration [1]. Qt is needed because Autoware.ai contains packages, such as RViz plugins, that draw their screens with the Qt library, and the installation guide of Week 4, Section 6.2, installs Qt 5.12.12, a long-term support (LTS) release, separately.
 
 > **Definition:** **Qt** is a cross-platform framework for building graphical user interface (GUI) programs in C++. ROS's RViz and rqt are also built with Qt. **qmake** is a tool that generates build files for Qt projects, and **Qt Creator** is the integrated development environment (IDE) for Qt development.
 
@@ -113,7 +113,7 @@ flowchart LR
 
 *Figure 1. Development order from ROS nodes to Autoware nodes*
 
-This note covers steps 1-3 on the left, that is, writing a node, building it, and checking its operation. Message passing in step 4 and its applications are covered in Weeks 6 and 7, and nodes that work with Autoware are covered in Week 14. Autoware nodes are also ROS nodes, so the structure of workspaces, packages, and nodes learned here applies to them unchanged.
+This unit covers steps 1-3 on the left, that is, writing a node, building it, and checking its operation. Message passing in step 4 and its applications are covered in Weeks 6 and 7, and nodes that work with Autoware are covered in Week 14. Autoware nodes are also ROS nodes, so the structure of workspaces, packages, and nodes learned here applies to them unchanged.
 
 ---
 
@@ -145,7 +145,7 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
 ### 3.2 The Spaces of a Workspace and Environment Setup
 
-A catkin workspace consists of folders with different roles, called **spaces** [2]. When `catkin_make` runs, the path of each space is printed first.
+A catkin workspace consists of folders with different roles, called **spaces** [3]. When `catkin_make` runs, the path of each space is printed first.
 
 | Space | Folder | Contents |
 |:-----|:-----|:-----|
@@ -156,7 +156,7 @@ A catkin workspace consists of folders with different roles, called **spaces** [
 
 *Table 2. Spaces that make up a catkin workspace*
 
-Sourcing `devel/setup.bash` adds the packages of this workspace to environment variables such as `ROS_PACKAGE_PATH`, so `rosrun` and `roslaunch` can find them. The script also loads the environment of the ROS installation the workspace was built against (`/opt/ros/melodic`), and if the workspace contains a package with the same name, the one in the workspace takes precedence. This arrangement, in which a workspace is laid over an existing environment, is called an **overlay** [2].
+Sourcing `devel/setup.bash` adds the packages of this workspace to environment variables such as `ROS_PACKAGE_PATH`, so `rosrun` and `roslaunch` can find them. The script also loads the environment of the ROS installation the workspace was built against (`/opt/ros/melodic`), and if the workspace contains a package with the same name, the one in the workspace takes precedence. This arrangement, in which a workspace is laid over an existing environment, is called an **overlay** [3].
 
 ### 3.3 Creating a Package
 
@@ -232,7 +232,7 @@ The `src` of the workspace (the source space) and the `src` inside the package (
 </package>
 ```
 
-`format="2"` means that manifest format 2 is used, and the dependency tags mean the following [3].
+`format="2"` means that manifest format 2 is used, and the dependency tags mean the following [4].
 
 | Tag | Meaning |
 |:-----|:-----|
@@ -287,7 +287,7 @@ target_link_libraries(hello_dsc
 
 *Table 4. Main commands of a package CMakeLists.txt*
 
-The order of the commands also follows rules. `catkin_package()` must be called before build targets are declared with `add_executable` or `add_library` [4], and `target_link_libraries` must come after the `add_executable` that created its target. In the generated file, this order is kept by placing `add_executable` below the comment `## Declare a C++ executable` and `target_link_libraries` below the comment `## Specify libraries to link a library or executable target against`.
+The order of the commands also follows rules. `catkin_package()` must be called before build targets are declared with `add_executable` or `add_library` [5], and `target_link_libraries` must come after the `add_executable` that created its target. In the generated file, this order is kept by placing `add_executable` below the comment `## Declare a C++ executable` and `target_link_libraries` below the comment `## Specify libraries to link a library or executable target against`.
 
 ![Figure 3. add_executable and target_link_libraries added to CMakeLists.txt in VS Code](../../images/Week05_5-2_p08.png)
 
@@ -295,7 +295,7 @@ The order of the commands also follows rules. `catkin_package()` must be called 
 
 In Figure 3, `add_executable(hello_dsc src/hello_dsc.cpp)` has been added on line 140 and `target_link_libraries(hello_dsc ${catkin_LIBRARIES})` on lines 158-160. The remaining lines are comments beginning with `#`, so they do not affect the build. Each time another node is created, these two commands are added once per node (Week 6).
 
-> **[Computer Programming]** A C++ program is built by **compiling** each source file into an object file (`.o`) and then **linking** the object files and libraries into an executable. `add_executable` decides what is compiled into which executable, and `target_link_libraries` decides which libraries are attached at link time. The declarations of functions such as `ros::init` are in the headers, but their implementations are in the roscpp library, so leaving out the link step causes "undefined reference" errors.
+> **[Systems Programming]** A C++ program is built by **compiling** each source file into an object file (`.o`) and then **linking** the object files and libraries into an executable. `add_executable` decides what is compiled into which executable, and `target_link_libraries` decides which libraries are attached at link time. The declarations of functions such as `ros::init` are in the headers, but their implementations are in the roscpp library, so leaving out the link step causes "undefined reference" errors.
 
 ### 3.6 Opening the Workspace in VS Code
 
@@ -327,7 +327,11 @@ Scanning dependencies of target hello_dsc
 /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o: In function `_start':
 (.text+0x20): undefined reference to `main'
 collect2: error: ld returned 1 exit status
+hello_ros/CMakeFiles/hello_dsc.dir/build.make:112: recipe for target '/home/mobility/catkin_ws/devel/lib/hello_ros/hello_dsc' failed
 make[2]: *** [/home/mobility/catkin_ws/devel/lib/hello_ros/hello_dsc] Error 1
+CMakeFiles/Makefile2:861: recipe for target 'hello_ros/CMakeFiles/hello_dsc.dir/all' failed
+make[1]: *** [hello_ros/CMakeFiles/hello_dsc.dir/all] Error 2
+Makefile:140: recipe for target 'all' failed
 make: *** [all] Error 2
 Invoking "make -j8 -l8" failed
 ```
@@ -335,9 +339,9 @@ Invoking "make -j8 -l8" failed
 The output divides into two main stages.
 
 1. **CMake configuration stage (lines beginning with `--`):** catkin 0.7.29 finds the packages under `src` and arranges them in an order consistent with their dependencies (topological order). There is only one package, `hello_ros`, so only it is processed, and the build files are written to the `build` folder.
-2. **make build stage:** `make -j8 -l8` runs (eight jobs at the same time, postponing new jobs while the system load exceeds 8). Compiling the empty `hello_dsc.cpp` (`Building CXX object`, 50%) succeeds, but linking, which produces the executable (`Linking CXX executable`, 100%), fails.
+2. **make build stage:** `make -j8 -l8` runs (eight jobs at the same time, postponing new jobs while the system load exceeds 8). Compiling the empty `hello_dsc.cpp` (`Building CXX object`, 50%) succeeds, but linking, which produces the executable (`Linking CXX executable`, 100%), fails. When linking fails, the error is reported in turn by the sub-make that was building that target (`make[2]`), then by `make[1]`, and finally by the top-level `make`.
 
-The cause of the error is that `hello_dsc.cpp` has no `main` function. An empty file is still valid C++ source, so it compiles, but an executable needs a point at which the program starts. The linker (`ld`; `collect2` is the step in which GCC calls the linker) cannot find the `main` called by `_start` in `Scrt1.o`, the startup code of the C runtime environment, and reports "undefined reference to `main'". When the build fails, the last line prints `Invoking "make -j8 -l8" failed`.
+The cause of the error is that `hello_dsc.cpp` has no `main` function. An empty file is still valid C++ source, so it compiles, but an executable needs a point at which the program starts. The linker (`ld`) cannot find the `main` called by `_start` in `Scrt1.o`, the startup code of the C runtime environment, and reports "undefined reference to `main'"; `collect2`, the helper program through which GCC runs the linker, then reports this failure as `ld returned 1 exit status`. When the build fails, the last line prints `Invoking "make -j8 -l8" failed`.
 
 > **[Systems Programming]** The real starting point of a C or C++ program is not `main` but `_start` in the startup code of the C runtime (`crt1.o`, or `Scrt1.o` for a position-independent executable). `_start` prepares the stack and arguments, calls `main` through the initialization function of the C library, and uses the value returned by `main` as the exit status of the program. This is why a missing `main` causes an error at link time rather than at compile time.
 
@@ -400,7 +404,7 @@ Install space: /home/mobility/catkin_ws/install
 [100%] Built target hello_dsc
 ```
 
-The first five lines are the paths of the spaces of Section 3.2. `make cmake_check_build_system` is the step that checks whether `CMakeLists.txt` has changed and reconfigures CMake if necessary, and the last line, `[100%] Built target hello_dsc`, means that the executable has been built. The executable is created at `devel/lib/hello_ros/hello_dsc` in the devel space.
+The five lines after `catkin_make` are the base path of the workspace and the paths of the four spaces of Section 3.2. `make cmake_check_build_system` is the step that checks whether `CMakeLists.txt` has changed and reconfigures CMake if necessary, and the last line, `[100%] Built target hello_dsc`, means that the executable has been built. The executable is created at `devel/lib/hello_ros/hello_dsc` in the devel space.
 
 ```mermaid
 flowchart LR
@@ -485,7 +489,7 @@ Changing a name with an argument of the form `name:=new_name` in this way is cal
 ros::init(argc, argv, "hello_dsc");
 ```
 
-`ros::init` initializes ROS and sets the name of this node. It must be called before any other ROS feature is used [5].
+`ros::init` initializes ROS and sets the name of this node. It must be called before any other ROS feature is used [6].
 
 - **`argc`, `argv`:** Passing the command-line arguments lets it process the remapping arguments of Section 5.2. `ros::init` removes the ROS arguments it processed from `argv`, so the code after it sees only ordinary arguments.
 - **`"hello_dsc"`:** The node name. It must be a base name without a namespace (it cannot contain `/`), and once running, the node is registered with the master as `/hello_dsc`. A node name must be unique within the ROS system, so if a new node with the same name starts, the node that was already running is shut down.
@@ -498,7 +502,7 @@ The node name (the third argument of `ros::init`) and the executable name (the f
 ros::NodeHandle n;
 ```
 
-The **node handle** is the main access point through which a node communicates with the ROS system. Creating publishers and subscribers and reading parameters are all done through the node handle. The first node handle created fully starts the node (registering it with the master and so on), and the node shuts down when the last node handle is destroyed [5]. This line is therefore the "declaration of the handle for using the ROS system", and the waiting of the node when there is no master, as in the caution box of Section 4.3, is also due to this startup process.
+The **node handle** is the main access point through which a node communicates with the ROS system. Creating publishers and subscribers and reading parameters are all done through the node handle. The first node handle created fully starts the node (registering it with the master and so on), and the node shuts down when the last node handle is destroyed [6]. This line is therefore the "declaration of the handle for using the ROS system", and the waiting of the node when there is no master, as in the caution box of Section 4.3, is also due to this startup process.
 
 ### 5.5 The Loop Condition: ros::ok
 
@@ -509,7 +513,7 @@ while (ros::ok())
 }
 ```
 
-`ros::ok()` returns whether the node may keep running, and becomes `false` when one of the following happens [6].
+`ros::ok()` returns whether the node may keep running, and becomes `false` when one of the following happens [7].
 
 - A SIGINT signal was received because `Ctrl + C` was pressed in the terminal.
 - Another node with the same name started, and this node was kicked off the network.
@@ -543,7 +547,7 @@ Because the message and the stream are declared inside the loop, new objects are
 ROS_INFO("%s", msg.data.c_str());
 ```
 
-`ROS_INFO` is a macro provided by the ROS logging facility (rosconsole) and uses the same format string as C's `printf` [7]. `%s` is a placeholder for a C string, so `msg.data`, a `std::string`, is converted to a C string (`const char*`) with `c_str()` before being passed. A message printed by `ROS_INFO` is not only shown in the terminal in the format of Section 4.3 but also published to the log topic `/rosout`, so it can be collected and viewed in tools such as rqt.
+`ROS_INFO` is a macro provided by the ROS logging facility (rosconsole) and uses the same format string as C's `printf` [8]. `%s` is a placeholder for a C string, so `msg.data`, a `std::string`, is converted to a C string (`const char*`) with `c_str()` before being passed. A message printed by `ROS_INFO` is not only shown in the terminal in the format of Section 4.3 but also published to the log topic `/rosout`, so it can be collected and viewed in tools such as rqt.
 
 | Macro | Severity | Use |
 |:-----|:-----|:-----|
@@ -563,11 +567,11 @@ ROS_INFO("%s", msg.data.c_str());
 usleep(1000);
 ```
 
-`usleep(n)` suspends the calling thread for at least $n$ microseconds (µs) [8]. Since 1 ms is 1000 µs and 1 s is 1000000 µs, `usleep(1000)` rests for 1 ms and `usleep(1000000)` for 1 second. Without this line, the loop would run without rest, keep one CPU core busy, and flood the terminal with output.
+`usleep(n)` suspends the calling thread for at least $n$ microseconds (µs) [9]. Since 1 ms is 1000 µs and 1 s is 1000000 µs, `usleep(1000)` rests for 1 ms and `usleep(1000000)` for 1 second. Without this line, the loop would run without rest, keep one CPU core busy, and flood the terminal with output.
 
-`usleep` is a function of POSIX operating systems declared in the header `<unistd.h>`, so this header is included as in Section 5.1. Without that line the code may still build because the declaration arrives through other headers that `ros/ros.h` includes internally, but this relies on the implementation of the ROS headers, so including `<unistd.h>` directly is safer. Also, the actual suspension can be slightly longer than requested because of other activity in the system and the precision of timers [8].
+`usleep` is a function of POSIX operating systems declared in the header `<unistd.h>`, so this header is included as in Section 5.1. Without that line the code may still build because the declaration arrives through other headers that `ros/ros.h` includes internally, but this relies on the implementation of the ROS headers, so including `<unistd.h>` directly is safer. Also, the actual suspension can be slightly longer than requested because of other activity in the system and the precision of timers [9].
 
-> **Note:** POSIX.1-2001 marked `usleep` as a function that should no longer be used, and the POSIX.1-2008 specification removed it [8]. It is still available on Linux, but standard C++ code commonly uses `std::this_thread::sleep_for(std::chrono::milliseconds(1))`, and ROS nodes commonly use `ros::Rate` from Section 6.4.
+> **Note:** POSIX.1-2001 marked `usleep` as a function that should no longer be used, and the POSIX.1-2008 specification removed it [9]. It is still available on Linux, but standard C++ code commonly uses `std::this_thread::sleep_for(std::chrono::milliseconds(1))`, and ROS nodes commonly use `ros::Rate` from Section 6.4.
 
 ---
 
@@ -627,15 +631,15 @@ int main(int argc, char **argv)
 Apart from the lines explained in Section 5, the following five places are new.
 
 - **`int count = 0;`:** An integer variable that counts which message is being sent. It is initialized to 0 only once, outside the loop.
-- **`ros::Publisher hello_dsc_pub = n.advertise<std_msgs::String>("hello_dsc_test",1000);`:** Tells the master that this node will publish messages of type `std_msgs/String` on the topic `hello_dsc_test` (the XMLRPC registration of Week 1) and receives a **publisher** object for sending messages on that topic. The master gives the publisher's address to nodes that want to subscribe to this topic, and the two nodes then connect directly and exchange messages [5].
+- **`ros::Publisher hello_dsc_pub = n.advertise<std_msgs::String>("hello_dsc_test",1000);`:** Tells the master that this node will publish messages of type `std_msgs/String` on the topic `hello_dsc_test` (the XMLRPC registration of Week 1) and receives a **publisher** object for sending messages on that topic. The master gives the publisher's address to nodes that want to subscribe to this topic, and the two nodes then connect directly and exchange messages [6].
   - **`<std_msgs::String>`:** The template argument sets the message type. Only messages of this type may be sent through this publisher.
   - **`"hello_dsc_test"`:** The topic name. A name that does not begin with `/` is resolved relative to the node's namespace, so it becomes `/hello_dsc_test` in this example.
-  - **`1000`:** The size of the outgoing message queue. If messages are published faster than they can be sent, up to 1000 unsent messages are buffered, and when the queue overflows the oldest ones are discarded first [5].
+  - **`1000`:** The size of the outgoing message queue. If messages are published faster than they can be sent, up to 1000 unsent messages are buffered, and when the queue overflows the oldest ones are discarded first [6].
 - **`ss << "hello world " << count;`:** Appends the value of `count` to the string, making the content different for each message, as in `"hello world 0"`, `"hello world 1"`, ....
 - **`hello_dsc_pub.publish(msg);`:** Publishes the message on the topic. At that moment the message is delivered to every node subscribed to this topic; if no node is subscribed, the message is delivered to no one and no error occurs. As the comment says, another node can receive this data by knowing only the topic name `hello_dsc_test`.
 - **`count++;`:** Adds 1 for the next message.
 
-There is also a reason to store the publisher object returned by `advertise` in a variable. When all copies of the publisher object are gone, the topic is automatically unadvertised [5], so the object must stay alive while publishing.
+There is also a reason to store the publisher object returned by `advertise` in a variable. When all copies of the publisher object are gone, the topic is automatically unadvertised [6], so the object must stay alive while publishing.
 
 ```mermaid
 flowchart LR
@@ -669,7 +673,7 @@ data: "hello world 1524"
 
 `usleep(1000)` rests an extra 1 ms after the loop body finishes, so one iteration takes "the time to run the body + at least 1 ms". If the body takes 0.8 ms, the period becomes about 1.8 ms and the node publishes about $1 / 0.0018 \approx 556$ times per second, and the period fluctuates whenever the time of the body changes. This is why the time differences in the output of Section 4.3 were 1.8-3 ms rather than 1 ms.
 
-ROS provides `ros::Rate`, which helps keep a desired period. The official ROS example writes a publisher in the following form [5].
+ROS provides `ros::Rate`, which helps keep a desired period. The official ROS example writes a publisher in the following form [6].
 
 ```cpp
 ros::Rate loop_rate(10);          // aim at 10 Hz, that is, a period of 0.1 s
@@ -691,7 +695,7 @@ while (ros::ok())
 }
 ```
 
-`ros::Rate loop_rate(10)` sets the target frequency to 10 Hz, and `loop_rate.sleep()` measures the time elapsed since `sleep()` was last called and rests only for 0.1 s minus that time [9]. If the body took 0.03 s, it rests for 0.07 s, so as long as the body runs for less than the period, the loop period is kept at 0.1 s. `ros::spinOnce()` is a function that processes the callback functions for messages that have arrived at this node and is covered in Week 6. It has nothing to do in a node that receives no messages, but by convention it is included so that callbacks run if a subscription is added later.
+`ros::Rate loop_rate(10)` sets the target frequency to 10 Hz, and `loop_rate.sleep()` measures the time elapsed since `sleep()` was last called and rests only for 0.1 s minus that time [10]. If the body took 0.03 s, it rests for 0.07 s, so as long as the body runs for less than the period, the loop period is kept at 0.1 s. `ros::spinOnce()` is a function that processes the callback functions for messages that have arrived at this node and is covered in Week 6. It has nothing to do in a node that receives no messages, but by convention it is included so that callbacks run if a subscription is added later.
 
 | Item | `usleep(n)` | `ros::Rate` |
 |:-----|:-----|:-----|
@@ -851,11 +855,12 @@ while (ros::ok())
 ## References
 
 1. Autoware Foundation, "Source Build," Autoware.ai documentation. https://github.com/autowarefoundation/autoware_ai_documentation/wiki/Source-Build
-2. ROS Wiki, "catkin/workspaces." https://wiki.ros.org/catkin/workspaces
-3. D. Thomas and J. O'Quin, "REP 140: Package Manifest Format Two Specification," ROS Enhancement Proposals, 2013. https://www.ros.org/reps/rep-0140.html
-4. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
-5. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
-6. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
-7. ROS Wiki, "rosconsole." https://wiki.ros.org/rosconsole
-8. M. Kerrisk, "usleep(3)," Linux manual page. https://man7.org/linux/man-pages/man3/usleep.3.html
-9. ROS Wiki, "roscpp/Overview/Time." https://wiki.ros.org/roscpp/Overview/Time
+2. ROS Wiki, "Creating a workspace for catkin." https://wiki.ros.org/catkin/Tutorials/create_a_workspace
+3. ROS Wiki, "catkin/workspaces." https://wiki.ros.org/catkin/workspaces
+4. D. Thomas and J. O'Quin, "REP 140: Package Manifest Format Two Specification," ROS Enhancement Proposals, 2013. https://www.ros.org/reps/rep-0140.html
+5. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
+6. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
+7. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
+8. ROS Wiki, "rosconsole." https://wiki.ros.org/rosconsole
+9. M. Kerrisk, "usleep(3)," Linux manual page. https://man7.org/linux/man-pages/man3/usleep.3.html
+10. ROS Wiki, "roscpp/Overview/Time." https://wiki.ros.org/roscpp/Overview/Time

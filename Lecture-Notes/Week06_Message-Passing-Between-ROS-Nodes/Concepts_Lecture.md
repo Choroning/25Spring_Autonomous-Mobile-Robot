@@ -52,7 +52,7 @@
 
 ### 1.1 Order of Development
 
-Week 5 covered steps 1-3: writing a ROS node, building it, and checking its operation. This note covers the next steps, message passing between nodes and its applications.
+Week 5 covered steps 1-3: writing a ROS node, building it, and checking its operation. This unit covers the next steps, message passing between nodes and its applications.
 
 | Step | ROS node development | Autoware node development |
 |:-----|:-----|:-----|
@@ -62,11 +62,11 @@ Week 5 covered steps 1-3: writing a ROS node, building it, and checking its oper
 | 4 | **Message passing between nodes** (Sections 2 and 3) | Message passing between nodes through the Autoware system |
 | 5 | **Applications of message passing between nodes** (Sections 4 and 5) | |
 
-*Table 1. Order of node development and the steps covered in this note*
+*Table 1. Order of node development and the steps covered in this unit*
 
 ### 1.2 Publishers and Subscribers
 
-The simplest form of message passing between nodes consists of one node that sends messages and one node that receives them. `hello_dsc`, built in Week 5, is the **sender node (node 1)** that sends messages, and `controller`, newly built in this note, is the **receiver node (node 2)** that receives them.
+The simplest form of message passing between nodes consists of one node that sends messages and one node that receives them. `hello_dsc`, built in Week 5, is the **sender node (node 1)** that sends messages, and `controller`, newly built in this unit, is the **receiver node (node 2)** that receives them.
 
 ```mermaid
 flowchart LR
@@ -255,7 +255,7 @@ rosrun hello_ros controller      # terminal 3: receiver node
 
 *Figure 4. Output of hello_dsc (top) and output of controller (bottom)*
 
-The upper terminal of Figure 4 shows what the sender node printed while publishing `hello world 0` to `hello world 19`, and the lower terminal shows `hello_dsc_check: [hello world 6]` to `[hello world 19]` printed by the receiver node in its callback function. Judging from the intervals of about 1 second, in this run the wait of the sender node was set to `usleep(1000000)` so that it published every second. The output shows the following.
+The upper terminal of Figure 4 shows what the sender node printed while publishing `hello world 0` to `hello world 19`, and the lower terminal shows `hello_dsc_check: [hello world 6]` to `[hello world 19]` printed by the receiver node in its callback function. The time intervals in the output are about 1 second, so Figure 4 is the result of a run in which the wait of the sender node was changed to `usleep(1000000)` so that it published every second. The output shows the following.
 
 - **A receiver node started later does not receive earlier messages.** `controller` received from `hello world 6` on. `hello world 0`-`5` were published before `controller` started and the connection was established, so there was nowhere to deliver them (Section 1.3).
 - **Once connected, every message is received.** Not a single number from 6 to 19 is missing.
@@ -271,7 +271,7 @@ The upper terminal of Figure 4 shows what the sender node printed while publishi
 
 ### 4.1 Two Application Configurations
 
-As applications of message passing, one node can send several topics, or several nodes can send messages to one node. This note builds the following two configurations in turn.
+As applications of message passing, one node can send several topics, or several nodes can send messages to one node. This unit builds the following two configurations in turn.
 
 ```mermaid
 flowchart LR
@@ -293,7 +293,7 @@ Configuration 1 imitates a single sensor node that sends a measurement (`Lidar_t
 
 ### 4.2 Message Types
 
-`safety_test` in configuration 1 sends the integers 0 and 1, so it uses a new message type, `std_msgs/Int16`. The `std_msgs` package defines one message type for each basic ROS data type, and every type has a single field named `data` [4].
+`safety_test` in configuration 1 sends the integers 0 and 1, so it uses a new message type, `std_msgs/Int16`. The `std_msgs` package defines, for each basic ROS data type, one message type that wraps a value of that type, and each of these types has only a single field named `data` [4]. The package also contains `Empty`, which sends an empty signal, and MultiArray types such as `Float64MultiArray`, which hold arrays.
 
 | Message type | Field definition | C++ type of `data` | Range or example |
 |:-----|:-----|:-----|:-----|
