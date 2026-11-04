@@ -198,7 +198,7 @@ Moving to a folder in a terminal and typing `code .` opens that folder in VS Cod
 
 ### 2.3 Installing and Configuring Eclipse
 
-Eclipse is an IDE written in Java, so a Java environment (JDK) is needed first. It can be installed manually by downloading the latest version or automatically with APT. The automatic installation is convenient but may install an old version that is in the repository, so if the latest version is needed, the manual installation is recommended.
+Eclipse is an IDE written in Java, so the Java Development Kit (JDK, which includes the Java runtime environment) must be installed first. It can be installed manually by downloading the latest version or automatically with APT. The automatic installation is convenient but may install an old version that is in the repository, so if the latest version is needed, the manual installation is recommended.
 
 **Manual installation.** Install the JDK and download the Eclipse installer.
 
@@ -256,7 +256,7 @@ sudo apt-get install eclipse-cdt     # install the C/C++ Development Tooling (CD
 
 **Configuration after the automatic installation.** In Window → Preferences → C/C++ → New C/C++ Project Wizard → Makefile Project, configure the following.
 
-- **Binary Parsers:** Choose Elf Parser. ELF is the format of Linux executables, and a binary parser reads the built executable to show binaries and symbols in the project explorer.
+- **Binary Parsers:** Check Elf Parser (in Figure 6, GNU Elf Parser and Cygwin PE Parser are also checked). ELF is the format of Linux executables, and a binary parser reads the built executable to show binaries and symbols in the project explorer.
 
 ![Figure 6. Elf Parser chosen in the Binary Parsers of Makefile Project](../../images/Week04_4-1_p17.png)
 
@@ -303,7 +303,7 @@ Qt Creator is the IDE of the GUI library Qt and is installed together with Qt in
 
 ### 3.1 Checking the Distribution to Install
 
-ROS 1 releases a **distribution** roughly every year, and each distribution is built for a specific Ubuntu version. The distribution for Ubuntu 18.04 (code name bionic) is ROS Melodic Morenia. The commands of this section follow the Melodic installation guide of the ROS Wiki [1].
+ROS 1 released a **distribution** roughly every year up to its last distribution, Noetic (2020), and each distribution was built for a specific Ubuntu version. The distribution for Ubuntu 18.04 (code name bionic) is ROS Melodic Morenia. The commands of this section follow the Melodic installation guide of the ROS Wiki [1].
 
 | Ubuntu | ROS distribution |
 |:-----|:-----|
@@ -313,7 +313,7 @@ ROS 1 releases a **distribution** roughly every year, and each distribution is b
 
 *Table 5. Correspondence between Ubuntu versions and ROS distributions*
 
-> **Caution:** Support for ROS Melodic ended in 2023 [2]. Its packages can still be installed, but no new updates are released, and some tools must be told explicitly to include end-of-life distributions, as in Section 3.6.
+> **Caution:** Support for ROS Melodic ended in June 2023, and support for ROS 1 as a whole ended with the end of support for Noetic in May 2025 [2]. Its packages can still be installed, but no new updates are released, and some tools must be told explicitly to include end-of-life distributions, as in Section 3.6.
 
 ### 3.2 Registering the ROS Repository
 
@@ -534,7 +534,7 @@ Click the terminal running `turtle_teleop_key` so that it receives the keyboard 
 ```text
 Reading from keyboard
 ---------------------------
-Use arrow keys to move the turtle.
+Use arrow keys to move the turtle. 'q' to quit.
 ```
 
 ![Figure 10. The turtlesim window right after launch and after moving the turtle with the arrow keys](../../images/Week04_4-2_p07a.png)
@@ -633,7 +633,7 @@ angular:
 ---
 ```
 
-`Twist` is the same type that pure_pursuit and twist_filter in Week 3 use to send velocity commands to the vehicle. Both the turtle moving on a plane and the vehicle are told how to move with two values, `linear.x` (linear velocity $v$) and `angular.z` (angular velocity $\omega$).
+The type of the velocity commands that pure_pursuit and twist_filter in Week 3 exchange (`twist_raw`, `twist_cmd`), `geometry_msgs/TwistStamped`, is this `Twist` with an added `header` that carries the time and the coordinate frame. Both the turtle moving on a plane and the vehicle are told how to move with two values, `linear.x` (linear velocity $v$) and `angular.z` (angular velocity $\omega$).
 
 ### 4.5 Stopping Nodes and Setting Up a Workspace Environment
 
@@ -766,7 +766,7 @@ On both PCs `ROS_MASTER_URI` points to A, and `ROS_HOSTNAME` is each PC's own ad
 
 ### 6.1 Autoware Versions and Requirements
 
-**Autoware.ai** is open-source autonomous driving software based on ROS 1, and the practice uses version 1.14.0. Later development of Autoware moved to ROS 2. The source build guide for Autoware.ai is in the documentation of the Autoware Foundation [7]. Each version supports different Ubuntu releases.
+**Autoware.ai** is open-source autonomous driving software based on ROS 1, and this unit installs version 1.14.0. Later development of Autoware moved to ROS 2. The source build guide for Autoware.ai is in the documentation of the Autoware Foundation [7]. Each version supports different Ubuntu releases.
 
 | Autoware version | Ubuntu 14.04 | Ubuntu 16.04 | Ubuntu 18.04 |
 |:-----|:-----|:-----|:-----|
@@ -791,11 +791,11 @@ On both PCs `ROS_MASTER_URI` points to A, and `ROS_HOSTNAME` is each PC's own ad
 
 *Table 13. Autoware requirements by Ubuntu version*
 
-Using Autoware 1.14.0 on Ubuntu 18.04 requires ROS Melodic and Qt 5.9.5 or higher. CUDA is needed only to accelerate some functions, such as deep-learning-based perception nodes, on a GPU, and the practice builds without CUDA. FlyCapture2 is a driver for particular cameras and Armadillo is a linear algebra library; each is needed only when the corresponding function is used.
+Using Autoware 1.14.0 on Ubuntu 18.04 requires ROS Melodic and Qt 5.9.5 or higher. CUDA is needed only to accelerate some functions, such as deep-learning-based perception nodes, on a GPU, and the installation in this unit builds without CUDA. FlyCapture2 is a driver for particular cameras and Armadillo is a linear algebra library; each is needed only when the corresponding function is used.
 
 ### 6.2 Installing Qt 5.12.12
 
-**Qt** is a library for building GUI programs in C++, and some Autoware tools use it. The Qt in the Ubuntu 18.04 repository is 5.9.5, but the practice installs version 5.12.12 separately in the home folder.
+**Qt** is a library for building GUI programs in C++, and some Autoware tools use it. The Qt in the Ubuntu 18.04 repository is 5.9.5, but this unit installs version 5.12.12 separately in the home folder.
 
 1. Download the installer of version 5.12 from `https://download.qt.io/archive/qt/5.12/5.12.12/`. Downloading and installing the offline installer `qt-opensource-linux-x64-5.12.12.run`, which already contains all the needed files, is recommended; if the download is slow, use a mirror site (`https://download.qt.io/static/mirrorlist/`).
 2. Run the following commands in order.
@@ -844,7 +844,7 @@ If 5.9.5 appears, as in `Using Qt version 5.9.5 in /usr/lib/x86_64-linux-gnu`, t
 sudo apt-get install git
 ```
 
-Check the installation with `git --version`. Running the command without `sudo` gives the `Permission denied` error of Section 1.2.
+Check the installation with `git --version`. Running the command without `sudo` gives a `Permission denied` error of the same kind as in Section 1.2 (`/var/lib/dpkg/lock-frontend`).
 
 ### 6.4 Building Autoware.ai 1.14.0 from Source
 
@@ -998,7 +998,7 @@ sudo make install          # install into the system (requires administrator pri
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | `sudo apt-get update` replaces installed programs with their newest versions. | **F.** It only refreshes the package lists. It is `upgrade` that replaces them. |
 | ROS settings may be added with `echo "..." > ~/.bashrc`. | **F.** `>` overwrites the file, so the existing content is lost. It must be appended with `>>`. |
@@ -1117,12 +1117,12 @@ sudo make install          # install into the system (requires administrator pri
 
 10. **Velodyne driver:** After fetching the driver with `git clone https://github.com/ros-drivers/velodyne.git` without specifying a branch, `catkin_make` failed. State the cause and the fix.
 
-   <details>
-   <summary>Answer</summary>
+    <details>
+    <summary>Answer</summary>
 
-   The default branch of this repository is the one for ROS 2 (`ros2`), which cannot be built with the ROS 1 catkin. Delete the `velodyne` folder in `src`, fetch the Melodic branch with `git clone -b melodic-devel https://github.com/ros-drivers/velodyne.git`, and run `catkin_make` again.
+    The default branch of this repository is the one for ROS 2 (`ros2`), which cannot be built with the ROS 1 catkin. Delete the `velodyne` folder in `src`, fetch the Melodic branch with `git clone -b melodic-devel https://github.com/ros-drivers/velodyne.git`, and run `catkin_make` again.
 
-   </details>
+    </details>
 
 ---
 
@@ -1132,7 +1132,7 @@ sudo make install          # install into the system (requires administrator pri
 
 1. Open Robotics, "Ubuntu install of ROS Melodic," ROS Wiki. https://wiki.ros.org/melodic/Installation/Ubuntu
 2. Open Robotics, "Distributions," ROS Wiki. https://wiki.ros.org/Distributions
-3. Open Robotics, "rosdep," GitHub repository ros-infrastructure/rosdep. https://github.com/ros-infrastructure/rosdep
+3. Open Robotics, "rosdep command reference," rosdep Documentation. https://docs.ros.org/en/independent/api/rosdep/html/commands.html
 4. ROBOTIS, "install_ros_melodic.sh," GitHub repository orocapangyo/meetup. https://github.com/orocapangyo/meetup/blob/master/190830/install_ros_melodic.sh
 5. Open Robotics, "Understanding ROS Topics," ROS Wiki Tutorials. https://wiki.ros.org/ROS/Tutorials/UnderstandingTopics
 6. Open Robotics, "Running ROS across multiple machines," ROS Wiki Tutorials. https://wiki.ros.org/ROS/Tutorials/MultipleMachines

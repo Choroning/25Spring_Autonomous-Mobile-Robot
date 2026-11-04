@@ -128,7 +128,7 @@ The Autoware installation of Week 4 treated the CANlib installation as optional,
 
 ### 1.4 Installing linuxcan
 
-**Step 1: Download.** On the download page of the Kvaser website (https://www.kvaser.com/download/), click "Kvaser LINUX Driver and SDK" and download `linuxcan.tar.gz`.
+**Step 1: Download.** On the download page of the Kvaser website (https://www.kvaser.com/download/), click "Kvaser Linux Drivers and SDK" and download `linuxcan.tar.gz`.
 
 ![Figure 4. The Kvaser Linux Drivers and SDK entry on the Kvaser download page](../../images/Week14_14-1_p06.png)
 
@@ -224,7 +224,7 @@ The items in Figure 5 are as follows.
 - **`CMakeLists.txt`:** the build configuration that states how to compile the source code and what to link it with.
 - **`src/`:** holds source code such as the node's C++ source (`<node>.cpp`) and Python scripts (`<node>.py`).
 - **`include/` and `lib/`:** hold the header files and source code of libraries shared by the nodes.
-- **`messages/<message package>/msg/`:** holds `.msg` files that define new message types. Gathering messages into a separate package lets several packages share the same message definitions.
+- **`messages/<message package>/msg/`:** holds `.msg` files that define new message types. Gathering messages into a separate package lets several packages share the same message definitions. Under `src/autoware/messages` in Autoware.ai 1.14 there are message packages such as `autoware_can_msgs`, `autoware_config_msgs`, `autoware_external_msgs`, `autoware_lanelet2_msgs`, `autoware_map_msgs`, and `autoware_msgs`, and the `VehicleCmd.msg` of Section 1.2 sits in `autoware_msgs/msg/` together with other message definitions such as `AccelCmd.msg`, `BrakeCmd.msg`, and `ControlCommand.msg`.
 
 > **Note:** The `nodes/<node name>/` layout of recommendation 2 is the style used by older Autoware packages, while Figure 5 and many packages of Autoware.ai 1.14 place their sources under `src/`. Whichever is used, the source path written in `add_executable` in Section 2.4 must match the actual file location.
 
@@ -268,7 +268,7 @@ void TwistGate::checkState()
 }
 ```
 
-- **`resetVehicleCmdMsg()`:** returns every field of the `VehicleCmd` message to be published (`twist_gate_msg_`) to its initial value. It sets the target velocity and angular velocity, the mode, the pedal and steering commands, and the emergency stop to 0, and the gear to `NONE`. Note that only `ctrl_cmd.linear_velocity` is set to -1 rather than 0. This value appears again in Section 3.8 when the CAN node converts the speed.
+- **`resetVehicleCmdMsg()`:** returns every field of the `VehicleCmd` message to be published (`twist_gate_msg_`) to its initial value. It sets the target velocity and angular velocity, the mode, the pedal and steering commands, and the emergency stop to 0, and the gear to `NONE`. Note that only `ctrl_cmd.linear_velocity` is set to -1 rather than 0. Section 3.12 discusses how the CAN node transmits this value.
 - **`checkState()`:** When the node is configured to use the state management node (decision_maker), it sets both the velocity command (`twist_cmd.twist`) and the control command (`ctrl_cmd`) to 0 if the vehicle is not in the driving state or if 0.5 seconds or more have passed since the last state message. It is a safety mechanism that stops the vehicle when state information is lost. `geometry_msgs::Twist()` and `autoware_msgs::ControlCommand()` create messages whose fields are all 0.
 
 The `CMakeLists.txt` of `twist_gate` is as follows.
@@ -345,7 +345,7 @@ target_link_libraries(mynode
 
 ### 2.5 Building with colcon
 
-**colcon** is a build tool that builds the packages in a workspace one by one, separately, in dependency order [10]. It can build both catkin packages and ROS 2 packages, and Autoware.ai 1.14, installed in Week 4, is also built with colcon. Run the following command in the top-level directory of the workspace.
+**colcon** is a build tool that builds each package in a workspace separately, in isolation; it builds dependencies before the packages that need them and builds packages that do not depend on each other in parallel [10]. It can build both catkin packages and ROS 2 packages, and Autoware.ai 1.14, installed in Week 4, is also built with colcon. Run the following command in the top-level directory of the workspace.
 
 ```bash
 cd ~/autoware.ai
@@ -420,6 +420,7 @@ subs :
         param: ndt_mapping
       # ... (approximate_ndt_mapping)
       - name : ndt_matching
+        desc : ndt_matching desc sample
         cmd  : roslaunch lidar_localizer ndt_matching.launch
         param: ndt
 ```
@@ -755,7 +756,7 @@ static void* senderCaller(void *unused)
 - **Signal setup:** `sighand` is registered as the handler for `SIGALRM` and `SIGINT`, and `alarm(1)` sets the first alarm one second later. `siginterrupt(SIGINT, 1)` makes a pending system call be interrupted rather than restarted automatically when `SIGINT` arrives, so that the program responds to a termination request even while blocked [14].
 - **`canInitializeLibrary()`:** initializes CANlib. It must be called before any other CANlib function [3].
 - **`canOpenChannel(channel, canOPEN_EXCLUSIVE)`:** opens channel 0 and returns a handle. `canOPEN_EXCLUSIVE` takes the channel exclusively so that no other program can open it at the same time. `canOPEN_REQUIRE_EXTENDED` in the commented-out line is an option that requires a channel supporting 29-bit extended IDs; this node uses only 11-bit standard IDs, so it does not need it. A negative handle means the channel could not be opened, so the thread prints a message and ends.
-- **`canSetBusParams(hnd, canBITRATE_500K, 0, 0, 0, 0, 0)`:** sets the bus bit rate to 500 kbit/s. When a predefined `canBITRATE_` constant is used, the subsequent bit timing parameters are ignored, so 0s are passed [3]. Every controller on a bus must use the same bit rate, so this value must match the vehicle's CAN bus.
+- **`canSetBusParams(hnd, canBITRATE_500K, 0, 0, 0, 0, 0)`:** sets the bus bit rate to 500 kbit/s. When the bit rate is set with a predefined `canBITRATE_` constant, the subsequent parameters that set the bit timing are all passed as 0 [3]. Every controller on a bus must use the same bit rate, so this value must match the vehicle's CAN bus.
 - **`canBusOn(hnd)`:** puts the channel on the bus. From this point frames can be sent and received.
 - The result of each step is printed with `check`. The commented-out `goto ErrorExit` is a trace of a structure that jumps to cleanup code on failure; this code has no `ErrorExit` label, so it is not used.
 - **Loop variables:** `bin` is an array that holds the 16 bits of the steering value, `check_num` is a counter that cycles through 0-15, `steer_gain = 16.5` is the steering ratio, `steer_raw` and `steer_smooth` are the input and output of the filter, and `LPF_Beta = 0.05` is the filter coefficient. Their meanings are explained in Sections 3.8 and 3.9.
@@ -794,7 +795,7 @@ static void* senderCaller(void *unused)
 - **Speed conversion:** `linear_velocity` (m/s) is multiplied by 3600/1000 to convert it to km/h, because 1 m/s is 3600 m in one hour (3600 s), that is, 3.6 km. The result is stored in a single `char`, so the fractional part is discarded, and it becomes byte 2 of the speed frame. For example, 5.0 m/s is $5.0 \times 3.6 = 18$ km/h, so `msg_velo[2] = 18` (`0x12`), and 4.2 m/s becomes 15 after the fractional part of 15.12 km/h is discarded.
 - `msg_velo[7] = check_num` puts the counter in the last byte of the speed frame.
 
-**Steering angle conversion.** `steering_angle` is the steering angle of the front wheels (rad), but the vehicle's steering controller takes the rotation angle of the steering wheel (°) as its command. The ratio between the angle the steering wheel is turned and the angle the wheels turn is called the **steering ratio**, and the steering ratio of this vehicle is 16.5 [15].
+**Steering angle conversion.** `steering_angle` is the steering angle of the front wheels (rad), but the vehicle's steering controller takes the rotation angle of the steering wheel (°) as its command. The ratio between the angle the steering wheel is turned and the angle the wheels turn is called the **steering ratio**, and the code sets the steering ratio of this vehicle to `steer_gain = 16.5`.
 
 $$\theta_{\text{sw}} = \delta \times \frac{180}{\pi} \times 16.5$$
 
@@ -804,7 +805,7 @@ Here $\delta$ is the steering angle of the wheels (rad), $\theta_{\text{sw}}$ is
 
 $$y[n] = y[n-1] - \beta \left( y[n-1] - x[n] \right) = (1 - \beta)\, y[n-1] + \beta\, x[n]$$
 
-The output mixes 95% of the previous output with 5% of the new input ($\beta = 0.05$). This equation is an **exponential moving average**, which gives exponentially decreasing weights to past values, and it is a first-order low-pass filter that attenuates fast-changing components (high frequencies) and passes slowly changing components (low frequencies) [16]. The smaller $\beta$ is, the smoother but slower the output becomes.
+The output mixes 95% of the previous output with 5% of the new input ($\beta = 0.05$). This equation is an **exponential moving average**, which gives exponentially decreasing weights to past values, and it is a first-order low-pass filter that attenuates fast-changing components (high frequencies) and passes slowly changing components (low frequencies) [15]. The smaller $\beta$ is, the smoother but slower the output becomes.
 
 Starting from $y = 0$, if the input suddenly changes to $X$ and stays there, the output approaches it as $y[n] = X \left( 1 - (1 - \beta)^{n+1} \right)$. With $X = 94.54°$, the first iteration gives $0.05 \times 94.54 \approx 4.73°$ and the second $0.95 \times 4.73 + 0.05 \times 94.54 \approx 9.22°$. The number of iterations for the output to reach $1 - e^{-1} \approx 63\%$ of the target follows from $(0.95)^{n} = e^{-1}$, giving $n = -1/\ln 0.95 \approx 19.5$, and since one iteration takes about 20 ms, this takes about 0.39 s. In other words, the steering wheel reaches about 2/3 of the target angle only about 0.4 seconds after the command changes.
 
@@ -891,7 +892,7 @@ int main(int argc, char **argv)
 - `ros::init(argc, argv, "can_mobility_test")` sets the node name to `can_mobility_test` and initializes ROS. `ros::NodeHandle n` creates a handle for communicating with the master.
 - `n.subscribe("/vehicle_cmd", 10, vehicleCmdCallback)` subscribes to `/vehicle_cmd` and arranges for `vehicleCmdCallback` to be called when a message arrives. 10 is the size of the queue that holds up to 10 messages waiting to be processed. The subscription remains active as long as the returned `sub` object is alive.
 - `command_data.reset()` sets the command before the first message arrives to speed 0 and steering angle 0.
-- `pthread_create(&th, nullptr, senderCaller, nullptr)` creates a new thread with default attributes (`nullptr`) and has it run `senderCaller`. A nonzero return value means failure, so the program prints the cause with `perror` and exits [17].
+- `pthread_create(&th, nullptr, senderCaller, nullptr)` creates a new thread with default attributes (`nullptr`) and has it run `senderCaller`. A nonzero return value means failure, so the program prints the cause with `perror` and exits. However, `pthread_create` does not set `errno` and instead returns the error number as its return value [16], so the cause printed by `perror` can differ from the actual error; to print the exact cause, the return value must be converted with `strerror`.
 - `pthread_detach(th)` detaches the thread so that its resources are reclaimed automatically when it ends. A detached thread does not need to be waited for with `pthread_join`. This is the same method used in Week 7.
 - `ros::spin()` waits for messages and calls callbacks until the node shuts down. The receiver therefore runs in the main thread and the sender in the new thread, at the same time.
 
@@ -955,7 +956,7 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 | Problem | Consequence | Improvement |
 |:-----|:-----|:-----|
 | No code increments `msgCounter` | The messages per second in the `SIGALRM` handler are never printed | Execute `msgCounter++` after each successful send |
-| The sender thread registers a `SIGINT` handler again | When a node is created, roscpp registers its own `SIGINT` handler that shuts the node down on Ctrl+C [18]; it is replaced by `sighand`, so pressing Ctrl+C ends only the sending loop while `ros::spin()` keeps running | Do not register a `SIGINT` handler and use `ros::ok()` in the loop condition, or call `ros::requestShutdown()` in the handler |
+| The sender thread registers a `SIGINT` handler again | When a node is created, roscpp registers its own `SIGINT` handler that shuts the node down on Ctrl+C [17]; it is replaced by `sighand`, so pressing Ctrl+C ends only the sending loop while `ros::spin()` keeps running | Do not register a `SIGINT` handler and use `ros::ok()` in the loop condition, or call `ros::requestShutdown()` in the handler |
 | Two threads read and write `command_data` without a lock | If one thread reads while the other is writing, the speed and steering angle can come from different messages (a data race) | Protect reads and writes with a `std::mutex` |
 | The results of the two `canWriteWait` calls overwrite the same `stat` | A failure to send the speed frame is ignored | Check the result of each call with `check` |
 | The channel is not closed when the loop ends | The channel stays on the bus, and opening it may fail on the next run | Call `canBusOff(hnd)` and `canClose(hnd)` after the loop |
@@ -990,7 +991,7 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 
 **True/False Check:**
 
-| Statement | Verdict and Reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | `ctrl_cmd.steering_angle` of `/vehicle_cmd` gives the rotation of the steering wheel in degrees. | **F.** It gives the steering angle of the front wheels in radians; the CAN node multiplies it by the steering ratio 16.5 and converts it to degrees to obtain the steering wheel angle. |
 | The environment script produced by `colcon build` is `devel/setup.bash`. | **F.** colcon places its results in `install/`, so it is `install/setup.bash`. `devel/` is the result of `catkin_make`. |
@@ -1128,7 +1129,7 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 1. Autoware-AI, "messages," GitHub repository. https://github.com/Autoware-AI/messages
 2. ROS Enhancement Proposals, "REP 103: Standard Units of Measure and Coordinate Conventions." https://www.ros.org/reps/rep-0103.html
 3. Kvaser, "CANlib SDK documentation." https://www.kvaser.com/canlib-webhelp/
-4. Kvaser, "Downloads: Kvaser Linux Drivers and SDK." https://www.kvaser.com/download/
+4. Kvaser, "Kvaser Downloads." https://www.kvaser.com/download/
 5. Ubuntu Wiki, "UEFI/SecureBoot." https://wiki.ubuntu.com/UEFI/SecureBoot
 6. Autoware-AI, "core_planning," GitHub repository. https://github.com/Autoware-AI/core_planning
 7. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
@@ -1139,7 +1140,6 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 12. ROS Enhancement Proposals, "REP 140: Package Manifest Format Two Specification." https://www.ros.org/reps/rep-0140.html
 13. M. Kerrisk, "signal-safety(7)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man7/signal-safety.7.html
 14. M. Kerrisk, "siginterrupt(3)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man3/siginterrupt.3.html
-15. R. Rajamani, *Vehicle Dynamics and Control*, 2nd ed. New York, NY, USA: Springer, 2012.
-16. A. V. Oppenheim and R. W. Schafer, *Discrete-Time Signal Processing*, 3rd ed. Upper Saddle River, NJ, USA: Pearson, 2010.
-17. M. Kerrisk, "pthread_create(3)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man3/pthread_create.3.html
-18. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
+15. A. V. Oppenheim and R. W. Schafer, *Discrete-Time Signal Processing*, 3rd ed. Upper Saddle River, NJ, USA: Pearson, 2010.
+16. M. Kerrisk, "pthread_create(3)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man3/pthread_create.3.html
+17. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown

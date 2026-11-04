@@ -53,7 +53,7 @@
 
 As seen in Section 3 of Week 1, the most fundamental technology in ROS is message communication between nodes. Nodes register their information with the master and then exchange topics and services directly using the connection information received from the master. The autonomous driving software Autoware is a large ROS system built on this structure, in which a great many nodes are connected by topics.
 
-> **Definition:** **Autoware** is open-source autonomous driving software based on ROS. It was developed by Nagoya University in Japan for autonomous driving research and development and released on GitHub in 2015 [1]. Development was later led by TIER IV, a company that grew out of Nagoya University, and it is maintained by the Autoware Foundation, founded in 2018 [2].
+> **Definition:** **Autoware** is open-source autonomous driving software based on ROS. It was developed by Nagoya University in Japan for autonomous driving research and development and released on GitHub in 2015 [1]. Development was later led by TIER IV, a company founded by Shinpei Kato, who started Autoware, and it is now maintained by the Autoware Foundation, a non-profit organization founded in December 2018 jointly by TIER IV and others [2].
 
 ```mermaid
 flowchart TB
@@ -73,11 +73,11 @@ Autoware consists of four layers.
 - **Host OS layer:** Linux (Ubuntu) is mainly used, and for embedded vehicle use a real-time operating system for many-core processors, such as eSOL's eMCOS, can also be used. A **real-time operating system (RTOS)** is an operating system focused on guaranteeing that tasks finish within fixed time limits.
 - **Hardware layer:** CPUs and GPUs for computation, cameras that sense the surroundings, **GNSS (global navigation satellite system)** receivers that measure position from satellite signals, and **LiDAR (light detection and ranging)** sensors that measure distance from the return time of emitted laser light. GPUs process heavy computations in parallel, such as deep-learning-based object detection on camera images.
 
-> **Note:** Autoware in this note means Autoware.ai, based on ROS 1 (version 1.14.0 in this course). Development of Autoware.ai has ended, and the Autoware Foundation is developing Autoware redesigned on ROS 2 (Autoware Universe) [2]. The structure that divides functions into nodes and topics and the principles of localization and path planning are common to both versions.
+> **Note:** In this unit, Autoware means Autoware.ai, based on ROS 1 (version 1.14.0 in this course). Development of Autoware.ai has ended, and the Autoware Foundation is developing Autoware redesigned on ROS 2 (Autoware Universe) [3]. The structure that divides functions into nodes and topics and the principles of localization and path planning are common to both versions.
 
 ### 1.2 rosbag
 
-In ROS, all the messages of topics can be logged together with time information (timestamps) to a `.bag` file called **rosbag** [3]. The logged messages can be published again and viewed in RViz, the 3D visualization tool of ROS. In robotics it is often difficult to analyze the interactions of several sensors at once, and rosbag enables efficient analysis and debugging of the system. Also, the logged messages can be replayed any number of times, allowing developers to debug their systems without the actual sensors.
+In ROS, all the messages of topics can be logged together with time information (timestamps) to a `.bag` file called **rosbag** [4]. The logged messages can be published again and viewed in RViz, the 3D visualization tool of ROS. In robotics it is often difficult to analyze the interactions of several sensors at once, and rosbag enables efficient analysis and debugging of the system. Also, the logged messages can be replayed any number of times, allowing developers to debug their systems without the actual sensors.
 
 The reasons rosbag is especially important for autonomous driving development are as follows.
 
@@ -122,7 +122,7 @@ The user interfaces available in Autoware are as follows.
 
 *Table 1. User interfaces of Autoware*
 
-Runtime Manager consists of tabs by function. In each tab the nodes of that function are started and stopped with check boxes, and the buttons at the bottom open recording (ROSBAG), RViz, and rqt. The very bottom of the window shows the usage of each CPU core and the memory usage [4].
+Runtime Manager consists of tabs by function. In each tab the nodes of that function are started and stopped with check boxes, and the buttons at the bottom open recording (ROSBAG), RViz, and rqt. The very bottom of the window shows the usage of each CPU core and the memory usage [5].
 
 | Tab | What it does |
 |:-----|:-----|
@@ -162,7 +162,7 @@ This information alone is enough to compute properties of the sensors.
 - The total number of messages is $11980 + 4788 = 16768$, equal to `messages`.
 - The publishing rate of the LiDAR point cloud topic `/points_raw` is $4788 / 479.17 \approx 9.99$, that is, about 10 Hz. It means the LiDAR rotates 10 times per second and publishes one point cloud per revolution.
 - The sentence topic of the GNSS receiver, `/nmea_sentence`, was published at $11980 / 479.17 \approx 25.0$, that is, about 25 Hz.
-- NMEA sentences are short strings of tens of bytes, so most of the file size is point clouds. The size of one point cloud is $7.9 \times 10^9 / 4788 \approx 1.65 \times 10^6$ bytes, that is, about 1.65 MB. The fact that eight minutes of recording needs 7.9 GB shows that ample storage must be prepared when recording LiDAR data.
+- NMEA sentences are short strings of tens of bytes, so most of the file size is point clouds. `rosbag info` shows sizes in units of 1024, so 7.9 GB is $7.9 \times 1024^3 \approx 8.48 \times 10^9$ bytes [6]. The size of one point cloud is therefore $8.48 \times 10^9 / 4788 \approx 1.77 \times 10^6$ bytes, that is, about 1.77 MB. The fact that eight minutes of recording needs 7.9 GB shows that ample storage must be prepared when recording LiDAR data.
 
 > **Definition:** An **NMEA sentence** is a string of the NMEA 0183 standard that GNSS receivers use to output position, time, and satellite information; it begins with `$`, as in `$GPGGA,...`, and separates fields with commas. A **point cloud** is a set of 3D points $(x, y, z)$ measured by a LiDAR, exchanged in ROS as `sensor_msgs/PointCloud2` messages.
 
@@ -174,7 +174,7 @@ The functions of Autoware are realized by many nodes connected by topics. The fi
 
 *Figure 4. Node graph of the whole running Autoware*
 
-Figure 4 is a drawing, made with `rqt_graph`, of Autoware actually performing autonomous driving. There are so many nodes and topics that the labels are hard to read one by one, but the overall flow starts from the sensor drivers (Velodyne LiDAR, GNSS) and map loaders at the lower left, passes through localization (`ndt_matching`) and the path planning nodes (`lane_rule`, `lane_select`, `velocity_set`, `pure_pursuit`, and others) in the middle, and ends at the velocity command processing (`twist_filter`, `twist_gate`) and the node that sends CAN commands to the vehicle on the right. Because a node graph shows the data flow of a system at a glance like this, it is used in debugging to find which topic is not being published when the system stops. Sections 1.6-1.8 read the graphs divided by function in turn.
+Figure 4 is a drawing, made with `rqt_graph`, of Autoware actually performing autonomous driving. There are so many nodes and topics that the labels are hard to read one by one, but the overall flow starts from the sensor drivers (Velodyne LiDAR, GNSS) and map loaders at the lower left, passes through localization (`ndt_matching`) and the path planning nodes (`lane_rule`, `lane_select`, `velocity_set`, `pure_pursuit`, and others) in the middle, and ends at the velocity command processing (`twist_filter`, `twist_gate`) and, on the right, the node that receives the vehicle command `vehicle_cmd` and sends CAN commands to the vehicle (`sending_CAN`). Because a node graph shows the data flow of a system at a glance like this, it is used in debugging to find which topic is not being published when the system stops. Sections 1.6-1.8 read the graphs divided by function in turn.
 
 ### 1.6 Node Configuration for Perception and Localization
 
@@ -188,11 +188,11 @@ Figure 5 is the node graph of the detection packages in `ros/src/computing/perce
 |:-----|:-----|:-----|:-----|
 | Camera object detection | `cv_tracker` | `image_raw` → `dpm_XXX` → `image_obj` → `range_fusion` → `image_obj_ranged` → `XXX_track` → `image_obj_tracked` → `obj_reproj` → `obj_label` | Finds vehicles or pedestrians in images (`dpm_XXX`, where XXX is the detection target), attaches distances using `vscan_image`, `points_image`, and `scan_image`, which are LiDAR points projected onto the image (`range_fusion`), tracks the same object across frames (`XXX_track`), and recovers 3D positions using the vehicle position (`current_pose`) and the coordinate transforms (`tf`) (`obj_reproj`) |
 | LiDAR object detection | `lidar_tracker` | `velodyne_points`, `vscan_points`, `scan` → `euclidean_cluster` → `points_obj` → `obj_fusion` → `obj_pose` | Groups nearby points of the point cloud into object candidates (`euclidean_cluster`) and combines them with the camera detection result `obj_label` to output object positions (`obj_fusion`) |
-| Traffic light recognition | `road_wizard` | `vector_map`, `tf` → `feat_proj` → `roi_signal` → `region_tlr` → `light_color` | Projects the traffic light positions stored in the vector map onto the camera image to define the region of interest (ROI) where a traffic light will appear (`feat_proj`), and recognizes the signal color in that region (`region_tlr`) |
+| Traffic light recognition | `road_wizard` | `vector_map`, `tf` → `feat_proj` → `roi_signal` → `region_tlr` → `light_color` | Projects the traffic light positions stored in the vector map onto the camera image to define the region of interest (ROI) where a traffic light will appear (`feat_proj`, which also outputs the lane ROI `roi_lane`), and recognizes the signal color in that region of the camera image `image_raw` (`region_tlr`) |
 
 *Table 4. Three flows of the detection node graph*
 
-> **Definition:** A **DPM (deformable part model)** detects objects by representing an object as its overall shape and the arrangement of several parts (for example, a person's head, arms, and legs), allowing the positions of the parts to deform to some extent [5]. **Euclidean clustering** groups points whose mutual distances are below a set threshold into the same cluster, dividing the point cloud on the road into objects such as vehicles and pedestrians.
+> **Definition:** A **DPM (deformable part model)** detects objects by representing an object as its overall shape and the arrangement of several parts (for example, a person's head, arms, and legs), allowing the positions of the parts to deform to some extent [7]. **Euclidean clustering** groups points whose mutual distances are below a set threshold into the same cluster, dividing the point cloud on the road into objects such as vehicles and pedestrians.
 
 A camera recognizes the kind of an object well but cannot measure distance directly, while a LiDAR measures distance accurately but has difficulty recognizing the kind of object. So **sensor fusion**, which combines the results of the two sensors, is used. `range_fusion` and `obj_fusion` play this role. The map is used in traffic light recognition for the same reason. Instead of searching the whole image for small traffic lights, knowing in advance from the map where a traffic light will be means only a narrow region needs to be examined, which is fast and produces few false detections.
 
@@ -220,24 +220,24 @@ Figure 6 is the node graph of three localization methods.
 
 *Figure 7. Node graph of path planning and path following*
 
-Figure 7 is the node graph of the lane planning (`lane_planner`), driving planning (`driving_planner`), waypoint generation (`waypoint_maker`), and waypoint following (`waypoint_follower`) packages. The Japanese "Rviz 表示用" in the figure means "for RViz display," and "vehicle_senderへ" means "to vehicle_sender." A **waypoint** is a point on the path the vehicle will pass, holding a position and the target speed at that point. Data flows in the following order.
+Figure 7 is the node graph of the lane planning (`lane_planner`), driving planning (`driving_planner`), waypoint generation (`waypoint_maker`), and waypoint following (`waypoint_follower`) packages. The Japanese "Rviz 表示用" in the figure means "for RViz display," and "vehicle_senderへ" means "to vehicle_sender"; the `odom_pose`, `target_waypoint`, and `marker_array` in the figure are such outputs for RViz display. A **waypoint** is a point on the path the vehicle will pass, holding a position and the target speed at that point. Data flows in the following order.
 
 | Stage | Node | Input | Output and what it does |
 |:-----|:-----|:-----|:-----|
-| Making the path | `waypoint_saver` | `current_pose`, `can_info` | While a person drives, saves the vehicle's position and speed to a file in the format $\{x, y, z, v\}$ |
+| Making the path | `waypoint_saver` | `current_pose`, `can_info` | While a person drives, saves the vehicle's position and speed to a file in the format $\lbrace x, y, z, v\rbrace$ |
 | | `waypoint_loader` | Saved file | Publishes the waypoints in the file as `lane_waypoint` |
 | | `lane_navi` | `route_cmd`, vector map | Builds the route to the destination on the lanes of the vector map and publishes it as `lane_waypoint` |
 | Applying traffic rules | `lane_rule` | `lane_waypoint`, `vector_map` | Adjusts waypoint speeds with map information such as stop lines, producing `green_waypoint` for a green light and `red_waypoint` for a red light |
 | | `lane_stop` | `green_waypoint`, `red_waypoint`, `traffic_light` | Chooses one of the two according to the traffic light state and publishes it as `traffic_waypoint` |
 | Lane selection | `lane_select` | `traffic_waypoint`, `current_pose`, and others | Chooses the waypoints of the lane matching the current position and publishes them as `base_waypoint` |
 | Velocity planning | `velocity_set` | `base_waypoint`, `vscan_points`, `obj_pose` | Modifies speeds so that the vehicle slows down or stops when there is an obstacle ahead, and publishes the result as `safety_waypoint` |
-| Path following | `pure_pursuit` | `safety_waypoint`, `control_pose` | Computes the linear and angular velocities that follow a target point on the path and publishes them as `twist_raw` |
+| Path following | `pure_pursuit` | `safety_waypoint`, `control_pose` | Computes the linear and angular velocities that follow a target point on the path and publishes them as `twist_raw`, and outputs the target point being followed as `target_waypoint` for RViz display |
 | Final check | `collision_avoid` | `twist_raw`, `safety_waypoint`, `vscan_points`, and others | Publishes, as `twist_cmd`, the velocity command after a last check for collision risk; this command goes to `vehicle_sender` |
 | Visualization | `odom_gen` | `twist_cmd`, `control_pose` | Computes the vehicle position from the velocity commands and outputs `odom_pose` for RViz display |
 
 *Table 6. Data flow of the path planning and following nodes*
 
-`lattice_trajectory_gen` is a node that generates lattice-shaped candidate trajectories from `base_waypoint`; its output left as "?" means it is a function at the development stage whose output topic was not yet decided. The `pure_pursuit` algorithm picks a point on the path a certain distance ahead of the vehicle as the target and steers to follow the arc passing through that point [6]; it is covered in detail in Week 3.
+`lattice_trajectory_gen` is a node that generates lattice-shaped candidate trajectories from `base_waypoint`; its output left as "?" means it is a function at the development stage whose output topic was not yet decided. The `pure_pursuit` algorithm picks a point on the path a certain distance ahead of the vehicle as the target and steers to follow the arc passing through that point [8]; it is covered in detail in Week 3.
 
 ![Figure 8. Node graph of map management](../../images/Week02_02-1_p14.png)
 
@@ -351,8 +351,8 @@ CMakeLists.txt  include/  package.xml  src/
 
 `catkin_create_pkg` creates the package directory together with `CMakeLists.txt`, `package.xml`, `include/` for header files, and `src/` for source files. Next, the two configuration files are edited to suit the package.
 
-- **`package.xml`:** The **manifest**, which records project management information such as the package name, version, description, maintainer, and license, together with the dependencies [7].
-- **`CMakeLists.txt`:** The CMake build script that states what to build and in what order [8].
+- **`package.xml`:** The **manifest**, which records project management information such as the package name, version, description, maintainer, and license, together with the dependencies [9].
+- **`CMakeLists.txt`:** The CMake build script that states what to build and in what order [10].
 
 The core content of the `package.xml` created by the command above is as follows (with the explanatory comments removed).
 
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-Line by line, the code works as follows.
+Line by line, the code works as follows [11].
 
 - **`#include "ros/ros.h"`:** Includes the header that declares the basic features of roscpp, such as `ros::init`, `ros::NodeHandle`, and `ros::spin`.
 - **`#include "std_msgs/String.h"`, `"std_msgs/Int32.h"`:** Headers that make the message types `std_msgs/String` (a single string field `data`) and `std_msgs/Int32` (a single 32-bit integer field `data`) usable as C++ structures. They are generated automatically from the `.msg` files at build time.
@@ -487,7 +487,7 @@ target_link_libraries(test_node
 
 The executable name (`test_node`) and the node name (`mynode`, given to `ros::init`) can differ. `rosrun` finds the program by its executable name, and the running program registers with the master under the node name `mynode`.
 
-> **Note:** ROS Melodic takes C++14 as its reference language [9]. The node above builds with `-std=c++0x` (C++11), but including headers from Melodic libraries that use C++14 features can cause errors, so `-std=c++14` is the safer choice on Melodic.
+> **Note:** ROS Melodic takes C++14 as its reference language [12]. The node above builds with `-std=c++0x` (C++11), but including headers from Melodic libraries that use C++14 features can cause errors, so `-std=c++14` is the safer choice on Melodic.
 
 After editing, move to Autoware's `ros` directory and run the build script.
 
@@ -517,7 +517,7 @@ data: 5
 ---
 ```
 
-`size()` counts bytes, so sending the Korean string `"안녕"`, which uses 3 bytes per character in UTF-8, prints 6 rather than 2. Opening `rqt_graph` shows the connection from a `/rostopic_...` node through `/mysubstr` to `/mynode`, and then through `/mypubval` to the `rostopic echo` node [10].
+`size()` counts bytes, so sending the Korean string `"안녕"`, which uses 3 bytes per character in UTF-8, prints 6 rather than 2. Running `rostopic pub` without the `-1` option keeps its node alive after the message is sent, and opening `rqt_graph` meanwhile shows the connection from a `/rostopic_...` node through `/mysubstr` to `/mynode`, and then through `/mypubval` to the `rostopic echo` node.
 
 ---
 
@@ -599,7 +599,7 @@ The recording node subscribes to the data being published on topics and saves it
 
 The procedure for recording data with Runtime Manager is as follows.
 
-1. **Launch Autoware:** In early versions of Autoware.ai, move with `cd ~/Autoware/ros/` and run `./run` to open Runtime Manager. In Autoware.ai 1.14.0, built with colcon, load the workspace's `install/setup.bash` and then open it with `roslaunch runtime_manager runtime_manager.launch` [11].
+1. **Launch Autoware:** In early versions of Autoware.ai, move with `cd ~/Autoware/ros/` and run `./run` to open Runtime Manager. In Autoware.ai 1.14.0, built with colcon, load the workspace's `install/setup.bash` and then open it with `roslaunch runtime_manager runtime_manager.launch` [13].
 2. **Launch nodes:** Check the boxes of the nodes that publish the topics to be recorded. For example, selecting the LiDAR (Velodyne HDL-32e) in the Sensing tab publishes `/points_raw`.
 3. **ROSBAG recording:** (A) Click the [ROSBAG] button to display the dialog. (B) Click the [Ref] button and specify the filename of the bag to be saved. (C) Click the [Refresh] button to update the topic list. (D) Check the boxes of the topics to be recorded. (E) Click the [Start] button to start recording. (F) Click the [Stop] button to end the recording.
 
@@ -616,9 +616,9 @@ A recorded bag file is played back in the Simulation tab (Figure 3).
 3. (D) Use the [Pause] button to pause or resume the playback.
 4. (E) Click the [Stop] button to stop the playback. At this point `/use_sim_time` is set to `false` automatically.
 
-> **Key Point:** ROS nodes normally use the computer's current time as ROS time. But if data recorded in 2015 is played back now, the messages' timestamps and the current time differ by years, and nodes that compare times (coordinate transforms `tf`, localization) regard the data as stale and discard it. With `/use_sim_time` set to `true`, nodes use as ROS time the time of the recording, published by the player on the `/clock` topic, instead of the computer's time [12]. So it must be `true` during playback and `false` when real sensors are used.
+> **Key Point:** ROS nodes normally use the computer's current time as ROS time. But if data recorded in 2015 is played back now, the messages' timestamps and the current time differ by years, and nodes that compare times (coordinate transforms `tf`, localization) regard the data as stale and discard it. With `/use_sim_time` set to `true`, nodes use as ROS time the time of the recording, published by the player on the `/clock` topic, instead of the computer's time [14]. So it must be `true` during playback and `false` when real sensors are used.
 
-The same work can be done with the command-line tools [3].
+The same work can be done with the command-line tools [4].
 
 ```bash
 rosbag record -O drive.bag /points_raw /image_raw   # record the two topics to drive.bag (stop with Ctrl+C)
@@ -629,7 +629,7 @@ rosbag play --clock drive.bag                       # play back while publishing
 
 ### 3.3 Principle of NDT Scan Matching
 
-Both building a 3D map (Section 3.4) and localization (Section 3.6) rest on **scan matching**, or **registration**, which aligns two point clouds so that they overlap. Finding the rotation and translation that best overlap two point clouds gives the relative position and orientation between the sensors that measured them. Autoware uses the **NDT (normal distributions transform)** as its registration method [13], [14].
+Both building a 3D map (Section 3.4) and localization (Section 3.6) rest on **scan matching**, or **registration**, which aligns two point clouds so that they overlap. Finding the rotation and translation that best overlap two point clouds gives the relative position and orientation between the sensors that measured them. Autoware uses the **NDT (normal distributions transform)** as its registration method [15], [16].
 
 NDT divides the reference point cloud (the map) into grid cells of equal size and summarizes the points in each cell as one **normal distribution**. The mean $\mathbf{q}$ and covariance $\Sigma$ of the points $\mathbf{x}_1, \ldots, \mathbf{x}_n$ in a cell are as follows (dividing by $n$, following the definition of Biber and Strasser).
 
@@ -650,7 +650,7 @@ NDT finds the pose $\mathbf{p}$ that maximizes this score by optimization such a
 1. The mean is $\mathbf{q} = \frac{1}{4}(0+2+0+2,\ 0+0+2+2) = (1, 1)$.
 2. The deviations from the mean are $(-1, -1), (1, -1), (-1, 1), (1, 1)$. The outer products $\mathbf{d}\mathbf{d}^{\top}$ of the deviations $\mathbf{d}$ are, in order, $\begin{pmatrix}1&1\\1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&1\\1&1\end{pmatrix}$, and their sum is $\begin{pmatrix}4&0\\0&4\end{pmatrix}$, so $\Sigma = \frac{1}{4}\begin{pmatrix}4&0\\0&4\end{pmatrix} = I$ (the identity matrix).
 3. Since $\Sigma^{-1} = I$, $p(\mathbf{x}') = \exp(-\lVert\mathbf{x}'-\mathbf{q}\rVert^2/2)$. The point $(1, 1)$ gives $\exp(0) = 1$, the point $(2, 1)$ gives $\exp(-1/2) \approx 0.6065$, and the point $(3, 1)$ gives $\exp(-2) \approx 0.1353$. The value drops quickly with distance from the mean.
-4. Now let a new point cloud consist of two points at $(-0.5, 0)$ and $(0.5, 0)$ in sensor coordinates, and let it be fitted by a translation $\mathbf{t}$ only, without rotation.
+4. Now let a new point cloud consist of two points at $(-0.5, 0)$ and $(0.5, 0)$ in sensor coordinates, and let it be fitted by a translation $\mathbf{t}$ only, without rotation. For simplicity, assume that every moved point is evaluated with the distribution of this cell regardless of the cell boundary.
 
 | Translation $\mathbf{t}$ | The two moved points | Values of the two points | Score |
 |:-----|:-----|:-----|:-----|
@@ -665,7 +665,7 @@ For example, with $\mathbf{t} = (1, 1)$ the two points are each 0.5 away from th
 
 > **[Probability and Statistics]** The probability density of a multivariate normal distribution is proportional to $\exp\left(-\frac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^{\top}\Sigma^{-1}(\mathbf{x}-\boldsymbol{\mu})\right)$. The quantity $(\mathbf{x}-\boldsymbol{\mu})^{\top}\Sigma^{-1}(\mathbf{x}-\boldsymbol{\mu})$ in the exponent is the square of the **Mahalanobis distance**, which counts differences along directions in which the distribution is widely spread as small and differences along narrow directions as large. The NDT score is the sum of this density, without its normalizing constant, over all points.
 
-> **Caution:** If a cell contains too few points or its points lie on a straight line, the covariance matrix has no inverse or becomes very unstable. So NDT implementations skip cells with fewer than a certain number of points (three in Biber and Strasser) or correct the covariance by enlarging eigenvalues that are too small [13]. The cell size (resolution) is an important parameter that determines both accuracy and computation.
+> **Caution:** If a cell contains too few points or its points lie on a straight line, the covariance matrix has no inverse or becomes very unstable. So NDT implementations skip cells with fewer than a certain number of points (three in Biber and Strasser) or correct the covariance by enlarging eigenvalues that are too small [15]. The cell size (resolution) is an important parameter that determines both accuracy and computation.
 
 ### 3.4 Building a 3D Map
 
@@ -742,7 +742,7 @@ Figure 24 shows the completed map viewed obliquely and from above. The large bui
 
 A point cloud map is sufficient for localization, but it does not record where the lanes are or where to stop. A **vector map** represents road elements such as lanes, stop lines, crosswalks, and traffic lights as coordinates of points, lines, and areas. Autoware generates paths from the lane and stop line information of the vector map and uses it in many ways, including vehicle control, so using a vector map is recommended.
 
-With **VectorMapper** of MapTools, a web tool provided by TIER IV, one can upload a point cloud map and partly build a vector map of one's own on top of it [15]. VectorMapper is a tool for quickly creating a vector map compatible with the ADAS map format used by Autoware, and its output is limited compared with original ADAS map data. The ADAS map files produced by VectorMapper are as follows.
+With **VectorMapper** of MapTools, a web tool provided by TIER IV, one can upload a point cloud map and partly build a vector map of one's own on top of it [17]. VectorMapper is a tool for quickly creating a vector map compatible with the ADAS map format used by Autoware, and its output is limited compared with original ADAS map data. The ADAS map files produced by VectorMapper are as follows.
 
 | File | Information held |
 |:-----|:-----|
@@ -807,7 +807,7 @@ flowchart LR
 | Situation | Result and reason |
 |:-----|:------------|
 | Play back a bag file recorded on a real road with `/use_sim_time` left `false`. | **Localization or coordinate transforms discard the data or print warnings.** Nodes use the current computer time, so the timestamps of the recording look far too old. |
-| Record 10 Hz LiDAR point clouds for 30 minutes, with each point cloud about 1.65 MB. | **About 30 GB is needed.** $10 \times 60 \times 30 = 18000$ point clouds multiplied by 1.65 MB gives about 29.7 GB. |
+| Record 10 Hz LiDAR point clouds for 30 minutes, with each point cloud about 1.77 MB. | **About 32 GB is needed.** $10 \times 60 \times 30 = 18000$ point clouds multiplied by 1.77 MB gives about 31.9 GB ($3.19 \times 10^{10}$ bytes). |
 | Replace a USB camera with a Point Grey camera. | **The detection nodes need no change.** Both drivers publish on the same topic `image_raw` with the same message type. |
 | `velocity_set` uses the raw point cloud for obstacle decisions without `ray_ground_filter`. | **The vehicle may fail to start or stop frequently.** Road points not removed by the height window (on slopes, with body pitch, or with a low Detection Height Bottom) can be counted as obstacles (Week 3, Section 5.3). |
 | Write a target name different from that of `add_executable` in `target_link_libraries` of `CMakeLists.txt`. | **An error occurs at the CMake configuration step.** It tries to link libraries to a target that does not exist. |
@@ -819,7 +819,7 @@ flowchart LR
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:------------|
 | Topics played back with rosbag are published under names different from those of the real sensor topics. | **F.** They are published again with the same topic names as when recorded, so subscribing nodes need not distinguish them. |
 | In a node graph, ellipses are nodes and rectangles are topics. | **T.** Arrows show the direction of publishing and subscribing. |
@@ -874,7 +874,7 @@ flowchart LR
    <details>
    <summary>Answer</summary>
 
-   `/points_raw` is $1200 / 120 = 10$ Hz, and `/imu_raw` is $12000 / 120 = 100$ Hz. The point clouds take up almost the whole file size, so one point cloud is $2.0 \times 10^9 / 1200 \approx 1.67 \times 10^6$ bytes, that is, about 1.67 MB.
+   `/points_raw` is $1200 / 120 = 10$ Hz, and `/imu_raw` is $12000 / 120 = 100$ Hz. The 2.0 GB of `rosbag info` is $2.0 \times 1024^3 \approx 2.15 \times 10^9$ bytes, and the point clouds take up almost the whole file size, so one point cloud is $2.15 \times 10^9 / 1200 \approx 1.79 \times 10^6$ bytes, that is, about 1.79 MB.
 
    </details>
 
@@ -966,17 +966,19 @@ flowchart LR
 ## References
 
 1. S. Kato, E. Takeuchi, Y. Ishiguro, Y. Ninomiya, K. Takeda, and T. Hamada, "An open approach to autonomous vehicles," *IEEE Micro*, vol. 35, no. 6, pp. 60-68, 2015.
-2. Autoware Foundation, "Autoware." https://www.autoware.org
-3. ROS Wiki, "rosbag." https://wiki.ros.org/rosbag
-4. Autoware Foundation, "Autoware.ai." https://github.com/autowarefoundation/autoware_ai
-5. P. F. Felzenszwalb, R. B. Girshick, D. McAllester, and D. Ramanan, "Object detection with discriminatively trained part-based models," *IEEE Trans. Pattern Anal. Mach. Intell.*, vol. 32, no. 9, pp. 1627-1645, 2010.
-6. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Institute, Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
-7. ROS Wiki, "catkin/package.xml." https://wiki.ros.org/catkin/package.xml
-8. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
-9. ROS Enhancement Proposals, "REP 3: Target Platforms." https://www.ros.org/reps/rep-0003.html
-10. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
-11. Autoware Foundation, "Source Build," Autoware.ai documentation. https://github.com/autowarefoundation/autoware_ai_documentation/wiki/Source-Build
-12. ROS Wiki, "Clock." https://wiki.ros.org/Clock
-13. P. Biber and W. Strasser, "The normal distributions transform: A new approach to laser scan matching," in *Proc. IEEE/RSJ Int. Conf. Intelligent Robots and Systems (IROS)*, 2003, pp. 2743-2748.
-14. M. Magnusson, "The three-dimensional normal-distributions transform: An efficient representation for registration, surface analysis, and loop detection," Ph.D. dissertation, Örebro Univ., Örebro, Sweden, 2009.
-15. TIER IV, "MapTools." https://tools.tier4.jp
+2. Apex.AI, "Announcing the Autoware Foundation," Dec. 9, 2018. https://www.apex.ai/post/announcing-the-autoware-foundation
+3. Autoware Foundation, "Autoware." https://www.autoware.org
+4. ROS Wiki, "rosbag." https://wiki.ros.org/rosbag
+5. Autoware Foundation, "Autoware.ai." https://github.com/autowarefoundation/autoware_ai
+6. ROS, "tools/rosbag/src/rosbag/bag.py," ros_comm repository (melodic-devel branch), GitHub. https://github.com/ros/ros_comm/blob/melodic-devel/tools/rosbag/src/rosbag/bag.py
+7. P. F. Felzenszwalb, R. B. Girshick, D. McAllester, and D. Ramanan, "Object detection with discriminatively trained part-based models," *IEEE Trans. Pattern Anal. Mach. Intell.*, vol. 32, no. 9, pp. 1627-1645, 2010.
+8. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Institute, Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
+9. ROS Wiki, "catkin/package.xml." https://wiki.ros.org/catkin/package.xml
+10. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
+11. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
+12. ROS Enhancement Proposals, "REP 3: Target Platforms." https://www.ros.org/reps/rep-0003.html
+13. Autoware Foundation, "ROSBAG Demo," Autoware.ai documentation. https://github.com/autowarefoundation/autoware_ai_documentation/wiki/ROSBAG-Demo
+14. ROS Wiki, "Clock." https://wiki.ros.org/Clock
+15. P. Biber and W. Strasser, "The normal distributions transform: A new approach to laser scan matching," in *Proc. IEEE/RSJ Int. Conf. Intelligent Robots and Systems (IROS)*, 2003, pp. 2743-2748.
+16. M. Magnusson, "The three-dimensional normal-distributions transform: An efficient representation for registration, surface analysis, and loop detection," Ph.D. dissertation, Örebro Univ., Örebro, Sweden, 2009.
+17. TIER IV, "MapTools." https://tools.tier4.jp

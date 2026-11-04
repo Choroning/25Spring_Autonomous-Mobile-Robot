@@ -413,7 +413,7 @@ CAN이 쓰이는 이유는 다음 네 가지로 정리된다.
 
 *표 7. CAN의 특징*
 
-CAN 메시지에는 받는 제어기의 주소가 없다. 대신 메시지 앞부분의 **식별자(identifier, ID)** 가 "엔진 회전수", "바퀴 속도"처럼 **메시지의 내용**을 나타내고, 각 제어기는 자신에게 필요한 ID의 메시지만 골라 받는다. 이를 **수신 필터링(acceptance filtering)** 이라 한다 [18]. 그래서 새 제어기를 버스에 추가해도 기존 제어기의 설정을 바꿀 필요가 없다.
+CAN 메시지에는 받는 제어기의 주소가 없다. 대신 메시지 앞부분의 **식별자(identifier, ID)** 가 엔진 회전수나 바퀴 속도처럼 **메시지의 내용**을 나타내고, 각 제어기는 자신에게 필요한 ID의 메시지만 골라 받는다. 이를 **수신 필터링(acceptance filtering)** 이라 한다 [18]. 그래서 새 제어기를 버스에 추가해도 기존 제어기의 설정을 바꿀 필요가 없다.
 
 **비동기식**이라는 말은 송신기와 수신기가 클럭 신호를 공유하지 않는다는 뜻이다. 각 제어기는 미리 약속한 비트 속도로 동작하고, 프레임의 첫 비트에서 시점을 맞춘 뒤 비트 값이 바뀌는 순간마다 자신의 시점을 다시 맞춘다. 같은 값이 오래 이어지면 시점을 맞출 기회가 없으므로, CAN은 같은 비트가 5개 이어지면 반대 값의 비트 하나를 끼워 넣는 **비트 스터핑(bit stuffing)** 을 쓴다 [18].
 
@@ -428,7 +428,7 @@ CAN 메시지에는 받는 제어기의 주소가 없다. 대신 메시지 앞�
 
 *그림 17. 차량 곳곳에 배치된 여러 제어기*
 
-그림 17은 차량 한 대에 들어가는 제어기와 센서의 예이다. 적응형 순항 제어, 전자식 브레이크 시스템, 센서 클러스터, 게이트웨이, 반력 피드백 가속 페달, 문 제어기, 선루프 제어기, 되감기식 안전띠 프리텐셔너, 좌석 제어기, 브레이크, 접근 속도 센서, 측면 충돌 센서, 전방 충돌 센서, 에어백 제어기가 차체 곳곳에 흩어져 있고, 이들이 버스로 연결되어 정보를 주고받는다.
+그림 17은 차량 한 대에 들어가는 제어기와 센서의 예이다. 적응형 순항 제어, 전자식 브레이크 시스템, 센서 클러스터, 게이트웨이, 반력 피드백 가속 페달, 문 제어기, 선루프 제어기, 가역식 안전띠 프리텐셔너, 좌석 제어기, 브레이크, 접근 속도 센서, 측면 충돌 센서, 전방 충돌 센서, 에어백 제어기가 차체 곳곳에 흩어져 있고, 이들이 버스로 연결되어 정보를 주고받는다.
 
 ### 3.3 물리 계층: 꼬임쌍선과 차동 신호
 
@@ -572,7 +572,7 @@ ISO 규격에 따라서는 다음과 같이 나뉜다.
 
 *표 13. CAN의 ISO 규격*
 
-지금의 ISO 11898은 여러 부분으로 나뉘어, Part 1이 데이터 링크 계층과 물리적 신호를, Part 2가 고속 CAN의 물리 계층을, Part 3이 선 하나가 끊어져도 통신을 이어 가는 저속 내결함성 CAN의 물리 계층을 다룬다 [19], [22], [23]. 저속 CAN을 정의하던 ISO 11519-2의 내용은 ISO 11898-3으로 이어졌다 [24].
+지금의 ISO 11898은 여러 부분으로 나뉘어, Part 1이 데이터 링크 계층과 물리적 신호를, Part 2가 고속 CAN의 물리 계층을, Part 3이 선 하나가 끊어져도 통신을 이어 가는 저속 내결함성 CAN의 물리 계층을 다룬다 [22], [23], [24]. 저속 CAN을 정의하던 ISO 11519-2의 내용은 ISO 11898-3으로 이어졌다 [25].
 
 > **참고:** ISO 11898의 고속 CAN은 "1 Mbit/s 이상"이 아니라 **최대 1 Mbit/s**까지 통신한다. 1 Mbit/s를 넘는 속도는 3.9절의 CAN FD에서 데이터 구간의 비트 속도를 높여 얻는다.
 
@@ -596,7 +596,7 @@ CAN의 높은 신뢰성은 다섯 가지 오류 검출 방법과 오류를 낸 �
 
 CAN의 데이터 전송 속도는 1 Mbit/s로 제한되므로, ECU의 수가 많아지고 주고받는 데이터가 늘어날수록 효율이 떨어진다. 한계는 다음과 같다.
 
-- **속도와 길이:** 중재가 동작하려면 한 비트가 버스의 가장 먼 제어기까지 갔다가 돌아오는 시간이 각 제어기가 비트 값을 읽는 시점보다 짧아야 한다. 그래서 비트 속도를 높이면 버스 길이가 짧아져야 하며, 1 Mbit/s에서 버스 길이는 약 40 m로 제한된다 [20].
+- **속도와 길이:** 중재가 동작하려면 한 비트가 버스의 가장 먼 제어기까지 갔다가 돌아오는 시간이, 비트가 시작된 뒤 각 제어기가 비트 값을 읽는 시점(샘플 시점)까지의 시간보다 짧아야 한다. 그래서 비트 속도를 높이면 버스 길이가 짧아져야 하며, 1 Mbit/s에서 버스 길이는 약 40 m로 제한된다 [20].
 - **작은 데이터:** 한 프레임에 최대 8바이트만 담을 수 있고, 3.5절의 계산처럼 프레임의 절반 가까이가 제어용 비트이다.
 - **대용량 데이터:** 카메라 영상이나 LiDAR 포인트 클라우드처럼 초당 수십 MB에 이르는 데이터는 CAN으로 나를 수 없다.
 
@@ -604,14 +604,14 @@ CAN의 데이터 전송 속도는 1 Mbit/s로 제한되므로, ECU의 수가 많
 
 *그림 22. 기존 CAN과 CAN FD의 비교와 차량에 쓰이는 여러 네트워크*
 
-**CAN FD(CAN with Flexible Data-rate)** 는 이 한계를 줄이기 위해 2012년 Bosch가 발표한 확장으로, 중재 구간은 기존 속도로 보내 중재 방식을 유지하고 데이터 구간에서만 비트 속도를 높이며, 한 프레임에 최대 64바이트를 담는다 [25]. 데이터 구간의 속도는 최대 8\~10 Mbit/s 정도이다. 그림 22의 위쪽은 같은 데이터를 보낼 때 CAN FD 프레임이 기존 CAN 프레임보다 짧게 끝나는 모습을 나타낸다.
+**CAN FD(CAN with Flexible Data-rate)** 는 이 한계를 줄이기 위해 2012년 Bosch가 발표한 확장으로, 중재 구간은 기존 속도로 보내 중재 방식을 유지하고 데이터 구간에서만 비트 속도를 높이며, 한 프레임에 최대 64바이트를 담는다 [26]. 데이터 구간의 속도는 최대 8\~10 Mbit/s 정도이다. 그림 22의 위쪽은 같은 데이터를 보낼 때 CAN FD 프레임이 기존 CAN 프레임보다 짧게 끝나는 모습을 나타낸다.
 
-그림 22의 아래쪽처럼 차량에는 CAN 외에도 용도가 다른 여러 네트워크가 함께 쓰인다 [26].
+그림 22의 아래쪽처럼 차량에는 CAN 외에도 용도가 다른 여러 네트워크가 함께 쓰인다 [27].
 
 | 네트워크 | 특징 | 주요 용도 |
 |:-----|:-----|:-----|
 | LIN(Local Interconnect Network) | 선 하나를 쓰는 저가의 저속 버스(최대 약 20 kbit/s), 주 장치 하나가 통신을 관리 | 스마트 키, 스위치, 창문 같은 편의 장치 |
-| CAN | 최대 1 Mbit/s, 다중 마스터, 우선순위 중재 | 파워트레인, 섀시, 차체 제어 전반 |
+| CAN | 최대 1 Mbit/s, 다중 마스터, 우선순위 중재 | 파워트레인, 섀시, 차체 제어 전반, 충돌 감지 시스템 |
 | CAN FD | 데이터 구간 수 Mbit/s, 최대 64바이트 | CAN보다 많은 데이터가 필요한 제어기 |
 | FlexRay | 10 Mbit/s, 정해진 시간 칸에 전송하는 시간 결정적 통신 | 브레이크 바이 와이어처럼 지연이 일정해야 하는 제어 |
 | MOST(Media Oriented Systems Transport) | 멀티미디어 데이터 전송 | 오디오, 비디오, 인포테인먼트 |
@@ -619,7 +619,7 @@ CAN의 데이터 전송 속도는 1 Mbit/s로 제한되므로, ECU의 수가 많
 
 *표 15. 차량에 쓰이는 네트워크의 비교*
 
-최근에는 이더넷을 CAN과 함께 쓰는 방향으로 통신 방식이 바뀌고 있다. 차량용 이더넷은 꼬임쌍선 한 쌍으로 100 Mbit/s를 보내는 100BASE-T1 같은 규격으로 정의된다 [27]. 이더넷의 장점과 단점은 다음과 같다.
+최근에는 이더넷을 CAN과 함께 쓰는 방향으로 통신 방식이 바뀌고 있다. 차량용 이더넷은 꼬임쌍선 한 쌍으로 100 Mbit/s를 보내는 100BASE-T1 같은 규격으로 정의된다 [28]. 이더넷의 장점과 단점은 다음과 같다.
 
 - 카메라, LiDAR 같은 대용량 데이터를 처리하기 쉽다.
 - 외부에서 쉽게 접속하여 차량 상태를 확인할 수 있으므로, 소프트웨어 서비스 중심으로 바뀌어 가는 미래 자동차에 알맞다.
@@ -635,7 +635,11 @@ CAN의 데이터 전송 속도는 1 Mbit/s로 제한되므로, ECU의 수가 많
 
 ### 3.10 PC와 CAN 버스의 연결
 
-자율주행 소프트웨어는 보통 차량에 실은 PC에서 동작하므로, PC가 만든 명령을 차량의 CAN 버스에 실으려면 USB 같은 PC의 포트를 CAN 버스에 연결하는 **CAN 인터페이스 장치**가 필요하다. Kvaser 같은 제조사가 USB-CAN 인터페이스와 이를 다루는 소프트웨어 라이브러리를 제공한다 [28]. PC의 ROS 노드는 이 라이브러리로 CAN 프레임을 만들어 보내고, 버스의 제어기들은 그 프레임을 받아 구동기를 움직인다. 이 노드를 만드는 과정은 14주차에서 다룬다.
+자율주행 소프트웨어는 보통 차량에 실은 PC에서 동작하므로, PC가 만든 명령을 차량의 CAN 버스에 실으려면 USB 같은 PC의 포트를 CAN 버스에 연결하는 **CAN 인터페이스 장치**가 필요하다. Kvaser 같은 제조사가 USB-CAN 인터페이스와 이를 다루는 소프트웨어 라이브러리를 제공한다 [29]. PC의 ROS 노드는 이 라이브러리로 CAN 프레임을 만들어 보내고, 버스의 제어기들은 그 프레임을 받아 구동기를 움직인다. 이 노드를 만드는 과정은 14주차에서 다룬다.
+
+![그림 24. PC의 USB 포트를 CAN 버스에 연결하는 두 채널 USB-CAN 인터페이스](../../images/Week13_13-3_p12.png)
+
+*그림 24. PC의 USB 포트를 CAN 버스에 연결하는 두 채널 USB-CAN 인터페이스*
 
 ---
 
@@ -798,7 +802,7 @@ CAN의 데이터 전송 속도는 1 Mbit/s로 제한되므로, ECU의 수가 많
     <details>
     <summary>정답</summary>
 
-    중재에서 각 제어기는 자신이 보낸 비트와 버스의 값을 같은 비트 시간 안에 비교해야 하므로, 신호가 가장 먼 제어기까지 왕복하는 시간이 비트 시간보다 짧아야 한다. 비트 속도를 높이면 비트 시간이 짧아져 버스 길이가 줄어야 하며, 1 Mbit/s에서 약 40 m가 한계이다. CAN FD는 중재 구간은 기존 속도로 보내 중재가 그대로 동작하게 하고, 중재가 끝난 뒤 한 송신기만 남는 데이터 구간에서만 비트 속도를 높이며, 한 프레임에 최대 64바이트를 담는다.
+    중재에서 각 제어기는 자신이 보낸 비트와 버스의 값을 같은 비트 시간 안에 비교해야 하므로, 신호가 가장 먼 제어기까지 왕복하는 시간이 비트 시간, 정확히는 비트 값을 읽는 샘플 시점까지의 시간보다 짧아야 한다. 비트 속도를 높이면 비트 시간이 짧아져 버스 길이가 줄어야 하며, 1 Mbit/s에서 약 40 m가 한계이다. CAN FD는 중재 구간은 기존 속도로 보내 중재가 그대로 동작하게 하고, 중재가 끝난 뒤 한 송신기만 남는 데이터 구간에서만 비트 속도를 높이며, 한 프레임에 최대 64바이트를 담는다.
 
     </details>
 
@@ -820,19 +824,20 @@ CAN의 데이터 전송 속도는 1 Mbit/s로 제한되므로, ECU의 수가 많
 10. Canadian Metalworking, "Technology spotlight: Safety laser scanner." https://www.canadianmetalworking.com/canadianmetalworking/article/management/technology-spotlight-safety-laser-scanner
 11. C. Iovescu and S. Rao, "The fundamentals of millimeter wave radar sensors," Texas Instruments, White Paper SPYY005A, 2020.
 12. M. I. Skolnik, *Introduction to Radar Systems*, 3rd ed. New York, NY, USA: McGraw-Hill, 2001.
-13. Fierce Electronics, "Lidar vs. radar." https://www.fierceelectronics.com/components/lidar-vs-radar
+13. Fierce Electronics. https://www.fierceelectronics.com/components/lidar-vs-radar
 14. Waymo. https://waymo.com
 15. Tesla. https://www.tesla.com
 16. Tesla, "Tesla Vision Update: Replacing Ultrasonic Sensors with Tesla Vision," Tesla Support. https://www.tesla.com/support/transitioning-tesla-vision
 17. B. Baker, "Finding the correct LiDAR application," *Microcontroller Tips*, Jun. 10, 2022. https://www.microcontrollertips.com/finding-the-correct-lidar-application/
 18. Robert Bosch GmbH, "CAN Specification, Version 2.0," Stuttgart, Germany, 1991.
-19. ISO 11898-1:2015, "Road vehicles - Controller area network (CAN) - Part 1: Data link layer and physical signalling," International Organization for Standardization, Geneva, Switzerland, 2015.
+19. CAN in Automation (CiA), "History of CAN technology." https://www.can-cia.org/can-knowledge/history-of-can-technology
 20. S. Corrigan, "Introduction to the Controller Area Network (CAN)," Texas Instruments, Application Report SLOA101B, 2016.
 21. R. I. Davis, A. Burns, R. J. Bril, and J. J. Lukkien, "Controller Area Network (CAN) schedulability analysis: Refuted, revisited and revised," *Real-Time Systems*, vol. 35, no. 3, pp. 239-272, 2007.
-22. ISO 11898-2:2016, "Road vehicles - Controller area network (CAN) - Part 2: High-speed medium access unit," International Organization for Standardization, Geneva, Switzerland, 2016.
-23. ISO 11898-3:2006, "Road vehicles - Controller area network (CAN) - Part 3: Low-speed, fault-tolerant, medium-dependent interface," International Organization for Standardization, Geneva, Switzerland, 2006.
-24. ISO 11519-2:1994, "Road vehicles - Low-speed serial data communication - Part 2: Low-speed controller area network (CAN)," International Organization for Standardization, Geneva, Switzerland, 1994.
-25. F. Hartwich, "CAN with flexible data-rate," in *Proc. 13th International CAN Conference (iCC)*, Hambach Castle, Germany, 2012.
-26. N. Navet, Y. Song, F. Simonot-Lion, and C. Wilwert, "Trends in automotive communication systems," *Proceedings of the IEEE*, vol. 93, no. 6, pp. 1204-1223, 2005.
-27. IEEE Std 802.3bw-2015, "IEEE Standard for Ethernet Amendment 1: Physical Layer Specifications and Management Parameters for 100 Mb/s Operation over a Single Balanced Twisted Pair Cable (100BASE-T1)," 2016.
-28. Kvaser, "CAN Hardware and Software." https://www.kvaser.com
+22. ISO 11898-1:2015, "Road vehicles - Controller area network (CAN) - Part 1: Data link layer and physical signalling," International Organization for Standardization, Geneva, Switzerland, 2015.
+23. ISO 11898-2:2016, "Road vehicles - Controller area network (CAN) - Part 2: High-speed medium access unit," International Organization for Standardization, Geneva, Switzerland, 2016.
+24. ISO 11898-3:2006, "Road vehicles - Controller area network (CAN) - Part 3: Low-speed, fault-tolerant, medium-dependent interface," International Organization for Standardization, Geneva, Switzerland, 2006.
+25. ISO 11519-2:1994, "Road vehicles - Low-speed serial data communication - Part 2: Low-speed controller area network (CAN)," International Organization for Standardization, Geneva, Switzerland, 1994. https://www.iso.org/standard/19470.html
+26. F. Hartwich, "CAN with flexible data-rate," in *Proc. 13th International CAN Conference (iCC)*, Hambach Castle, Germany, 2012.
+27. N. Navet, Y. Song, F. Simonot-Lion, and C. Wilwert, "Trends in automotive communication systems," *Proceedings of the IEEE*, vol. 93, no. 6, pp. 1204-1223, 2005.
+28. IEEE Std 802.3bw-2015, "IEEE Standard for Ethernet Amendment 1: Physical Layer Specifications and Management Parameters for 100 Mb/s Operation over a Single Balanced Twisted Pair Cable (100BASE-T1)," 2016.
+29. Kvaser AB. https://www.kvaser.com

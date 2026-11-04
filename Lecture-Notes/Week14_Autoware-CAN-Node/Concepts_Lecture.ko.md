@@ -128,7 +128,7 @@ ROS는 SI 단위를 쓰므로 `ctrl_cmd`의 속도는 m/s, 가속도는 m/s², �
 
 ### 1.4 linuxcan 설치
 
-**1단계: 내려받기.** Kvaser 사이트의 다운로드 페이지(https://www.kvaser.com/download/)에서 "Kvaser LINUX Driver and SDK"를 클릭하여 `linuxcan.tar.gz`를 내려받는다.
+**1단계: 내려받기.** Kvaser 사이트의 다운로드 페이지(https://www.kvaser.com/download/)에서 "Kvaser Linux Drivers and SDK"를 클릭하여 `linuxcan.tar.gz`를 내려받는다.
 
 ![그림 4. Kvaser 다운로드 페이지의 Kvaser Linux Drivers and SDK 항목](../../images/Week14_14-1_p06.png)
 
@@ -224,7 +224,7 @@ src/autoware/messages/<message package>/
 - **`CMakeLists.txt`:** 소스 코드를 어떻게 컴파일하고 무엇과 링크할지 적는 빌드 설정이다.
 - **`src/`:** 노드의 C++ 소스(`<node>.cpp`)와 Python 스크립트(`<node>.py`) 같은 소스 코드를 둔다.
 - **`include/`와 `lib/`:** 노드들이 함께 쓰는 라이브러리의 헤더 파일과 소스 코드를 둔다.
-- **`messages/<message package>/msg/`:** 새 메시지 형식을 정의하는 `.msg` 파일을 둔다. 메시지를 별도 패키지로 모아 두면 여러 패키지가 같은 메시지 정의를 공유할 수 있다.
+- **`messages/<message package>/msg/`:** 새 메시지 형식을 정의하는 `.msg` 파일을 둔다. 메시지를 별도 패키지로 모아 두면 여러 패키지가 같은 메시지 정의를 공유할 수 있다. Autoware.ai 1.14의 `src/autoware/messages` 아래에는 `autoware_can_msgs`, `autoware_config_msgs`, `autoware_external_msgs`, `autoware_lanelet2_msgs`, `autoware_map_msgs`, `autoware_msgs` 같은 메시지 패키지가 있으며, 1.2절의 `VehicleCmd.msg`는 `autoware_msgs/msg/` 아래에 `AccelCmd.msg`, `BrakeCmd.msg`, `ControlCommand.msg` 같은 다른 메시지 정의와 함께 있다.
 
 > **참고:** 권장 조건 2의 `nodes/<노드 이름>/` 구성은 예전 Autoware 패키지들이 쓰던 방식이고, 그림 5와 Autoware.ai 1.14의 많은 패키지는 소스를 `src/` 아래에 둔다. 어느 쪽을 쓰든 2.4절의 `add_executable`에 적는 소스 경로가 실제 파일 위치와 같아야 한다.
 
@@ -268,7 +268,7 @@ void TwistGate::checkState()
 }
 ```
 
-- **`resetVehicleCmdMsg()`:** 발행할 `VehicleCmd` 메시지(`twist_gate_msg_`)의 모든 필드를 초기값으로 되돌린다. 목표 속도와 각속도, 모드, 페달과 조향 명령, 비상 정지를 0으로, 기어를 `NONE`으로 둔다. `ctrl_cmd.linear_velocity`만 0이 아닌 -1로 두는 점에 주의할 필요가 있다. 이 값은 3.8절에서 CAN 노드가 속도를 변환할 때 다시 등장한다.
+- **`resetVehicleCmdMsg()`:** 발행할 `VehicleCmd` 메시지(`twist_gate_msg_`)의 모든 필드를 초기값으로 되돌린다. 목표 속도와 각속도, 모드, 페달과 조향 명령, 비상 정지를 0으로, 기어를 `NONE`으로 둔다. `ctrl_cmd.linear_velocity`만 0이 아닌 -1로 두는 점에 주의할 필요가 있다. CAN 노드가 이 값을 어떻게 전송하는지는 3.12절에서 다룬다.
 - **`checkState()`:** 상태 관리 노드(decision_maker)를 쓰도록 설정되어 있을 때, 차량 상태가 주행 상태가 아니거나 마지막 상태 메시지를 받은 지 0.5초 이상 지났으면 속도 명령(`twist_cmd.twist`)과 제어 명령(`ctrl_cmd`)을 모두 0으로 만든다. 상태 정보가 끊기면 차량을 멈추는 안전 장치이다. `geometry_msgs::Twist()`와 `autoware_msgs::ControlCommand()`는 모든 필드가 0인 메시지를 만든다.
 
 `twist_gate`의 `CMakeLists.txt`는 다음과 같다.
@@ -345,7 +345,7 @@ target_link_libraries(mynode
 
 ### 2.5 colcon 빌드
 
-**colcon**은 작업 공간 안의 여러 패키지를 의존 순서대로 하나씩 따로 빌드하는 빌드 도구이다 [10]. catkin 패키지와 ROS 2 패키지를 모두 빌드할 수 있으며, 4주차에서 설치한 Autoware.ai 1.14도 colcon으로 빌드한다. 작업 공간의 최상위 디렉토리에서 다음 명령을 실행한다.
+**colcon**은 작업 공간 안의 패키지를 하나하나 격리하여 따로 빌드하는 빌드 도구로, 의존하는 패키지를 먼저 빌드하는 순서를 지키면서 서로 의존하지 않는 패키지는 동시에 빌드한다 [10]. catkin 패키지와 ROS 2 패키지를 모두 빌드할 수 있으며, 4주차에서 설치한 Autoware.ai 1.14도 colcon으로 빌드한다. 작업 공간의 최상위 디렉토리에서 다음 명령을 실행한다.
 
 ```bash
 cd ~/autoware.ai
@@ -420,6 +420,7 @@ subs :
         param: ndt_mapping
       # ... (approximate_ndt_mapping)
       - name : ndt_matching
+        desc : ndt_matching desc sample
         cmd  : roslaunch lidar_localizer ndt_matching.launch
         param: ndt
 ```
@@ -755,7 +756,7 @@ static void* senderCaller(void *unused)
 - **신호 설정:** `SIGALRM`과 `SIGINT`의 처리기로 `sighand`를 등록하고, `alarm(1)`로 1초 뒤의 첫 알람을 맞춘다. `siginterrupt(SIGINT, 1)`은 `SIGINT`가 오면 대기 중인 시스템 호출을 자동으로 다시 시작하지 않고 중단시켜, 프로그램이 블록된 상태에서도 종료 요청에 반응하게 한다 [14].
 - **`canInitializeLibrary()`:** CANlib를 초기화한다. 다른 CANlib 함수보다 먼저 호출해야 한다 [3].
 - **`canOpenChannel(channel, canOPEN_EXCLUSIVE)`:** 0번 채널을 열고 핸들을 돌려받는다. `canOPEN_EXCLUSIVE`는 다른 프로그램이 같은 채널을 함께 열지 못하게 독점한다. 주석 처리된 줄의 `canOPEN_REQUIRE_EXTENDED`는 29비트 확장 ID를 지원하는 채널을 요구하는 옵션으로, 이 노드는 11비트 표준 ID만 쓰므로 필요 없다. 핸들이 음수이면 채널을 열지 못한 것이므로 메시지를 출력하고 스레드를 끝낸다.
-- **`canSetBusParams(hnd, canBITRATE_500K, 0, 0, 0, 0, 0)`:** 버스의 비트 속도를 500 kbit/s로 정한다. 미리 정의된 `canBITRATE_` 상수를 쓰면 뒤의 비트 타이밍 매개변수는 무시되므로 0을 넘긴다 [3]. 버스의 모든 제어기는 같은 비트 속도를 써야 하므로, 이 값은 차량의 CAN 버스에 맞추어야 한다.
+- **`canSetBusParams(hnd, canBITRATE_500K, 0, 0, 0, 0, 0)`:** 버스의 비트 속도를 500 kbit/s로 정한다. 미리 정의된 `canBITRATE_` 상수로 비트 속도를 정할 때에는 비트 타이밍을 정하는 뒤의 매개변수를 모두 0으로 넘긴다 [3]. 버스의 모든 제어기는 같은 비트 속도를 써야 하므로, 이 값은 차량의 CAN 버스에 맞추어야 한다.
 - **`canBusOn(hnd)`:** 채널을 버스에 참여시킨다. 이때부터 프레임을 보내고 받을 수 있다.
 - 각 단계의 결과는 `check`로 출력한다. 주석 처리된 `goto ErrorExit`는 실패하면 정리 코드로 건너뛰는 구조의 흔적이며, 이 코드에는 `ErrorExit` 레이블이 없으므로 쓰이지 않는다.
 - **루프 변수:** `bin`은 조향 값의 16비트를 담는 배열, `check_num`은 0\~15를 도는 카운터, `steer_gain = 16.5`는 조향비, `steer_raw`와 `steer_smooth`는 필터의 입력과 출력, `LPF_Beta = 0.05`는 필터 계수이다. 각각의 의미는 3.8절과 3.9절에서 설명한다.
@@ -794,7 +795,7 @@ static void* senderCaller(void *unused)
 - **속도 변환:** `linear_velocity`(m/s)에 3600/1000을 곱해 km/h로 바꾼다. 1 m/s는 1시간(3600 s)에 3600 m, 곧 3.6 km이기 때문이다. 결과는 `char` 하나에 저장되므로 소수점 아래는 버려지며, 속도 프레임의 2번 바이트가 된다. 예를 들어 5.0 m/s는 $5.0 \times 3.6 = 18$ km/h이므로 `msg_velo[2] = 18`(`0x12`)이고, 4.2 m/s는 15.12 km/h에서 소수 부분이 버려져 15가 된다.
 - `msg_velo[7] = check_num`은 속도 프레임의 마지막 바이트에 카운터를 넣는다.
 
-**조향각 변환.** `steering_angle`은 앞바퀴의 조향각(rad)인데, 차량의 조향 제어기는 운전대의 회전각(°)을 명령으로 받는다. 운전대를 돌린 각과 바퀴가 꺾인 각의 비를 **조향비(steering ratio)** 라 하며, 이 차량의 조향비는 16.5이다 [15].
+**조향각 변환.** `steering_angle`은 앞바퀴의 조향각(rad)인데, 차량의 조향 제어기는 운전대의 회전각(°)을 명령으로 받는다. 운전대를 돌린 각과 바퀴가 꺾인 각의 비를 **조향비(steering ratio)** 라 하며, 코드는 이 차량의 조향비를 `steer_gain = 16.5`로 둔다.
 
 $$\theta_{\text{sw}} = \delta \times \frac{180}{\pi} \times 16.5$$
 
@@ -804,7 +805,7 @@ $$\theta_{\text{sw}} = \delta \times \frac{180}{\pi} \times 16.5$$
 
 $$y[n] = y[n-1] - \beta \left( y[n-1] - x[n] \right) = (1 - \beta)\, y[n-1] + \beta\, x[n]$$
 
-출력은 이전 출력의 95%와 새 입력의 5%를 섞은 값($\beta = 0.05$)이다. 이 식은 이전 값들에 지수적으로 줄어드는 가중치를 주는 **지수 이동 평균(exponential moving average)** 이며, 빠르게 변하는 성분(높은 주파수)을 줄이고 천천히 변하는 성분(낮은 주파수)을 통과시키는 1차 저역 통과 필터이다 [16]. $\beta$가 작을수록 출력이 더 부드럽지만 더 늦게 따라간다.
+출력은 이전 출력의 95%와 새 입력의 5%를 섞은 값($\beta = 0.05$)이다. 이 식은 이전 값들에 지수적으로 줄어드는 가중치를 주는 **지수 이동 평균(exponential moving average)** 이며, 빠르게 변하는 성분(높은 주파수)을 줄이고 천천히 변하는 성분(낮은 주파수)을 통과시키는 1차 저역 통과 필터이다 [15]. $\beta$가 작을수록 출력이 더 부드럽지만 더 늦게 따라간다.
 
 처음 $y = 0$인 상태에서 입력이 갑자기 $X$로 바뀌어 유지되면 출력은 $y[n] = X \left( 1 - (1 - \beta)^{n+1} \right)$으로 다가간다. $X = 94.54°$일 때 첫 반복은 $0.05 \times 94.54 \approx 4.73°$, 두 번째는 $0.95 \times 4.73 + 0.05 \times 94.54 \approx 9.22°$이다. 출력이 목표의 $1 - e^{-1} \approx 63\%$에 이르는 반복 수는 $(0.95)^{n} = e^{-1}$에서 $n = -1/\ln 0.95 \approx 19.5$이고, 한 반복이 약 20 ms이므로 약 0.39 s가 걸린다. 곧 운전대는 명령이 바뀐 뒤 약 0.4초가 지나야 목표 각도의 약 2/3에 이른다.
 
@@ -891,7 +892,7 @@ int main(int argc, char **argv)
 - `ros::init(argc, argv, "can_mobility_test")`는 노드 이름을 `can_mobility_test`로 정하고 ROS를 초기화한다. `ros::NodeHandle n`은 마스터와 통신하는 핸들을 만든다.
 - `n.subscribe("/vehicle_cmd", 10, vehicleCmdCallback)`은 `/vehicle_cmd`를 구독하고, 메시지가 오면 `vehicleCmdCallback`을 부르게 한다. 10은 처리되기를 기다리는 메시지를 최대 10개까지 쌓아 두는 큐의 크기이다. 반환된 `sub` 객체가 살아 있는 동안 구독이 유지된다.
 - `command_data.reset()`은 첫 메시지가 오기 전의 명령을 속도 0, 조향각 0으로 둔다.
-- `pthread_create(&th, nullptr, senderCaller, nullptr)`는 기본 속성(`nullptr`)으로 새 스레드를 만들어 `senderCaller`를 실행하게 한다. 0이 아닌 값을 돌려주면 실패이므로 `perror`로 원인을 출력하고 종료한다 [17].
+- `pthread_create(&th, nullptr, senderCaller, nullptr)`는 기본 속성(`nullptr`)으로 새 스레드를 만들어 `senderCaller`를 실행하게 한다. 0이 아닌 값을 돌려주면 실패이므로 `perror`로 원인을 출력하고 종료한다. 다만 `pthread_create`는 `errno`를 설정하지 않고 오류 번호를 반환값으로 돌려주므로 [16], `perror`가 출력하는 원인은 실제 오류와 다를 수 있으며, 정확한 원인은 반환값을 `strerror`로 바꾸어 출력해야 한다.
 - `pthread_detach(th)`는 스레드를 분리하여, 스레드가 끝나면 그 자원이 자동으로 회수되게 한다. 분리한 스레드는 `pthread_join`으로 기다릴 필요가 없다. 7주차에서 쓴 방법과 같다.
 - `ros::spin()`은 노드가 종료될 때까지 메시지를 기다리며 콜백을 호출한다. 따라서 수신부는 main 스레드에서, 송신부는 새 스레드에서 동시에 동작한다.
 
@@ -955,7 +956,7 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 | 문제 | 결과 | 개선 방법 |
 |:-----|:-----|:-----|
 | `msgCounter`를 늘리는 코드가 없다 | `SIGALRM` 처리기의 초당 메시지 수가 출력되지 않는다 | 송신이 성공할 때마다 `msgCounter++`를 한다 |
-| 송신 스레드가 `SIGINT` 처리기를 다시 등록한다 | roscpp는 노드를 만들 때 Ctrl+C로 노드를 끝내는 자신의 `SIGINT` 처리기를 등록하는데 [18], 이것이 `sighand`로 바뀌어 Ctrl+C를 눌러도 송신 루프만 끝나고 `ros::spin()`은 계속된다 | `SIGINT` 처리기를 등록하지 않고 루프 조건에 `ros::ok()`를 쓰거나, 처리기에서 `ros::requestShutdown()`을 호출한다 |
+| 송신 스레드가 `SIGINT` 처리기를 다시 등록한다 | roscpp는 노드를 만들 때 Ctrl+C로 노드를 끝내는 자신의 `SIGINT` 처리기를 등록하는데 [17], 이것이 `sighand`로 바뀌어 Ctrl+C를 눌러도 송신 루프만 끝나고 `ros::spin()`은 계속된다 | `SIGINT` 처리기를 등록하지 않고 루프 조건에 `ros::ok()`를 쓰거나, 처리기에서 `ros::requestShutdown()`을 호출한다 |
 | `command_data`를 두 스레드가 잠금 없이 읽고 쓴다 | 한 스레드가 쓰는 도중에 다른 스레드가 읽으면 속도와 조향각이 서로 다른 메시지에서 온 값이 될 수 있다(데이터 경쟁) | `std::mutex`로 읽기와 쓰기를 보호한다 |
 | 두 `canWriteWait`의 결과를 같은 `stat`에 덮어쓴다 | 속도 프레임의 송신 실패가 무시된다 | 호출마다 `check`로 결과를 확인한다 |
 | 루프가 끝나도 채널을 닫지 않는다 | 채널이 버스에 남아 다음 실행에서 열기에 실패할 수 있다 | 루프 뒤에 `canBusOff(hnd)`와 `canClose(hnd)`를 호출한다 |
@@ -1128,7 +1129,7 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 1. Autoware-AI, "messages," GitHub repository. https://github.com/Autoware-AI/messages
 2. ROS Enhancement Proposals, "REP 103: Standard Units of Measure and Coordinate Conventions." https://www.ros.org/reps/rep-0103.html
 3. Kvaser, "CANlib SDK documentation." https://www.kvaser.com/canlib-webhelp/
-4. Kvaser, "Downloads: Kvaser Linux Drivers and SDK." https://www.kvaser.com/download/
+4. Kvaser, "Kvaser Downloads." https://www.kvaser.com/download/
 5. Ubuntu Wiki, "UEFI/SecureBoot." https://wiki.ubuntu.com/UEFI/SecureBoot
 6. Autoware-AI, "core_planning," GitHub repository. https://github.com/Autoware-AI/core_planning
 7. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
@@ -1139,7 +1140,6 @@ rostopic pub -r 10 /vehicle_cmd autoware_msgs/VehicleCmd "{ctrl_cmd: {linear_vel
 12. ROS Enhancement Proposals, "REP 140: Package Manifest Format Two Specification." https://www.ros.org/reps/rep-0140.html
 13. M. Kerrisk, "signal-safety(7)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man7/signal-safety.7.html
 14. M. Kerrisk, "siginterrupt(3)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man3/siginterrupt.3.html
-15. R. Rajamani, *Vehicle Dynamics and Control*, 2nd ed. New York, NY, USA: Springer, 2012.
-16. A. V. Oppenheim and R. W. Schafer, *Discrete-Time Signal Processing*, 3rd ed. Upper Saddle River, NJ, USA: Pearson, 2010.
-17. M. Kerrisk, "pthread_create(3)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man3/pthread_create.3.html
-18. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
+15. A. V. Oppenheim and R. W. Schafer, *Discrete-Time Signal Processing*, 3rd ed. Upper Saddle River, NJ, USA: Pearson, 2010.
+16. M. Kerrisk, "pthread_create(3)," *Linux Manual Pages*. https://man7.org/linux/man-pages/man3/pthread_create.3.html
+17. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown

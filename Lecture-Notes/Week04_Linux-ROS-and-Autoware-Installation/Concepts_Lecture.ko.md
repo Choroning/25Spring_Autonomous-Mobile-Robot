@@ -198,7 +198,7 @@ sudo apt install ./code_*.deb    # ./ 는 저장소가 아니라 지금 폴더�
 
 ### 2.3 Eclipse 설치와 설정
 
-Eclipse는 Java로 만든 IDE이므로 먼저 Java 실행 환경(JDK)이 필요하다. 설치 방법은 최신 버전을 직접 받는 수동 설치와 APT를 쓰는 자동 설치가 있다. 자동 설치는 편하지만 저장소에 있는 오래된 버전이 설치될 수 있으므로, 최신 버전이 필요하면 수동 설치를 권한다.
+Eclipse는 Java로 만든 IDE이므로 먼저 Java 개발 도구(JDK, Java 실행 환경을 포함한다)를 설치해야 한다. 설치 방법은 최신 버전을 직접 받는 수동 설치와 APT를 쓰는 자동 설치가 있다. 자동 설치는 편하지만 저장소에 있는 오래된 버전이 설치될 수 있으므로, 최신 버전이 필요하면 수동 설치를 권한다.
 
 **수동 설치.** JDK를 설치하고 Eclipse 설치 프로그램을 내려받는다.
 
@@ -256,7 +256,7 @@ sudo apt-get install eclipse-cdt     # Eclipse의 C/C++ 개발 도구(CDT) 설�
 
 **자동 설치 뒤의 설정.** Window → Preferences → C/C++ → New C/C++ Project Wizard → Makefile Project에서 다음과 같이 설정한다.
 
-- **Binary Parsers:** Elf Parser를 고른다. ELF는 리눅스 실행 파일의 형식이며, 바이너리 파서는 빌드된 실행 파일을 읽어 프로젝트 탐색기에 바이너리와 기호를 보여 준다.
+- **Binary Parsers:** Elf Parser를 체크한다(그림 6에서는 GNU Elf Parser와 Cygwin PE Parser도 체크되어 있다). ELF는 리눅스 실행 파일의 형식이며, 바이너리 파서는 빌드된 실행 파일을 읽어 프로젝트 탐색기에 바이너리와 기호를 보여 준다.
 
 ![그림 6. Makefile Project의 Binary Parsers에서 Elf Parser를 고른 화면](../../images/Week04_4-1_p17.png)
 
@@ -303,7 +303,7 @@ Qt Creator는 GUI 라이브러리 Qt의 IDE로, 6.2절에서 Qt를 설치할 때
 
 ### 3.1 설치할 배포판 확인
 
-ROS 1은 대략 해마다 **배포판(distribution)** 을 내며, 각 배포판은 특정 Ubuntu 버전에 맞추어 만들어진다. Ubuntu 18.04(코드명 bionic)에 맞는 배포판은 ROS Melodic Morenia이다. 이 절의 명령은 ROS Wiki의 Melodic 설치 안내를 따른다 [1].
+ROS 1은 마지막 배포판인 Noetic(2020년)까지 대략 해마다 **배포판(distribution)** 을 냈으며, 각 배포판은 특정 Ubuntu 버전에 맞추어 만들어졌다. Ubuntu 18.04(코드명 bionic)에 맞는 배포판은 ROS Melodic Morenia이다. 이 절의 명령은 ROS Wiki의 Melodic 설치 안내를 따른다 [1].
 
 | Ubuntu | ROS 배포판 |
 |:-----|:-----|
@@ -313,7 +313,7 @@ ROS 1은 대략 해마다 **배포판(distribution)** 을 내며, 각 배포판�
 
 *표 5. Ubuntu 버전과 ROS 배포판의 대응*
 
-> **주의:** ROS Melodic은 2023년에 지원이 끝났다 [2]. 패키지는 여전히 설치할 수 있지만 새 업데이트는 나오지 않으며, 3.6절처럼 일부 도구는 지원이 끝난 배포판을 따로 지정해야 한다.
+> **주의:** ROS Melodic은 2023년 6월에 지원이 끝났고, ROS 1 전체도 2025년 5월 Noetic의 지원 종료와 함께 끝났다 [2]. 패키지는 여전히 설치할 수 있지만 새 업데이트는 나오지 않으며, 3.6절처럼 일부 도구는 지원이 끝난 배포판을 따로 지정해야 한다.
 
 ### 3.2 ROS 저장소 등록
 
@@ -534,7 +534,7 @@ started core service [/rosout]
 ```text
 Reading from keyboard
 ---------------------------
-Use arrow keys to move the turtle.
+Use arrow keys to move the turtle. 'q' to quit.
 ```
 
 ![그림 10. 처음 실행한 turtlesim 창과 방향키로 거북이를 움직인 뒤의 창](../../images/Week04_4-2_p07a.png)
@@ -633,7 +633,7 @@ angular:
 ---
 ```
 
-`Twist`는 3주차의 pure_pursuit와 twist_filter가 차량에 속도 명령을 보낼 때 쓰는 것과 같은 형식이다. 평면을 움직이는 거북이와 차량은 모두 `linear.x`(선속도 $v$)와 `angular.z`(각속도 $\omega$) 두 값으로 움직임을 지시받는다.
+3주차의 pure_pursuit와 twist_filter가 주고받는 속도 명령(`twist_raw`, `twist_cmd`)의 형식 `geometry_msgs/TwistStamped`는 이 `Twist`에 시각과 좌표계를 담은 `header`를 더한 것이다. 평면을 움직이는 거북이와 차량은 모두 `linear.x`(선속도 $v$)와 `angular.z`(각속도 $\omega$) 두 값으로 움직임을 지시받는다.
 
 ### 4.5 노드 종료와 작업 공간의 환경 설정
 
@@ -766,7 +766,7 @@ flowchart LR
 
 ### 6.1 Autoware 버전과 요구 환경
 
-**Autoware.ai**는 ROS 1을 기반으로 한 오픈 소스 자율주행 소프트웨어로, 실습은 1.14.0판을 쓴다. 이후 Autoware의 개발은 ROS 2 기반으로 옮겨 갔다. Autoware.ai의 소스 코드 빌드 안내는 Autoware Foundation의 문서에 있다 [7]. 버전마다 지원하는 Ubuntu가 다르다.
+**Autoware.ai**는 ROS 1을 기반으로 한 오픈 소스 자율주행 소프트웨어로, 이 단원은 1.14.0판을 설치한다. 이후 Autoware의 개발은 ROS 2 기반으로 옮겨 갔다. Autoware.ai의 소스 코드 빌드 안내는 Autoware Foundation의 문서에 있다 [7]. 버전마다 지원하는 Ubuntu가 다르다.
 
 | Autoware 버전 | Ubuntu 14.04 | Ubuntu 16.04 | Ubuntu 18.04 |
 |:-----|:-----|:-----|:-----|
@@ -791,11 +791,11 @@ flowchart LR
 
 *표 13. Ubuntu 버전별 Autoware 요구 환경*
 
-Ubuntu 18.04에서 Autoware 1.14.0을 쓰려면 ROS Melodic과 Qt 5.9.5 이상이 필요하다. CUDA는 GPU로 딥러닝 기반 인식 노드 같은 일부 기능을 가속할 때만 필요하며, 실습은 CUDA 없이 빌드한다. FlyCapture2는 특정 카메라의 드라이버, Armadillo는 선형대수 라이브러리로, 해당 기능을 쓸 때만 필요하다.
+Ubuntu 18.04에서 Autoware 1.14.0을 쓰려면 ROS Melodic과 Qt 5.9.5 이상이 필요하다. CUDA는 GPU로 딥러닝 기반 인식 노드 같은 일부 기능을 가속할 때만 필요하며, 이 단원의 설치는 CUDA 없이 빌드한다. FlyCapture2는 특정 카메라의 드라이버, Armadillo는 선형대수 라이브러리로, 해당 기능을 쓸 때만 필요하다.
 
 ### 6.2 Qt 5.12.12 설치
 
-**Qt**는 C++로 GUI 프로그램을 만드는 라이브러리이며, Autoware의 일부 도구가 쓴다. Ubuntu 18.04의 저장소에 있는 Qt는 5.9.5이지만, 실습은 5.12.12판을 홈 폴더에 따로 설치한다.
+**Qt**는 C++로 GUI 프로그램을 만드는 라이브러리이며, Autoware의 일부 도구가 쓴다. Ubuntu 18.04의 저장소에 있는 Qt는 5.9.5이지만, 이 단원에서는 5.12.12판을 홈 폴더에 따로 설치한다.
 
 1. `https://download.qt.io/archive/qt/5.12/5.12.12/`에서 5.12 버전의 설치 파일을 내려받는다. 필요한 파일을 미리 모두 담은 오프라인 설치 파일 `qt-opensource-linux-x64-5.12.12.run`을 받아 설치하는 것을 권장하며, 내려받기가 느리면 미러 사이트(`https://download.qt.io/static/mirrorlist/`)를 이용한다.
 2. 다음 명령을 차례로 실행한다.
@@ -844,7 +844,7 @@ Using Qt version 5.12.12 in /home/user/Qt5.12.12/5.12.12/gcc_64/lib
 sudo apt-get install git
 ```
 
-`git --version`으로 설치를 확인한다. `sudo` 없이 실행하면 1.2절의 `Permission denied` 오류가 난다.
+`git --version`으로 설치를 확인한다. `sudo` 없이 실행하면 1.2절과 같은 종류의 `Permission denied` 오류(`/var/lib/dpkg/lock-frontend`)가 난다.
 
 ### 6.4 Autoware.ai 1.14.0 소스 빌드
 
@@ -1117,12 +1117,12 @@ sudo make install          # 시스템에 설치 (관리자 권한 필요)
 
 10. **Velodyne 드라이버:** 브랜치를 지정하지 않고 `git clone https://github.com/ros-drivers/velodyne.git`으로 받은 뒤 `catkin_make`가 실패하였다. 원인과 해결 방법을 쓰라.
 
-   <details>
-   <summary>정답</summary>
+    <details>
+    <summary>정답</summary>
 
-   이 저장소의 기본 브랜치가 ROS 2용(`ros2`)이므로 ROS 1의 catkin으로는 빌드할 수 없다. `src`의 `velodyne` 폴더를 지우고 `git clone -b melodic-devel https://github.com/ros-drivers/velodyne.git`으로 Melodic용 브랜치를 받은 뒤 다시 `catkin_make`를 실행한다.
+    이 저장소의 기본 브랜치가 ROS 2용(`ros2`)이므로 ROS 1의 catkin으로는 빌드할 수 없다. `src`의 `velodyne` 폴더를 지우고 `git clone -b melodic-devel https://github.com/ros-drivers/velodyne.git`으로 Melodic용 브랜치를 받은 뒤 다시 `catkin_make`를 실행한다.
 
-   </details>
+    </details>
 
 ---
 
@@ -1132,7 +1132,7 @@ sudo make install          # 시스템에 설치 (관리자 권한 필요)
 
 1. Open Robotics, "Ubuntu install of ROS Melodic," ROS Wiki. https://wiki.ros.org/melodic/Installation/Ubuntu
 2. Open Robotics, "Distributions," ROS Wiki. https://wiki.ros.org/Distributions
-3. Open Robotics, "rosdep," GitHub repository ros-infrastructure/rosdep. https://github.com/ros-infrastructure/rosdep
+3. Open Robotics, "rosdep command reference," rosdep Documentation. https://docs.ros.org/en/independent/api/rosdep/html/commands.html
 4. ROBOTIS, "install_ros_melodic.sh," GitHub repository orocapangyo/meetup. https://github.com/orocapangyo/meetup/blob/master/190830/install_ros_melodic.sh
 5. Open Robotics, "Understanding ROS Topics," ROS Wiki Tutorials. https://wiki.ros.org/ROS/Tutorials/UnderstandingTopics
 6. Open Robotics, "Running ROS across multiple machines," ROS Wiki Tutorials. https://wiki.ros.org/ROS/Tutorials/MultipleMachines

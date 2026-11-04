@@ -53,7 +53,7 @@
 
 1주차 3절에서 본 것처럼 ROS에서 가장 기본이 되는 기술은 노드 간의 메시지 통신이다. 노드들은 마스터에 자신의 정보를 등록하고, 마스터에게서 받은 접속 정보로 서로 직접 토픽과 서비스를 주고받는다. 자율주행 소프트웨어 Autoware는 이 구조 위에서 수많은 노드가 토픽으로 연결된 거대한 ROS 시스템이다.
 
-> **용어 정의:** **Autoware**는 ROS를 기반으로 하는 오픈 소스 자율주행 소프트웨어이다. 일본 나고야 대학교가 자율주행 연구와 개발을 위해 개발하여 2015년 GitHub에 공개했다 [1]. 이후 나고야 대학교에서 출발한 기업 TIER IV가 개발을 이끌었고, 2018년에 설립된 Autoware Foundation이 관리한다 [2].
+> **용어 정의:** **Autoware**는 ROS를 기반으로 하는 오픈 소스 자율주행 소프트웨어이다. 일본 나고야 대학교가 자율주행 연구와 개발을 위해 개발하여 2015년 GitHub에 공개했다 [1]. 이후 Autoware를 처음 만든 가토 신페이(Shinpei Kato)가 세운 기업 TIER IV가 개발을 이끌었고, 지금은 2018년 12월에 TIER IV 등이 함께 설립한 비영리 단체 Autoware Foundation이 관리한다 [2].
 
 ```mermaid
 flowchart TB
@@ -73,11 +73,11 @@ Autoware는 네 계층으로 이루어진다.
 - **호스트 운영체제 계층:** 주로 Linux(Ubuntu)를 쓰며, 임베디드 차량용으로는 eSOL의 eMCOS처럼 여러 코어를 가진 프로세서용 실시간 운영체제도 쓸 수 있다. **실시간 운영체제(RTOS, real-time operating system)** 는 작업이 정해진 시간 안에 끝나도록 보장하는 데 중점을 둔 운영체제이다.
 - **하드웨어 계층:** 계산을 맡는 CPU와 GPU, 주변을 감지하는 카메라, 위성 신호로 위치를 재는 **GNSS(global navigation satellite system)**, 레이저를 쏘아 돌아오는 시간으로 거리를 재는 **LiDAR(light detection and ranging)** 가 있다. GPU는 카메라 영상의 딥러닝 기반 물체 검출처럼 계산량이 큰 작업을 병렬로 처리한다.
 
-> **참고:** 이 정리본의 Autoware는 ROS 1 기반의 Autoware.ai(이 과목은 1.14.0)를 말한다. Autoware.ai는 개발이 끝났으며, Autoware Foundation은 ROS 2 기반으로 다시 설계한 Autoware(Autoware Universe)를 개발하고 있다 [2]. 노드와 토픽으로 기능을 나누는 구조와 위치 인식, 경로 계획의 원리는 두 버전에 공통이다.
+> **참고:** 이 단원에서 Autoware는 ROS 1 기반의 Autoware.ai(이 과목은 1.14.0)를 가리킨다. Autoware.ai는 개발이 끝났으며, Autoware Foundation은 ROS 2 기반으로 다시 설계한 Autoware(Autoware Universe)를 개발하고 있다 [3]. 노드와 토픽으로 기능을 나누는 구조와 위치 인식, 경로 계획의 원리는 두 버전에 공통이다.
 
 ### 1.2 rosbag
 
-ROS에서는 토픽의 모든 메시지를 시간 정보(타임스탬프)와 함께 **rosbag**이라 부르는 `.bag` 파일에 기록할 수 있다 [3]. 기록한 메시지는 다시 발행하여 ROS의 3D 시각화 도구인 RViz로 볼 수 있다. 로봇 공학에서는 여러 센서의 상호 작용을 한꺼번에 분석하기 어려운 경우가 많은데, rosbag은 시스템을 효율적으로 분석하고 디버깅하게 해 준다. 또한 기록한 메시지를 몇 번이든 반복해서 재생할 수 있으므로, 개발자는 실제 센서 없이도 자신의 시스템을 디버깅할 수 있다.
+ROS에서는 토픽의 모든 메시지를 시간 정보(타임스탬프)와 함께 **rosbag**이라 부르는 `.bag` 파일에 기록할 수 있다 [4]. 기록한 메시지는 다시 발행하여 ROS의 3D 시각화 도구인 RViz로 볼 수 있다. 로봇 공학에서는 여러 센서의 상호 작용을 한꺼번에 분석하기 어려운 경우가 많은데, rosbag은 시스템을 효율적으로 분석하고 디버깅하게 해 준다. 또한 기록한 메시지를 몇 번이든 반복해서 재생할 수 있으므로, 개발자는 실제 센서 없이도 자신의 시스템을 디버깅할 수 있다.
 
 rosbag이 자율주행 개발에 특히 중요한 이유는 다음과 같다.
 
@@ -122,7 +122,7 @@ Autoware에서 쓸 수 있는 사용자 인터페이스는 다음과 같다.
 
 *표 1. Autoware의 사용자 인터페이스*
 
-Runtime Manager는 기능별 탭으로 이루어진다. 각 탭에서 해당 기능의 노드를 체크 상자로 켜고 끄며, 아래쪽 버튼으로 기록(ROSBAG), RViz, rqt를 띄운다. 화면 맨 아래에는 CPU 코어별 사용률과 메모리 사용량이 표시된다 [4].
+Runtime Manager는 기능별 탭으로 이루어진다. 각 탭에서 해당 기능의 노드를 체크 상자로 켜고 끄며, 아래쪽 버튼으로 기록(ROSBAG), RViz, rqt를 띄운다. 화면 맨 아래에는 CPU 코어별 사용률과 메모리 사용량이 표시된다 [5].
 
 | 탭 | 하는 일 |
 |:-----|:-----|
@@ -162,7 +162,7 @@ Runtime Manager는 기능별 탭으로 이루어진다. 각 탭에서 해당 기
 - 메시지 수의 합은 $11980 + 4788 = 16768$으로 `messages`와 같다.
 - LiDAR 포인트 클라우드 토픽 `/points_raw`의 발행 주기는 $4788 / 479.17 \approx 9.99$, 곧 약 10 Hz이다. LiDAR가 1초에 10번 회전하며 한 바퀴마다 포인트 클라우드 하나를 발행한다는 뜻이다.
 - GNSS 수신기의 문장 토픽 `/nmea_sentence`는 $11980 / 479.17 \approx 25.0$, 곧 약 25 Hz로 발행되었다.
-- NMEA 문장은 수십 바이트의 짧은 문자열이므로 파일 크기의 대부분은 포인트 클라우드이다. 포인트 클라우드 하나의 크기는 $7.9 \times 10^9 / 4788 \approx 1.65 \times 10^6$바이트, 곧 약 1.65 MB이다. 8분 기록에 7.9 GB가 필요하다는 사실은 LiDAR 데이터를 기록할 때 저장 공간을 넉넉히 준비해야 함을 보여 준다.
+- NMEA 문장은 수십 바이트의 짧은 문자열이므로 파일 크기의 대부분은 포인트 클라우드이다. `rosbag info`는 크기를 1024배 단위로 나타내므로 7.9 GB는 $7.9 \times 1024^3 \approx 8.48 \times 10^9$바이트이다 [6]. 따라서 포인트 클라우드 하나의 크기는 $8.48 \times 10^9 / 4788 \approx 1.77 \times 10^6$바이트, 곧 약 1.77 MB이다. 8분 기록에 7.9 GB가 필요하다는 사실은 LiDAR 데이터를 기록할 때 저장 공간을 넉넉히 준비해야 함을 보여 준다.
 
 > **용어 정의:** **NMEA 문장(NMEA sentence)** 은 GNSS 수신기가 위치, 시각, 위성 정보를 출력할 때 쓰는 NMEA 0183 표준의 문자열로, `$GPGGA,...`처럼 `$`로 시작하고 쉼표로 필드를 나눈다. **포인트 클라우드(point cloud, 점군)** 는 LiDAR가 측정한 3차원 점 $(x, y, z)$의 집합이며, ROS에서는 `sensor_msgs/PointCloud2` 메시지로 주고받는다.
 
@@ -174,7 +174,7 @@ Autoware의 기능은 많은 노드가 토픽으로 연결되어 이루어진다
 
 *그림 4. 실행 중인 Autoware 전체의 노드 그래프*
 
-그림 4는 실제로 자율주행을 수행하는 Autoware를 `rqt_graph`로 그린 것이다. 글자를 하나하나 읽기 어려울 만큼 노드와 토픽이 많지만, 큰 흐름은 왼쪽 아래의 센서 드라이버(Velodyne LiDAR, GNSS)와 지도 로더에서 시작하여, 가운데의 위치 인식(`ndt_matching`)과 경로 계획 노드들(`lane_rule`, `lane_select`, `velocity_set`, `pure_pursuit` 등)을 지나, 오른쪽의 속도 명령 처리(`twist_filter`, `twist_gate`)와 차량에 CAN 명령을 보내는 노드로 끝난다. 노드 그래프는 이처럼 시스템의 데이터 흐름을 한눈에 보여 주므로, 어떤 토픽이 발행되지 않아 시스템이 멈추었는지 찾는 디버깅에 쓰인다. 다음 1.6\~1.8절에서는 기능별로 나눈 그래프를 차례로 읽는다.
+그림 4는 실제로 자율주행을 수행하는 Autoware를 `rqt_graph`로 그린 것이다. 글자를 하나하나 읽기 어려울 만큼 노드와 토픽이 많지만, 큰 흐름은 왼쪽 아래의 센서 드라이버(Velodyne LiDAR, GNSS)와 지도 로더에서 시작하여, 가운데의 위치 인식(`ndt_matching`)과 경로 계획 노드들(`lane_rule`, `lane_select`, `velocity_set`, `pure_pursuit` 등)을 지나, 오른쪽의 속도 명령 처리(`twist_filter`, `twist_gate`)와, 차량 명령 `vehicle_cmd`를 받아 차량에 CAN 명령을 보내는 노드(`sending_CAN`)로 끝난다. 노드 그래프는 이처럼 시스템의 데이터 흐름을 한눈에 보여 주므로, 어떤 토픽이 발행되지 않아 시스템이 멈추었는지 찾는 디버깅에 쓰인다. 다음 1.6\~1.8절에서는 기능별로 나눈 그래프를 차례로 읽는다.
 
 ### 1.6 인식과 위치 인식의 노드 구성
 
@@ -188,11 +188,11 @@ Autoware의 기능은 많은 노드가 토픽으로 연결되어 이루어진다
 |:-----|:-----|:-----|:-----|
 | 카메라 물체 검출 | `cv_tracker` | `image_raw` → `dpm_XXX` → `image_obj` → `range_fusion` → `image_obj_ranged` → `XXX_track` → `image_obj_tracked` → `obj_reproj` → `obj_label` | 영상에서 차량이나 보행자를 찾고(`dpm_XXX`, XXX는 검출 대상), LiDAR 점을 영상에 투영한 `vscan_image`, `points_image`, `scan_image`로 거리를 붙이고(`range_fusion`), 프레임 사이에서 같은 물체를 추적한 뒤(`XXX_track`), 차량 위치(`current_pose`)와 좌표 변환(`tf`)으로 3차원 위치를 되살린다(`obj_reproj`) |
 | LiDAR 물체 검출 | `lidar_tracker` | `velodyne_points`, `vscan_points`, `scan` → `euclidean_cluster` → `points_obj` → `obj_fusion` → `obj_pose` | 포인트 클라우드를 서로 가까운 점끼리 묶어 물체 후보를 만들고(`euclidean_cluster`), 카메라 검출 결과 `obj_label`과 합쳐 물체의 위치를 낸다(`obj_fusion`) |
-| 신호등 인식 | `road_wizard` | `vector_map`, `tf` → `feat_proj` → `roi_signal` → `region_tlr` → `light_color` | 벡터 지도에 저장된 신호등 위치를 카메라 영상 위로 투영하여 신호등이 보일 관심 영역(ROI)을 정하고(`feat_proj`), 그 영역에서 신호의 색을 인식한다(`region_tlr`) |
+| 신호등 인식 | `road_wizard` | `vector_map`, `tf` → `feat_proj` → `roi_signal` → `region_tlr` → `light_color` | 벡터 지도에 저장된 신호등 위치를 카메라 영상 위로 투영하여 신호등이 보일 관심 영역(ROI)을 정하고(`feat_proj`, 차선의 관심 영역 `roi_lane`도 낸다), 카메라 영상 `image_raw`의 그 영역에서 신호의 색을 인식한다(`region_tlr`) |
 
 *표 4. 검출 노드 그래프의 세 가지 흐름*
 
-> **용어 정의:** **DPM(deformable part model)** 은 물체를 전체 모양과 여러 부분(예: 사람의 머리, 팔, 다리)의 배치로 표현하고, 부분의 위치가 어느 정도 변형되는 것을 허용하여 물체를 검출하는 방법이다 [5]. **유클리드 군집화(Euclidean clustering)** 는 서로의 거리가 정한 값보다 가까운 점들을 같은 무리로 묶는 방법으로, 도로 위의 포인트 클라우드를 차량, 보행자 같은 물체 단위로 나눈다.
+> **용어 정의:** **DPM(deformable part model)** 은 물체를 전체 모양과 여러 부분(예: 사람의 머리, 팔, 다리)의 배치로 표현하고, 부분의 위치가 어느 정도 변형되는 것을 허용하여 물체를 검출하는 방법이다 [7]. **유클리드 군집화(Euclidean clustering)** 는 서로의 거리가 정한 값보다 가까운 점들을 같은 무리로 묶는 방법으로, 도로 위의 포인트 클라우드를 차량, 보행자 같은 물체 단위로 나눈다.
 
 카메라는 물체의 종류를 잘 알아보지만 거리를 직접 재지 못하고, LiDAR는 거리를 정확히 재지만 물체의 종류를 알아보기 어렵다. 그래서 두 센서의 결과를 합치는 **센서 융합(sensor fusion)** 이 쓰인다. `range_fusion`과 `obj_fusion`이 그 역할을 한다. 신호등 인식에서 지도를 쓰는 이유도 같다. 영상 전체에서 작은 신호등을 찾는 대신, 지도로 신호등이 있을 자리를 미리 알면 좁은 영역만 살피면 되므로 빠르고 오검출이 적다.
 
@@ -220,24 +220,24 @@ Autoware의 기능은 많은 노드가 토픽으로 연결되어 이루어진다
 
 *그림 7. 경로 계획과 경로 추종의 노드 그래프*
 
-그림 7은 차선 계획(`lane_planner`), 주행 계획(`driving_planner`), 웨이포인트 생성(`waypoint_maker`), 웨이포인트 추종(`waypoint_follower`) 패키지의 노드 그래프이다. 그림 안의 일본어 "Rviz 表示用"은 "RViz 표시용", "vehicle_senderへ"는 "vehicle_sender로"라는 뜻이다. **웨이포인트(waypoint)** 은 차량이 지나갈 경로 위의 점으로, 위치와 그 점에서의 목표 속도를 담는다. 데이터는 다음 순서로 흐른다.
+그림 7은 차선 계획(`lane_planner`), 주행 계획(`driving_planner`), 웨이포인트 생성(`waypoint_maker`), 웨이포인트 추종(`waypoint_follower`) 패키지의 노드 그래프이다. 그림 안의 일본어 "Rviz 表示用"은 "RViz 표시용", "vehicle_senderへ"는 "vehicle_sender로"라는 뜻이며, 그림의 `odom_pose`, `target_waypoint`, `marker_array`가 이런 RViz 표시용 출력이다. **웨이포인트(waypoint)** 은 차량이 지나갈 경로 위의 점으로, 위치와 그 점에서의 목표 속도를 담는다. 데이터는 다음 순서로 흐른다.
 
 | 단계 | 노드 | 입력 | 출력과 하는 일 |
 |:-----|:-----|:-----|:-----|
-| 경로 만들기 | `waypoint_saver` | `current_pose`, `can_info` | 사람이 운전하는 동안 차량의 위치와 속도를 $\{x, y, z, v\}$ 형식의 파일로 저장한다 |
+| 경로 만들기 | `waypoint_saver` | `current_pose`, `can_info` | 사람이 운전하는 동안 차량의 위치와 속도를 $\lbrace x, y, z, v\rbrace$ 형식의 파일로 저장한다 |
 | | `waypoint_loader` | 저장된 파일 | 파일의 웨이포인트를 `lane_waypoint`로 발행한다 |
 | | `lane_navi` | `route_cmd`, 벡터 지도 | 목적지까지의 경로를 벡터 지도의 차선 위에서 만들어 `lane_waypoint`로 발행한다 |
 | 교통 규칙 적용 | `lane_rule` | `lane_waypoint`, `vector_map` | 정지선 같은 지도 정보로 웨이포인트의 속도를 조정하여, 신호가 초록일 때의 `green_waypoint`와 빨강일 때의 `red_waypoint`를 만든다 |
 | | `lane_stop` | `green_waypoint`, `red_waypoint`, `traffic_light` | 신호등 상태에 따라 둘 중 하나를 골라 `traffic_waypoint`로 발행한다 |
 | 차선 선택 | `lane_select` | `traffic_waypoint`, `current_pose` 등 | 현재 위치에 맞는 차선의 웨이포인트를 골라 `base_waypoint`로 발행한다 |
 | 속도 계획 | `velocity_set` | `base_waypoint`, `vscan_points`, `obj_pose` | 앞에 장애물이 있으면 감속하거나 멈추도록 속도를 고쳐 `safety_waypoint`로 발행한다 |
-| 경로 추종 | `pure_pursuit` | `safety_waypoint`, `control_pose` | 경로 위의 목표점을 따라가는 선속도와 각속도를 계산하여 `twist_raw`로 발행한다 |
+| 경로 추종 | `pure_pursuit` | `safety_waypoint`, `control_pose` | 경로 위의 목표점을 따라가는 선속도와 각속도를 계산하여 `twist_raw`로 발행하고, 추종 중인 목표점을 RViz 표시용 `target_waypoint`로 낸다 |
 | 최종 확인 | `collision_avoid` | `twist_raw`, `safety_waypoint`, `vscan_points` 등 | 충돌 위험을 마지막으로 확인한 속도 명령을 `twist_cmd`로 발행하며, 이 명령이 `vehicle_sender`로 간다 |
 | 시각화 | `odom_gen` | `twist_cmd`, `control_pose` | 속도 명령으로 차량 위치를 계산하여 RViz 표시용 `odom_pose`를 낸다 |
 
 *표 6. 경로 계획과 추종 노드의 데이터 흐름*
 
-`lattice_trajectory_gen`은 `base_waypoint`에서 격자(lattice) 모양의 후보 궤적을 만드는 노드로, 출력이 "?"로 남아 있는 것은 출력 토픽이 정해지지 않은 개발 단계의 기능이라는 뜻이다. `pure_pursuit` 알고리즘은 차량 앞쪽 일정 거리의 경로 위 점을 목표로 정하고 그 점을 지나는 원호를 따라가도록 조향하는 방법이며 [6], 3주차에서 자세히 다룬다.
+`lattice_trajectory_gen`은 `base_waypoint`에서 격자(lattice) 모양의 후보 궤적을 만드는 노드로, 출력이 "?"로 남아 있는 것은 출력 토픽이 정해지지 않은 개발 단계의 기능이라는 뜻이다. `pure_pursuit` 알고리즘은 차량 앞쪽 일정 거리의 경로 위 점을 목표로 정하고 그 점을 지나는 원호를 따라가도록 조향하는 방법이며 [8], 3주차에서 자세히 다룬다.
 
 ![그림 8. 지도 관리의 노드 그래프](../../images/Week02_02-1_p14.png)
 
@@ -351,8 +351,8 @@ CMakeLists.txt  include/  package.xml  src/
 
 `catkin_create_pkg`는 패키지 디렉토리와 함께 `CMakeLists.txt`, `package.xml`, 헤더 파일용 `include/`, 소스 파일용 `src/`를 만든다. 다음으로 두 설정 파일을 패키지에 맞게 고친다.
 
-- **`package.xml`:** 패키지의 이름, 버전, 설명, 관리자(maintainer), 라이선스 같은 프로젝트 관리 정보와 의존 패키지를 적는 **매니페스트(manifest)** 이다 [7].
-- **`CMakeLists.txt`:** 무엇을 어떤 순서로 빌드할지 적는 CMake 빌드 스크립트이다 [8].
+- **`package.xml`:** 패키지의 이름, 버전, 설명, 관리자(maintainer), 라이선스 같은 프로젝트 관리 정보와 의존 패키지를 적는 **매니페스트(manifest)** 이다 [9].
+- **`CMakeLists.txt`:** 무엇을 어떤 순서로 빌드할지 적는 CMake 빌드 스크립트이다 [10].
 
 위 명령이 만드는 `package.xml`의 핵심 내용은 다음과 같다(설명 주석을 줄였다).
 
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-코드를 줄별로 보면 다음과 같다.
+코드를 줄별로 보면 다음과 같다 [11].
 
 - **`#include "ros/ros.h"`:** `ros::init`, `ros::NodeHandle`, `ros::spin`처럼 roscpp의 기본 기능을 선언한 헤더를 포함한다.
 - **`#include "std_msgs/String.h"`, `"std_msgs/Int32.h"`:** 메시지 형식 `std_msgs/String`(문자열 필드 `data` 하나)과 `std_msgs/Int32`(32비트 정수 필드 `data` 하나)를 C++ 구조체로 쓰게 하는 헤더이다. 빌드할 때 `.msg` 파일에서 자동으로 만들어진다.
@@ -487,7 +487,7 @@ target_link_libraries(test_node
 
 실행 파일의 이름(`test_node`)과 노드의 이름(`ros::init`에 준 `mynode`)은 다를 수 있다. `rosrun`은 실행 파일 이름으로 프로그램을 찾고, 실행된 프로그램은 마스터에 `mynode`라는 노드 이름으로 등록된다.
 
-> **참고:** ROS Melodic은 C++14를 기준 언어로 삼는다 [9]. `-std=c++0x`(C++11)로도 위 노드는 빌드되지만, Melodic의 라이브러리 가운데 C++14 기능을 쓰는 헤더를 포함하면 오류가 날 수 있으므로 Melodic에서는 `-std=c++14`를 쓰는 편이 안전하다.
+> **참고:** ROS Melodic은 C++14를 기준 언어로 삼는다 [12]. `-std=c++0x`(C++11)로도 위 노드는 빌드되지만, Melodic의 라이브러리 가운데 C++14 기능을 쓰는 헤더를 포함하면 오류가 날 수 있으므로 Melodic에서는 `-std=c++14`를 쓰는 편이 안전하다.
 
 고친 뒤 Autoware의 `ros` 디렉토리로 이동하여 빌드 스크립트를 실행한다.
 
@@ -517,7 +517,7 @@ data: 5
 ---
 ```
 
-`size()`는 바이트 수를 세므로, UTF-8로 한 글자에 3바이트를 쓰는 한글 문자열 `"안녕"`을 보내면 2가 아니라 6이 출력된다. `rqt_graph`를 띄우면 `/rostopic_...` 노드에서 `/mysubstr`를 거쳐 `/mynode`로, 다시 `/mypubval`을 거쳐 `rostopic echo` 노드로 이어지는 연결을 볼 수 있다 [10].
+`size()`는 바이트 수를 세므로, UTF-8로 한 글자에 3바이트를 쓰는 한글 문자열 `"안녕"`을 보내면 2가 아니라 6이 출력된다. `-1` 옵션을 빼고 `rostopic pub`을 실행하면 메시지를 보낸 뒤에도 그 노드가 남아 있으므로, 그동안 `rqt_graph`를 띄우면 `/rostopic_...` 노드에서 `/mysubstr`를 거쳐 `/mynode`로, 다시 `/mypubval`을 거쳐 `rostopic echo` 노드로 이어지는 연결을 볼 수 있다.
 
 ---
 
@@ -599,7 +599,7 @@ flowchart LR
 
 Runtime Manager로 데이터를 기록하는 순서는 다음과 같다.
 
-1. **Autoware 실행:** Autoware.ai의 초기 버전에서는 `cd ~/Autoware/ros/`로 이동한 뒤 `./run`을 실행하여 Runtime Manager를 띄운다. colcon으로 빌드하는 Autoware.ai 1.14.0에서는 작업 공간의 `install/setup.bash`를 불러온 뒤 `roslaunch runtime_manager runtime_manager.launch`로 띄운다 [11].
+1. **Autoware 실행:** Autoware.ai의 초기 버전에서는 `cd ~/Autoware/ros/`로 이동한 뒤 `./run`을 실행하여 Runtime Manager를 띄운다. colcon으로 빌드하는 Autoware.ai 1.14.0에서는 작업 공간의 `install/setup.bash`를 불러온 뒤 `roslaunch runtime_manager runtime_manager.launch`로 띄운다 [13].
 2. **노드 실행:** 기록할 토픽을 발행하는 노드의 체크 상자를 선택한다. 예를 들어 Sensing 탭에서 LiDAR(Velodyne HDL-32e)를 선택하면 `/points_raw`가 발행된다.
 3. **ROSBAG 기록:** (A) [ROSBAG] 버튼을 눌러 대화 상자를 띄운다. (B) [Ref] 버튼을 눌러 저장할 백 파일의 이름을 정한다. (C) [Refresh] 버튼을 눌러 토픽 목록을 갱신한다. (D) 기록할 토픽의 체크 상자를 선택한다. (E) [Start] 버튼을 눌러 기록을 시작한다. (F) [Stop] 버튼을 눌러 기록을 끝낸다.
 
@@ -616,9 +616,9 @@ Runtime Manager로 데이터를 기록하는 순서는 다음과 같다.
 3. (D) [Pause] 버튼으로 재생을 잠시 멈추거나 다시 시작한다.
 4. (E) [Stop] 버튼을 눌러 재생을 멈춘다. 이때 `/use_sim_time`이 자동으로 `false`가 된다.
 
-> **핵심:** ROS 노드는 보통 컴퓨터의 현재 시각을 ROS 시간으로 쓴다. 그런데 2015년에 기록한 데이터를 지금 재생하면 메시지의 타임스탬프와 현재 시각이 몇 년씩 어긋나, 시간을 비교하는 노드(좌표 변환 `tf`, 위치 인식)가 데이터를 오래된 것으로 보고 버린다. `/use_sim_time`을 `true`로 하면 노드들은 컴퓨터 시각 대신 재생기가 `/clock` 토픽으로 발행하는 기록 당시의 시각을 ROS 시간으로 쓴다 [12]. 그래서 재생하는 동안에는 `true`, 실제 센서를 쓸 때는 `false`여야 한다.
+> **핵심:** ROS 노드는 보통 컴퓨터의 현재 시각을 ROS 시간으로 쓴다. 그런데 2015년에 기록한 데이터를 지금 재생하면 메시지의 타임스탬프와 현재 시각이 몇 년씩 어긋나, 시간을 비교하는 노드(좌표 변환 `tf`, 위치 인식)가 데이터를 오래된 것으로 보고 버린다. `/use_sim_time`을 `true`로 하면 노드들은 컴퓨터 시각 대신 재생기가 `/clock` 토픽으로 발행하는 기록 당시의 시각을 ROS 시간으로 쓴다 [14]. 그래서 재생하는 동안에는 `true`, 실제 센서를 쓸 때는 `false`여야 한다.
 
-같은 작업은 명령행 도구로도 할 수 있다 [3].
+같은 작업은 명령행 도구로도 할 수 있다 [4].
 
 ```bash
 rosbag record -O drive.bag /points_raw /image_raw   # 두 토픽을 drive.bag에 기록한다 (Ctrl+C로 끝낸다)
@@ -629,7 +629,7 @@ rosbag play --clock drive.bag                       # 기록 당시의 시각을
 
 ### 3.3 NDT 스캔 매칭의 원리
 
-3D 지도 작성(3.4절)과 위치 인식(3.6절)은 모두 두 포인트 클라우드를 겹치도록 맞추는 **스캔 매칭(scan matching)**, 곧 **정합(registration)** 을 바탕으로 한다. 두 포인트 클라우드를 가장 잘 겹치게 하는 회전과 평행 이동을 찾으면, 그것이 두 포인트 클라우드를 측정한 센서 사이의 상대 위치와 방향이 된다. Autoware는 정합 방법으로 **NDT(normal distributions transform)** 를 쓴다 [13], [14].
+3D 지도 작성(3.4절)과 위치 인식(3.6절)은 모두 두 포인트 클라우드를 겹치도록 맞추는 **스캔 매칭(scan matching)**, 곧 **정합(registration)** 을 바탕으로 한다. 두 포인트 클라우드를 가장 잘 겹치게 하는 회전과 평행 이동을 찾으면, 그것이 두 포인트 클라우드를 측정한 센서 사이의 상대 위치와 방향이 된다. Autoware는 정합 방법으로 **NDT(normal distributions transform)** 를 쓴다 [15], [16].
 
 NDT는 기준 포인트 클라우드(지도)을 같은 크기의 격자 칸(셀)으로 나누고, 각 칸에 들어 있는 점들을 하나의 **정규 분포(normal distribution)** 로 요약한다. 칸 안의 점 $\mathbf{x}_1, \ldots, \mathbf{x}_n$의 평균 $\mathbf{q}$와 공분산 $\Sigma$는 다음과 같다(Biber와 Strasser의 정의를 따라 $n$으로 나눈다).
 
@@ -650,7 +650,7 @@ NDT는 이 점수를 가장 크게 하는 자세 $\mathbf{p}$를 뉴턴 방법 �
 1. 평균은 $\mathbf{q} = \frac{1}{4}(0+2+0+2,\ 0+0+2+2) = (1, 1)$이다.
 2. 평균에서의 편차는 $(-1, -1), (1, -1), (-1, 1), (1, 1)$이다. 각 편차 $\mathbf{d}$의 외적 $\mathbf{d}\mathbf{d}^{\top}$는 차례로 $\begin{pmatrix}1&1\\1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&-1\\-1&1\end{pmatrix}, \begin{pmatrix}1&1\\1&1\end{pmatrix}$이고, 합은 $\begin{pmatrix}4&0\\0&4\end{pmatrix}$이므로 $\Sigma = \frac{1}{4}\begin{pmatrix}4&0\\0&4\end{pmatrix} = I$(단위 행렬)이다.
 3. $\Sigma^{-1} = I$이므로 $p(\mathbf{x}') = \exp(-\lVert\mathbf{x}'-\mathbf{q}\rVert^2/2)$이다. 점 $(1, 1)$은 $\exp(0) = 1$, 점 $(2, 1)$은 $\exp(-1/2) \approx 0.6065$, 점 $(3, 1)$은 $\exp(-2) \approx 0.1353$이다. 평균에서 멀어질수록 값이 빠르게 작아진다.
-4. 이제 센서 좌표로 $(-0.5, 0)$과 $(0.5, 0)$에 있는 두 점으로 이루어진 새 포인트 클라우드를 회전 없이 평행 이동 $\mathbf{t}$만큼 옮겨 맞춘다고 하자.
+4. 이제 센서 좌표로 $(-0.5, 0)$과 $(0.5, 0)$에 있는 두 점으로 이루어진 새 포인트 클라우드를 회전 없이 평행 이동 $\mathbf{t}$만큼 옮겨 맞춘다고 하자. 단순화를 위해 옮긴 점은 칸의 경계와 관계없이 모두 이 칸의 분포로 평가한다고 가정한다.
 
 | 이동 $\mathbf{t}$ | 옮긴 두 점 | 두 점의 값 | 점수 |
 |:-----|:-----|:-----|:-----|
@@ -665,7 +665,7 @@ NDT는 이 점수를 가장 크게 하는 자세 $\mathbf{p}$를 뉴턴 방법 �
 
 > **[확률및통계]** 다변량 정규 분포의 확률 밀도는 $\exp\left(-\frac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^{\top}\Sigma^{-1}(\mathbf{x}-\boldsymbol{\mu})\right)$에 비례한다. 지수 안의 $(\mathbf{x}-\boldsymbol{\mu})^{\top}\Sigma^{-1}(\mathbf{x}-\boldsymbol{\mu})$를 **마할라노비스 거리(Mahalanobis distance)** 의 제곱이라 하며, 분포가 넓게 퍼진 방향으로의 차이는 작게, 좁은 방향으로의 차이는 크게 센다. NDT의 점수는 정규화 상수를 뺀 이 밀도를 모든 점에 대해 더한 것이다.
 
-> **주의:** 칸 안의 점이 너무 적거나 한 직선 위에 늘어서 있으면 공분산 행렬의 역행렬이 없거나 매우 불안정해진다. 그래서 NDT 구현은 점이 일정 개수(Biber와 Strasser는 3개)보다 적은 칸을 쓰지 않거나, 너무 작은 고윳값을 키워 공분산을 보정한다 [13]. 칸의 크기(해상도)는 정확도와 계산량을 함께 정하는 중요한 매개변수이다.
+> **주의:** 칸 안의 점이 너무 적거나 한 직선 위에 늘어서 있으면 공분산 행렬의 역행렬이 없거나 매우 불안정해진다. 그래서 NDT 구현은 점이 일정 개수(Biber와 Strasser는 3개)보다 적은 칸을 쓰지 않거나, 너무 작은 고윳값을 키워 공분산을 보정한다 [15]. 칸의 크기(해상도)는 정확도와 계산량을 함께 정하는 중요한 매개변수이다.
 
 ### 3.4 3D 지도 작성
 
@@ -742,7 +742,7 @@ Velodyne 드라이버는 하나의 관리자 프로세스(`velodyne_nodelet_mana
 
 포인트 클라우드 지도는 위치 인식에는 충분하지만, 어디가 차선이고 어디서 멈추어야 하는지는 담고 있지 않다. **벡터 지도(vector map)** 는 차선, 정지선, 횡단보도, 신호등 같은 도로 요소를 점, 선, 면의 좌표로 표현한 지도이다. Autoware는 벡터 지도의 차선과 정지선 정보로 경로를 만들고 차량 제어 등에 다양하게 쓰므로, 벡터 지도를 쓰는 것을 권장한다.
 
-TIER IV가 제공하는 웹 도구 MapTools의 **VectorMapper**를 쓰면, 포인트 클라우드 지도를 올리고 그 위에 사용자가 원하는 벡터 지도를 일부 만들 수 있다 [15]. VectorMapper는 Autoware가 쓰는 ADAS 지도 형식과 호환되는 벡터 지도를 빠르게 만드는 도구이며, 그 출력은 원래의 ADAS 지도 데이터에 비하면 제한적이다. VectorMapper가 만드는 ADAS 지도 파일은 다음과 같다.
+TIER IV가 제공하는 웹 도구 MapTools의 **VectorMapper**를 쓰면, 포인트 클라우드 지도를 올리고 그 위에 사용자가 원하는 벡터 지도를 일부 만들 수 있다 [17]. VectorMapper는 Autoware가 쓰는 ADAS 지도 형식과 호환되는 벡터 지도를 빠르게 만드는 도구이며, 그 출력은 원래의 ADAS 지도 데이터에 비하면 제한적이다. VectorMapper가 만드는 ADAS 지도 파일은 다음과 같다.
 
 | 파일 | 담는 정보 |
 |:-----|:-----|
@@ -807,7 +807,7 @@ flowchart LR
 | 상황 | 결과와 이유 |
 |:-----|:------------|
 | 실제 도로에서 기록한 백 파일을 재생하는데 `/use_sim_time`을 `false`로 둔다. | **위치 인식이나 좌표 변환이 데이터를 버리거나 경고를 낸다.** 노드들이 현재 컴퓨터 시각을 쓰므로 기록 당시의 타임스탬프가 너무 오래된 것으로 보이기 때문이다. |
-| LiDAR 10 Hz 포인트 클라우드를 30분 동안 기록하려 한다. 포인트 클라우드 하나가 약 1.65 MB이다. | **약 30 GB가 필요하다.** $10 \times 60 \times 30 = 18000$개의 포인트 클라우드에 1.65 MB를 곱하면 약 29.7 GB이다. |
+| LiDAR 10 Hz 포인트 클라우드를 30분 동안 기록하려 한다. 포인트 클라우드 하나가 약 1.77 MB이다. | **약 32 GB가 필요하다.** $10 \times 60 \times 30 = 18000$개의 포인트 클라우드에 1.77 MB를 곱하면 약 31.9 GB($3.19 \times 10^{10}$바이트)이다. |
 | 카메라를 USB 카메라에서 Point Grey 카메라로 바꾼다. | **검출 노드는 고칠 필요가 없다.** 두 드라이버 모두 같은 토픽 `image_raw`에 같은 메시지 형식으로 발행하기 때문이다. |
 | `ray_ground_filter` 없이 `velocity_set`이 원시 포인트 클라우드를 장애물 판단에 쓴다. | **차량이 출발하지 못하거나 자주 멈출 수 있다.** 높이 범위로 걸러지지 않는 도로면의 점(경사로, 차체의 기울어짐, 낮게 잡은 높이 범위)이 장애물로 잡힐 수 있기 때문이다(3주차 5.3절). |
 | `CMakeLists.txt`의 `target_link_libraries`에 `add_executable`과 다른 대상 이름을 적는다. | **CMake 설정 단계에서 오류가 난다.** 존재하지 않는 대상에 라이브러리를 링크하려 하기 때문이다. |
@@ -874,7 +874,7 @@ flowchart LR
    <details>
    <summary>정답</summary>
 
-   `/points_raw`는 $1200 / 120 = 10$ Hz, `/imu_raw`는 $12000 / 120 = 100$ Hz이다. 파일 크기를 포인트 클라우드가 거의 모두 차지하므로 포인트 클라우드 하나는 $2.0 \times 10^9 / 1200 \approx 1.67 \times 10^6$바이트, 곧 약 1.67 MB이다.
+   `/points_raw`는 $1200 / 120 = 10$ Hz, `/imu_raw`는 $12000 / 120 = 100$ Hz이다. `rosbag info`의 2.0 GB는 $2.0 \times 1024^3 \approx 2.15 \times 10^9$바이트이고, 파일 크기를 포인트 클라우드가 거의 모두 차지하므로 포인트 클라우드 하나는 $2.15 \times 10^9 / 1200 \approx 1.79 \times 10^6$바이트, 곧 약 1.79 MB이다.
 
    </details>
 
@@ -966,17 +966,19 @@ flowchart LR
 ## 참고 문헌
 
 1. S. Kato, E. Takeuchi, Y. Ishiguro, Y. Ninomiya, K. Takeda, and T. Hamada, "An open approach to autonomous vehicles," *IEEE Micro*, vol. 35, no. 6, pp. 60-68, 2015.
-2. Autoware Foundation, "Autoware." https://www.autoware.org
-3. ROS Wiki, "rosbag." https://wiki.ros.org/rosbag
-4. Autoware Foundation, "Autoware.ai." https://github.com/autowarefoundation/autoware_ai
-5. P. F. Felzenszwalb, R. B. Girshick, D. McAllester, and D. Ramanan, "Object detection with discriminatively trained part-based models," *IEEE Trans. Pattern Anal. Mach. Intell.*, vol. 32, no. 9, pp. 1627-1645, 2010.
-6. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Institute, Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
-7. ROS Wiki, "catkin/package.xml." https://wiki.ros.org/catkin/package.xml
-8. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
-9. ROS Enhancement Proposals, "REP 3: Target Platforms." https://www.ros.org/reps/rep-0003.html
-10. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
-11. Autoware Foundation, "Source Build," Autoware.ai documentation. https://github.com/autowarefoundation/autoware_ai_documentation/wiki/Source-Build
-12. ROS Wiki, "Clock." https://wiki.ros.org/Clock
-13. P. Biber and W. Strasser, "The normal distributions transform: A new approach to laser scan matching," in *Proc. IEEE/RSJ Int. Conf. Intelligent Robots and Systems (IROS)*, 2003, pp. 2743-2748.
-14. M. Magnusson, "The three-dimensional normal-distributions transform: An efficient representation for registration, surface analysis, and loop detection," Ph.D. dissertation, Örebro Univ., Örebro, Sweden, 2009.
-15. TIER IV, "MapTools." https://tools.tier4.jp
+2. Apex.AI, "Announcing the Autoware Foundation," Dec. 9, 2018. https://www.apex.ai/post/announcing-the-autoware-foundation
+3. Autoware Foundation, "Autoware." https://www.autoware.org
+4. ROS Wiki, "rosbag." https://wiki.ros.org/rosbag
+5. Autoware Foundation, "Autoware.ai." https://github.com/autowarefoundation/autoware_ai
+6. ROS, "tools/rosbag/src/rosbag/bag.py," ros_comm repository (melodic-devel branch), GitHub. https://github.com/ros/ros_comm/blob/melodic-devel/tools/rosbag/src/rosbag/bag.py
+7. P. F. Felzenszwalb, R. B. Girshick, D. McAllester, and D. Ramanan, "Object detection with discriminatively trained part-based models," *IEEE Trans. Pattern Anal. Mach. Intell.*, vol. 32, no. 9, pp. 1627-1645, 2010.
+8. R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," Robotics Institute, Carnegie Mellon Univ., Pittsburgh, PA, USA, Tech. Rep. CMU-RI-TR-92-01, 1992.
+9. ROS Wiki, "catkin/package.xml." https://wiki.ros.org/catkin/package.xml
+10. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
+11. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
+12. ROS Enhancement Proposals, "REP 3: Target Platforms." https://www.ros.org/reps/rep-0003.html
+13. Autoware Foundation, "ROSBAG Demo," Autoware.ai documentation. https://github.com/autowarefoundation/autoware_ai_documentation/wiki/ROSBAG-Demo
+14. ROS Wiki, "Clock." https://wiki.ros.org/Clock
+15. P. Biber and W. Strasser, "The normal distributions transform: A new approach to laser scan matching," in *Proc. IEEE/RSJ Int. Conf. Intelligent Robots and Systems (IROS)*, 2003, pp. 2743-2748.
+16. M. Magnusson, "The three-dimensional normal-distributions transform: An efficient representation for registration, surface analysis, and loop detection," Ph.D. dissertation, Örebro Univ., Örebro, Sweden, 2009.
+17. TIER IV, "MapTools." https://tools.tier4.jp

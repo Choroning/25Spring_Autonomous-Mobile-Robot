@@ -162,7 +162,7 @@ topics:      /nmea_sentence   11980 msgs    : nmea_msgs/Sentence
 
 This information tells us the nature of the data.
 
-- **Recording time:** The data was recorded for 479 seconds (7 minutes 59 seconds) on March 24, 2015. The number in parentheses is the time in seconds counted from 1970-01-01 00:00 (UTC) (Unix time), and the date before it expresses that time in Japan Standard Time (UTC+9).
+- **Recording time:** The data was recorded for 479 seconds (7 minutes 59 seconds) on March 24, 2015. The number in parentheses is the time in seconds counted from 1970-01-01 00:00 (UTC) (Unix time), and the date and time before it express that time in the time zone of the computer that printed the bag information. The output above uses UTC+9, so in Coordinated Universal Time the recording ran from 00:40:50 to 00:48:49; Japan, where the data was recorded, also uses UTC+9, so the data was recorded from 9:40 to 9:48 in the morning local time.
 - **Topics:** There are only two, the NMEA sentences of the GNSS receiver `/nmea_sentence` and the LiDAR point clouds `/points_raw`. The message counts add up to 11980 + 4788 = 16768, the total number of messages.
 - **LiDAR rate:** Since 4788 / 479 ≈ 10.0, the LiDAR produces about 10 scans per second.
 - **Size of one scan:** Dividing 7.9 GB by 4788 scans gives about 1.65 MB per scan. NMEA sentences are short text, so almost all of the bag consists of LiDAR data. Processing such large data at every scan requires downsampling to reduce the number of points (Section 4.5).
@@ -191,7 +191,7 @@ autoware.ai/src/autoware/documentation/autoware_quickstart_examples/launch/rosba
 | Button | Launch file | Function launched |
 |:-----|:-----|:-----|
 | Map | `my_map.launch` | Loads the point cloud map, the vector map, and the TF of the map frames |
-| Sensing | `my_sensing.launch` | Runs sensor drivers and nodes that process sensor data |
+| Sensing | `my_sensing.launch` | Runs the driver nodes of the LiDAR (Velodyne HDL-32E) |
 | Localization | `my_localization.launch` | Sets the TF between the vehicle and the LiDAR and runs nodes that compute the vehicle position (NDT matching and so on) |
 | Detection | `my_detection.launch` | Runs nodes that detect surrounding objects |
 | Mission Planning | `my_mission_planning.launch` | Runs nodes that build the global route to the destination from waypoints and lane information (lane_navi, lane_rule, lane_stop, and so on) |
@@ -217,7 +217,7 @@ Both map building and localization are computations that move point clouds aroun
 
 ### 2.1 Representing Point Clouds
 
-A point cloud is a set of points $P = \{\mathbf{p}_1, \dots, \mathbf{p}_N\}$ with $\mathbf{p}_i = (x_i, y_i, z_i)$. A LiDAR point may carry values besides its coordinates, such as the strength of the returned laser (intensity) or the index of the laser that measured it (ring). The order of the points has no meaning, so a point cloud is mathematically an unordered set. The open-source **PCL (Point Cloud Library)** is a C++ library that collects algorithms for storing, filtering, and registering point clouds, and map building and localization in Autoware are based on PCL [1].
+A point cloud is a set of points $P = \lbrace\mathbf{p}_1, \dots, \mathbf{p}_N\rbrace$ with $\mathbf{p}_i = (x_i, y_i, z_i)$. A LiDAR point may carry values besides its coordinates, such as the strength of the returned laser (intensity) or the index of the laser that measured it (ring). The order of the points has no meaning, so a point cloud is mathematically an unordered set. The open-source **PCL (Point Cloud Library)** is a C++ library that collects algorithms for storing, filtering, and registering point clouds, and map building and localization in Autoware are based on PCL [1].
 
 In ROS, point clouds are exchanged as `sensor_msgs/PointCloud2` messages [2]. The message packs all points into a single byte array and separately describes which value sits at which position within the bytes of each point.
 
@@ -387,7 +387,7 @@ Recording receives the topics published by the sensor drivers and stores them in
 
 If split is enabled in the ROSBAG Record window and a size in MB is entered in size, recording continues into a new file every time a file reaches that size. As seen in Section 1.4, LiDAR data quickly grows to several GB, so this is useful for recording long drives.
 
-A recorded file is played back in the Simulation tab. Choosing the bag file with the Ref button and pressing Play starts playback, and `/use_sim_time` becomes `true` automatically. Pause stops or resumes playback, and Stop ends playback and sets `/use_sim_time` back to `false`.
+A recorded file is played back in the Simulation tab. Choosing the bag file with the Ref button and pressing Play starts playback, and `/use_sim_time` becomes `true` automatically. Pause stops or resumes playback, and Stop ends playback and sets `/use_sim_time` back to `false`. The bag information also shows what was recorded. For example, if a 256-second bag (10.2 GB) recorded with a camera and a LiDAR contains 3844 `/image_raw` and 2561 `/velodyne_points` messages, the camera was recorded at about 15 Hz (3844 / 256 ≈ 15.0) and the LiDAR at about 10 Hz (2561 / 256 ≈ 10.0).
 
 ### 3.3 Building a Map by Scan Matching
 
@@ -401,7 +401,7 @@ In each rotation, a LiDAR measures only the shape of its surroundings within a f
 
 $$
 T_k = \arg\min_{T} \; E(T; \, S_k, M_{k-1}), \qquad
-M_k = M_{k-1} \cup \{ \, T_k \mathbf{s} \mid \mathbf{s} \in S_k \, \}
+M_k = M_{k-1} \cup \lbrace \, T_k \mathbf{s} \mid \mathbf{s} \in S_k \, \rbrace
 $$
 
 Here $S_k$ is the $k$-th scan (in the LiDAR frame), $M_{k-1}$ is the map built so far (in the map frame), $E$ is a cost function measuring how far the scan moved by a transformation $T$ deviates from the map, and $T_k = T^{\text{map}}_{\text{lidar}}$ is the LiDAR pose when the $k$-th scan was measured. In NDT, $E$ is the score of Week 3, Section 2.4 with a negative sign [5]. The first scan $S_0$ has no map to compare with and becomes the map as it is, so the origin of the map frame is the vehicle position at the moment map building starts.
@@ -434,10 +434,10 @@ Week 3, Sections 2.3-2.4 derived the NDT score, gradient, and Hessian in the pla
 The parameters of a 3D transformation collect three translations and three rotation angles, $\mathbf{p} = (t_x, t_y, t_z, \phi, \theta, \psi)$. A scan point $\mathbf{x}$ is moved by $T(\mathbf{p}, \mathbf{x}) = R(\phi, \theta, \psi)\mathbf{x} + \mathbf{t}$, and if the map cell containing the moved point has mean $\boldsymbol{\mu}$ and covariance $\Sigma$, then $\mathbf{q} = T(\mathbf{p}, \mathbf{x}) - \boldsymbol{\mu}$. When minimizing the 3D score function of Week 3, Section 2.5, the gradient components for one point follow from the chain rule.
 
 $$
-g_i = d_1 d_2 \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \exp\left( -\frac{d_2}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q} \right), \qquad i = 1, \dots, 6
+g_i = -d_1 d_2 \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \exp\left( -\frac{d_2}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q} \right), \qquad i = 1, \dots, 6
 $$
 
-The form of the equation is the same as in 2D; what changes is the $3 \times 6$ matrix obtained by differentiating $\mathbf{q}$ with respect to the parameters, the **Jacobian** $J = \partial \mathbf{q} / \partial \mathbf{p}$. The derivative with respect to translation is the identity matrix $I_3$. The derivative with respect to rotation is long at general angles, but if a small rotation increment near the current estimate is taken as the parameter, it follows simply from the approximation $R \approx I + [\boldsymbol{\omega}]_{\times}$ of Section 2.2. Here $\boldsymbol{\omega} = (\phi, \theta, \psi)$, and $[\boldsymbol{\omega}]_{\times}$ is the skew-symmetric matrix that expresses the cross product $\boldsymbol{\omega} \times \mathbf{x}$ as a matrix product.
+Since $d_1 < 0$, the coefficient $-d_1 d_2$ is positive, and setting $d_1 = -1$, $d_2 = 1$ gives the same expression as the 2D gradient of Week 3, Section 2.4. The form of the equation is the same as in 2D; what changes is the $3 \times 6$ matrix obtained by differentiating $\mathbf{q}$ with respect to the parameters, the **Jacobian** $J = \partial \mathbf{q} / \partial \mathbf{p}$. The derivative with respect to translation is the identity matrix $I_3$. The derivative with respect to rotation is long at general angles, but if a small rotation increment near the current estimate is taken as the parameter, it follows simply from the approximation $R \approx I + [\boldsymbol{\omega}]_{\times}$ of Section 2.2. Here $\boldsymbol{\omega} = (\phi, \theta, \psi)$, and $[\boldsymbol{\omega}]_{\times}$ is the skew-symmetric matrix that expresses the cross product $\boldsymbol{\omega} \times \mathbf{x}$ as a matrix product.
 
 $$
 R\mathbf{x} \approx \mathbf{x} + \boldsymbol{\omega} \times \mathbf{x} = \mathbf{x} - \mathbf{x} \times \boldsymbol{\omega}
@@ -549,7 +549,7 @@ The left of Figure 13 is the Sensing tab. Velodyne HDL-32E is checked in the LID
 
 The left side of the Computing tab holds the localization nodes. `gnss_localizer` contains `fix2tfpose` and `nmea2tfpose`, which obtain positions from GNSS; `lidar_localizer` contains `ndt_mapping`, `approximate_ndt_mapping`, `ndt_matching`, `ndt_matching_monitor`, and `icp_matching`; below them are `ekf_localizer`, which fuses several sensors, `twist_generator`, which converts vehicle speed, `autoware_connector`, and others. The right side holds the path planning nodes, covered in Week 10.
 
-When `ndt_mapping` runs, it prints information like the following to the terminal for every scan.
+When `ndt_mapping` runs, it prints information like the following to the terminal for every scan. The last line is printed by the `queue_counter` node, which runs alongside it.
 
 ```text
 Sequence number: 86688
@@ -585,7 +585,7 @@ shift: 0.0316652
 | (x, y, z, roll, pitch, yaw) | See the interpretation below | Pose of the vehicle reference point in the map frame (m, rad) |
 | Transformation Matrix | See the interpretation below | LiDAR pose $T^{\text{map}}_{\text{lidar}}$ obtained by registration |
 | shift | 0.0316652 | Horizontal distance moved since a scan was last added (m) |
-| (Processed/Input) | (55 / 55) | All 55 received scans have been processed |
+| (Processed/Input) | (55 / 55) | Counts kept by `queue_counter` of processed scans (number of `/ndt_map` messages) and received scans (`/points_raw`). All 55 received scans have been processed |
 
 *Table 7. Interpretation of the ndt_mapping output*
 
@@ -607,7 +607,7 @@ That is, NDT registration finds the LiDAR pose, and what is printed and publishe
 
 ### 3.8 Node Configuration and Saving the Map
 
-To build a map of a wide area, `approximate_ndt_mapping` can be used instead of `ndt_mapping`. This node builds the map as submaps of fixed size and saves them to files one after another, so the registration target and memory do not grow without bound as the map grows. The node configuration seen in rqt_graph when it runs was covered in Week 2, Section 3.4. In short, the nodelets of the Velodyne driver publish `/points_raw` via `/velodyne_packets`; `approximate_ndt_mapping` receives `/points_raw` and the settings `/config/approximate_ndt_mapping` sent by the Runtime Manager and publishes `/ndt_map`; and `queue_counter` counts the messages waiting to be processed to show whether map building keeps up with the input.
+To build a map of a wide area, `approximate_ndt_mapping` can be used instead of `ndt_mapping`. This node builds the map as submaps of fixed size and saves them to files one after another, so the registration target and memory do not grow without bound as the map grows. The node configuration seen in rqt_graph when it runs was covered in Week 2, Section 3.4. In short, the nodelets of the Velodyne driver publish `/points_raw` via `/velodyne_packets`; `approximate_ndt_mapping` receives `/points_raw` and the settings `/config/approximate_ndt_mapping` sent by the Runtime Manager and publishes `/ndt_map`; and `queue_counter` counts the received `/points_raw` and published `/ndt_map` messages to show whether map building keeps up with the input ((Processed/Input) in Section 3.7).
 
 When the bag finishes playing, save the map with the PCD OUTPUT button of Section 3.6 and, as the last step, check the generated file. Specifying the saved PCD file under Point Cloud in the Map tab and loading it shows the map in RViz, and it can also be opened directly with tools such as `pcl_viewer` of PCL. Choosing Filter Resolution 0.2 when saving merges the points that fall in the same 0.2 m cube into their single centroid, so the file becomes much smaller while keeping the shape needed for localization.
 
@@ -846,7 +846,7 @@ When localization is working, the scan points overlap the building walls and roa
 
 **True/False Check:**
 
-| Statement | Judgment and rationale |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | In NDT mapping, the origin of the map frame is the vehicle reference point at the moment map building starts. | **T.** The first scan is moved by $T^{\text{base}}_{\text{lidar}}$ and taken as the map as it is. |
 | ndt_mapping adds the downsampled scan to the map. | **F.** The downsampled scan is used only for registration; the map receives the moved scan that has passed only the range filter. |

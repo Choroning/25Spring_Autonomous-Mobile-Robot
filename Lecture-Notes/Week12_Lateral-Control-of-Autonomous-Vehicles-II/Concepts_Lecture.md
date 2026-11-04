@@ -57,7 +57,7 @@
 
 The dynamic bicycle model of Week 11 explained lateral motion through the lateral forces and slip angles of the tires. The **kinematic model** of this section describes the motion of the vehicle from geometric relations alone, without considering forces. Its key assumption is that the velocities at the front and rear wheel positions point in the directions the wheels face, that is, **the tire slip angles of both wheels are zero** [1].
 
-This assumption fits well at low speed. To drive around a circle of radius $R$ at speed $V$, the two wheels together must produce the centripetal force $mV^2/R$, and since this force is proportional to the square of the speed, it is small at low speed. When the lateral force is small, the required slip angle is also small and can be regarded as zero. For example, when a vehicle with $m = 2000$ kg drives around a circle of radius 20 m, the required lateral force is $2000 \times 25 / 20 = 2500$ N at $V = 5$ m/s, but 40000 N at $V = 20$ m/s, 16 times larger. If the sum of the cornering stiffnesses of the two axles is about 140000 N/rad, the required slip angle is roughly 0.018 rad (1.0°) and 0.29 rad (16°); the former is negligible, but the latter exceeds even the range of the linear tire model. The kinematic model is useful at low speeds of about 5 m/s (18 km/h) or less [1].
+This assumption fits well at low speed. To drive around a circle of radius $R$ at speed $V$, the two wheels together must produce the centripetal force $mV^2/R$, and since this force is proportional to the square of the speed, it is small at low speed. When the lateral force is small, the required slip angle is also small and can be regarded as zero. For example, when a vehicle with $m = 2000$ kg drives around a circle of radius 20 m, the required lateral force is $2000 \times 25 / 20 = 2500$ N at $V = 5$ m/s, but 40000 N at $V = 20$ m/s, 16 times larger. If the sum of the cornering stiffnesses of the two axles is about 140000 N/rad, the required slip angle is roughly 0.018 rad (1.0°) and 0.29 rad (16°); the former is negligible, but the latter exceeds even the range of the linear tire model. The kinematic model is suitable for low speeds of about 5 m/s (18 km/h) or less [1].
 
 ### 1.2 Geometry and the Law of Sines
 
@@ -181,7 +181,7 @@ Because the bicycle model combines the left and right wheels into one [1], it ca
 
 *Figure 2. Turning with the vehicle width considered: steering angles of the outer and inner front wheels and the center of rotation O*
 
-In Figure 2, $L$ is the wheelbase, $l_w$ is the distance between the left and right wheels (the **track width**), and $R$ is the turning radius. For all four wheels to roll without slipping, the lines perpendicular to the velocities at the four wheels must meet at a single point O. Since O lies on the extension of the rear axle, the inner wheel is closer to O than the outer wheel and must be turned more.
+In Figure 2, $L$ is the wheelbase, $l_w$ is the distance between the left and right wheels (the **track width**), and $R$ is the turning radius. For all four wheels to roll without slipping, the lines perpendicular to the velocities at the four wheels must meet at a single point O. When the rear wheels are not steered, O lies on the extension of the rear axle, so the inner wheel is closer to O than the outer wheel and must be turned more.
 
 In the bicycle model with small slip and $\delta_r = 0$, $\cos\beta \approx 1$ and $\tan\delta_f \approx \delta_f$, so the following two equations hold.
 
@@ -244,7 +244,7 @@ The lateral controller of Section 1.5 in Week 11 uses an estimated sideslip angl
 
 *Table 3. State matrix entries and eigenvalues of the dynamic model computed with the estimated parameters*
 
-As the speed decreases, the magnitudes of the entries and eigenvalues grow rapidly. A large eigenvalue magnitude means a very short time constant, so when the observer is implemented in discrete time, the sampling period cannot keep up. For example, Euler integration at 100 Hz ($\Delta t = 0.01$ s) is stable only when $-2 < \lambda\Delta t < 0$, but at 1 km/h $\lambda\Delta t = -4.66$, outside this range, so the computation diverges. Also, because of $1/V$, small measurement errors in the yaw rate turn into large sideslip angle errors. Right after switching to the dynamic model, time is also needed for the estimate of the observer to converge to the true value.
+As the speed decreases, the magnitudes of the entries and eigenvalues grow rapidly. A large eigenvalue magnitude means a very short time constant, so when the observer is implemented in discrete time, the sampling period cannot keep up. For example, Euler integration at 100 Hz ($\Delta t = 0.01$ s) is stable only when $-2 < \lambda\Delta t < 0$, but at 1 km/h $\lambda\Delta t = -4.66$, outside this range, so the computation diverges. Also, as $V \to 0$ the $1/V$ and $1/V^2$ terms grow without bound and the model itself becomes undefined, so the dynamic model cannot be used near a standstill. Right after switching to the dynamic model, time is also needed for the estimate of the observer to converge to the true value.
 
 **Hysteresis.** If the two models are switched at a single threshold speed (for example, 12.5 km/h), the model keeps switching when the vehicle speed moves up and down around that speed (chattering). Because the estimate fluctuates at every switch, a **hysteresis** property is given by using different thresholds for rising and falling speeds.
 
@@ -304,7 +304,7 @@ $I_{zz}$ is the yaw moment of inertia $I$ of Week 11. The output matrix $C = [0 
 
 The eigenvalues are $-9.59 \pm 3.51j$ with negative real parts, so without a steering input $\beta$ and $r$ decay to 0 while oscillating (stable).
 
-> **[Linear Algebra]** The solution of a linear system $\dot{\mathbf{x}} = A\mathbf{x}$ consists of components of the form $e^{\lambda t}$, one for each eigenvalue $\lambda$ of $A$. If all eigenvalues have negative real parts, the solution converges to 0 (stable), and if they have imaginary parts, it oscillates. The eigenvalues of a $2 \times 2$ matrix are the roots of the characteristic equation $\lambda^2 - (a_{11} + a_{22})\lambda + (a_{11}a_{22} - a_{12}a_{21}) = 0$.
+> **[Linear Algebra]** If $A$ is diagonalizable, the solution of a linear system $\dot{\mathbf{x}} = A\mathbf{x}$ consists of components of the form $e^{\lambda t}$, one for each eigenvalue $\lambda$ of $A$ (if a repeated eigenvalue prevents diagonalization, terms such as $te^{\lambda t}$ are added). If all eigenvalues have negative real parts, the solution converges to 0 (stable), and if they have imaginary parts, it oscillates. The eigenvalues of a $2 \times 2$ matrix are the roots of the characteristic equation $\lambda^2 - (a_{11} + a_{22})\lambda + (a_{11}a_{22} - a_{12}a_{21}) = 0$.
 
 ### 2.3 Path Tracking Error Model
 
@@ -375,7 +375,7 @@ flowchart LR
 
 The Inner-loop in Figure 6 is the sub-system for the lateral offset; it computes the desired yaw rate and passes it to the Outer-loop. The Outer-loop is the sub-system for the yaw rate; it computes the steering angle and controls the vehicle directly. In the block diagram of Figure 8 in Week 11, the "desired yaw rate computation" block corresponds to the Inner-loop and the "control input" block to the Outer-loop.
 
-> **Note:** In general cascade control terminology, the fast loop close to the actuator (here the yaw rate loop) is called the inner loop and the slow position loop the outer loop. The names in this design call the step designed first in backstepping the Inner-loop, so when reading other references, distinguish the loops by what each one takes in and puts out rather than by their names.
+> **Note:** In general cascade control terminology, the fast loop close to the actuator (here the yaw rate loop) is called the inner loop and the slow position loop the outer loop. This design does the opposite, calling the lateral offset loop the Inner-loop and the yaw rate loop the Outer-loop, so when reading other references, distinguish the loops by what each one takes in and puts out rather than by their names.
 
 ### 2.5 Step 1: The Desired Yaw Rate
 
@@ -395,15 +395,15 @@ $$
 
 Now drive $e_r$ to 0 with the actual input $\delta$. The rate of change of $e_r$ is $\dot e_r = \dot r - \dot r_d$.
 
-**Step 1: compute $\dot r_d$.** Differentiating the formula for $r_d$ gives $\dot r_d = -\frac{1}{L_s}\left[V(\dot\beta + \Delta\dot\psi) + K_d \dot d_s\right]$ ($V$ is constant).
+**(1) Compute $\dot r_d$.** Differentiating the formula for $r_d$ gives $\dot r_d = -\frac{1}{L_s}\left[V(\dot\beta + \Delta\dot\psi) + K_d \dot d_s\right]$ ($V$ is constant).
 
-**Step 2: substitute.** Insert the fourth-order model of Section 2.3 for $\dot r$, $\dot\beta$, $\Delta\dot\psi$, and $\dot d_s$.
+**(2) Substitute.** Insert the fourth-order model of Section 2.3 for $\dot r$, $\dot\beta$, $\Delta\dot\psi$, and $\dot d_s$.
 
 $$
 \dot e_r = (a_{21}\beta + a_{22} r + b_{21}\delta) + \frac{V}{L_s}\left(a_{11}\beta + a_{12} r + b_{11}\delta + r - V\rho\right) + \frac{K_d}{L_s}\left(V\beta + V\Delta\psi + L_s r\right)
 $$
 
-**Step 3: rearrange.** Collecting the terms of each variable gives the following.
+**(3) Rearrange.** Collecting the terms of each variable gives the following.
 
 $$
 \dot e_r = f(\beta, r, \Delta\psi, \rho) + b_\delta\,\delta, \qquad f \equiv h_\beta\beta + h_r r + h_\psi\Delta\psi - h_\rho\rho
@@ -413,7 +413,7 @@ $$
 b_\delta = b_{21} + \frac{V b_{11}}{L_s}, \quad h_\beta = \frac{V a_{11} + V K_d + L_s a_{21}}{L_s}, \quad h_r = \frac{V a_{12} + V + K_d L_s + L_s a_{22}}{L_s}, \quad h_\psi = \frac{K_d V}{L_s}, \quad h_\rho = \frac{V^2}{L_s}
 $$
 
-**Step 4: choose the steering angle with a Lyapunov function.** Take the function $\mathcal{V} = \frac{1}{2}W_d d_s^2 + \frac{1}{2}W_r e_r^2$ ($W_d, W_r > 0$ are weights) that measures the size of the two errors, and compute its rate of change.
+**(4) Choose the steering angle with a Lyapunov function.** Take the function $\mathcal{V} = \frac{1}{2}W_d d_s^2 + \frac{1}{2}W_r e_r^2$ ($W_d, W_r > 0$ are weights) that measures the size of the two errors, and compute its rate of change.
 
 $$
 \dot{\mathcal{V}} = W_d d_s\dot d_s + W_r e_r\dot e_r = -W_d K_d d_s^2 + W_d L_s d_s e_r + W_r e_r\left(f + b_\delta\delta\right)
@@ -431,9 +431,9 @@ $$
 
 $\mathcal{V}$ is 0 only when the errors are 0, positive elsewhere, and keeps decreasing, so if the model is exact, both $d_s$ and $e_r$ converge to 0. The three terms of the steering formula are, in order, a feedforward that cancels the known vehicle and road dynamics (including the curvature term $h_\rho\rho$), a term that cancels the cross term, and a feedback that reduces the yaw rate error. This formula can be used only when $b_\delta \neq 0$, that is, when the steering affects $\dot e_r$.
 
-> **Note:** A **Lyapunov function** is a function that is 0 only when the state is at the equilibrium, positive elsewhere, and decreases as time passes along the system. If such a function exists, it can be shown that the state goes to the equilibrium without solving for the solution directly. Backstepping is a method that adds a term to this function at each step and chooses the control input so that its rate of change is negative [2].
+> **Definition:** A **Lyapunov function** is a function that is 0 only when the state is at the equilibrium, positive elsewhere, and decreases as time passes along the system. If such a function exists, it can be shown that the state goes to the equilibrium without solving for the solution directly. Backstepping is a method that adds a term to this function at each step and chooses the control input so that its rate of change is negative [2].
 
-Mapping this result onto the block diagram of Figure 8 in Week 11, the "desired yaw rate computation" block computes the formula for $r_d$, and the "control input" block computes the formula for $\delta$. The estimated sideslip angle and the estimated yaw rate come from the observer of Section 2.8, and $d_s$, $\Delta\psi$, $\rho$ come from DGPS.
+Mapping this result onto the block diagram of Figure 8 in Week 11, the "desired yaw rate computation" block computes the formula for $r_d$, and the "control input" block computes the formula for $\delta$. The estimated sideslip angle and the estimated yaw rate come from the observer of Section 2.8, and $d_s$, $\Delta\psi$, $\rho$ come from DGPS. The observer takes the yaw rate, vehicle speed, and steering wheel angle measured by the in-vehicle sensors as inputs, and the steering wheel angle command computed by the control input block moves the vehicle through the steering actuator.
 
 ### 2.7 Numerical Example
 
@@ -492,7 +492,7 @@ Simulating the case where the true state is $\beta(0) = 0$, the observer starts 
 
 *Figure 7. Results of the state observer: yaw rate and sideslip angle in simulation (left) and a real vehicle test (right)*
 
-The left side of Figure 7 shows simulation results in which the reference input (blue) and the observer output (red dashed) almost coincide. The RMS errors are 0.0016939°/s for the yaw rate and 0.024147° for the sideslip angle. The right side shows real vehicle test results in which the measured yaw rate (blue) and the estimated yaw rate (red dashed) agree well over 350 seconds, and the lower graph is the sideslip angle estimated during the same drive. The sideslip angle becomes large in sections of sharp turning (around 75 s and 200 s).
+The left side of Figure 7 shows simulation results in which the reference input (blue) and the observer output (red dashed) almost coincide. The RMS errors are 0.0016939°/s for the yaw rate and 0.024147° for the sideslip angle. The right side shows real vehicle test results in which the measured yaw rate (blue) and the estimated yaw rate (red dashed) agree well over 350 seconds, and the lower graph is the sideslip angle estimated during the same drive. The sideslip angle becomes large in sections of sharp turning (around 75-90 s and 200 s).
 
 ### 2.9 Real Vehicle Test Results
 
@@ -500,7 +500,7 @@ The left side of Figure 7 shows simulation results in which the reference input 
 
 *Figure 8. Real vehicle test of the lateral controller: driving path (minimum radius 12 m), lateral distance error, steering angle, and heading angle error*
 
-Figure 8 shows the result of one lap of a test track with a minimum turning radius of 12 m. The reference path (black) and the driving trajectory (red) at the upper left almost coincide. The lateral distance error stays mostly within ±0.2 m but grows to around 1 m at the moments of entering sharp curves (around 75 s and 200 s). The steering angle graph shows the steering wheel angle; the command (blue) and the actual value (red dashed) agree well, and the heading angle error also spikes only in sharp curves.
+Figure 8 shows the result of one lap of a test track with a minimum turning radius of 12 m. The reference path (black) and the driving trajectory (red) at the upper left almost coincide. The lateral distance error stays mostly within ±0.2 m but grows to as much as about 1.2 m at the moments of entering sharp curves (around 75-90 s and 200 s). The steering angle graph shows the steering wheel angle; the command (blue) and the actual value (red dashed) agree well, and the heading angle error also spikes only in sharp curves.
 
 ![Figure 9. Speed, lateral offset, and relative heading angle when driving at 40 km/h and 80 km/h on a straight road](../../images/Week12_12-2_p10.png)
 
@@ -517,7 +517,7 @@ Figure 9 shows the tracking errors measured with RTK GPS on a straight road. The
 
 *Table 7. Targets and results of lateral control performance on a straight road*
 
-Both speeds meet the targets. At higher speed the maximum lateral distance error increases, but the heading angle error actually decreases. This is because at high speed a smaller heading angle is needed for the same lateral movement.
+Both speeds meet the targets. At higher speed the maximum lateral distance error increases, but the heading angle error actually decreases. This agrees with the fact that the velocity component perpendicular to the path is about $V\Delta\psi$, so the relative heading angle needed to return to the path at a given lateral speed is smaller at higher speed.
 
 ---
 
@@ -535,6 +535,7 @@ Testing path planning and path following nodes without a real vehicle requires a
 | IDEAL_STEER | Speed $v$ and steering angle $\delta$ | $\dot X = v\cos\psi$, $\dot Y = v\sin\psi$, $\dot\psi = v\tan\delta / L$ |
 | DELAY_TWIST | Speed and angular velocity | IDEAL_TWIST with the commands applied through a time delay and a first-order lag |
 | DELAY_STEER | Speed and steering angle | IDEAL_STEER with the commands applied through a time delay and a first-order lag |
+| CONST_ACCEL_TWIST | Speed and angular velocity | IDEAL_TWIST in which the speed and angular velocity follow the commands at a constant acceleration and angular acceleration |
 
 *Table 8. Vehicle models of the wf_simulator*
 
@@ -564,11 +565,11 @@ flowchart LR
 
 The `/current_pose` and `/current_velocity` published by the wf_simulator go not only to pure_pursuit but also to lane_select, astar_avoid, and velocity_set, closing the loop. Although simplified in the figure, lane_rule also publishes `/traffic_waypoints_array`, and lane_stop chooses between the waypoints for a red light and those for a green light according to the traffic light state and publishes them on the same topic.
 
-![Figure 11. Example of a wf_simulator simulation: a vehicle following a path in RViz](../../images/Week12_12-2_p12.png)
+![Figure 11. Example of a wf_simulator simulation: the path and the obstacle detection range shown in RViz](../../images/Week12_12-2_p12.png)
 
-*Figure 11. Example of a wf_simulator simulation: a vehicle following a path in RViz*
+*Figure 11. Example of a wf_simulator simulation: the path and the obstacle detection range shown in RViz*
 
-Figure 11 shows the simulation running. A yellow waypoint path is drawn over the lanes and crosswalks of the vector map, and the vehicle, surrounded by a green circle (the obstacle detection range), turns through the intersection and follows the path. The number 40.0 is the target speed of the waypoints (km/h). Sections 3.3-3.8 below give the procedure for obtaining this result.
+Figure 11 shows the simulation running. A yellow waypoint path runs over the lanes and crosswalks of the vector map and turns through the intersection, and the green circles overlapping along the front part of the path are the Detection Range display, that is, the range in which velocity_set looks for obstacles. The number 40.0 beside the path is the target speed of the waypoints (km/h). Sections 3.3-3.8 below give the procedure for obtaining this result.
 
 ### 3.3 Loading the TF and the Maps
 
@@ -596,7 +597,7 @@ The values in Figure 12 are $x = 1.2$ m, $y = 0$, $z = 2$ m, and yaw, pitch, and
 
 1. **Point Cloud:** With the Ref button, select all `.pcd` files in `~/.autoware/data/map/pointcloud_map/` and press the Point Cloud button.
 2. **Vector Map:** Select all `.csv` files in `~/.autoware/data/map/vector_map/` and press the Vector Map button.
-3. **TF:** Select `~/.autoware/data/tf/tf.launch` and press the TF button. This launch file publishes the transform between the `world` and `map` frames.
+3. **TF:** Select `~/.autoware/data/tf/tf.launch` and press the TF button. This launch file publishes the static transforms of the map frames, such as the one between the `world` and `map` frames (the `/world_to_map` and `/map_to_mobility` nodes in Figure 20).
 4. Open RViz with the RViz button at the lower right.
 
 ### 3.4 Creating Waypoints
@@ -629,9 +630,9 @@ Load the created file so that the path planning nodes can use it.
 
 *Figure 16. waypoint_loader settings (left) and the contents of the waypoint file (right)*
 
-The right side of Figure 16 shows the waypoint file opened in a spreadsheet. Each row is one waypoint, and the columns are, in order, $x$, $y$, $z$ (m, map frame), yaw (rad), and speed (km/h). The first row has only four values without a speed; waypoint_loader determines the file format from the number of columns in the first row, and with four columns it reads the file in the "x, y, z, yaw, speed" format [6]. The speeds of the remaining rows are all 40, as set in waypoint_clicker.
+The right side of Figure 16 shows the waypoint file opened in a spreadsheet. Each row is one waypoint, and the columns are, in order, $x$, $y$, $z$ (m, map frame), yaw (rad), and speed (km/h). The first row has only four values without a speed; waypoint_loader determines the file format from the number of columns in the first row, and with four columns it reads the file in the "x, y, z, yaw, speed" format. The first row is used only for this check and is not read as a waypoint [6]. The speeds of the remaining rows are all 40, as set in waypoint_clicker.
 
-Turning on replanning_mode in the dialog makes waypoint_replanner replan the speeds of the loaded path. In this example it is off, so the items below are grayed out and inactive, and the speeds in the file are used as they are.
+The values in the dialog are passed to waypoint_replanner on the `/config/waypoint_replanner` topic. Turning on replanning_mode makes waypoint_replanner replan the speeds of the loaded path. In this example it is off, so the items below are grayed out and inactive, and the speeds in the file are used as they are. The check boxes below choose the steps applied during replanning: resample mode rearranges the waypoints at the resample interval, replan curve mode applies the curve deceleration of the formula below, and overwrite velocity max mode overwrites the speeds of all waypoints with Vmax before the curve deceleration. In addition, replan endpoint mode slows the last few waypoints of the path to Vmin and sets the speeds of the final waypoints to 0 to stop the vehicle, and realtime_tuning_mode replans and publishes the path every time a value in the dialog changes [6]. In Figure 16, resample mode and replan endpoint mode are on, as by default.
 
 | Item | Example value | Meaning |
 |:-----|:-----|:-----|
@@ -641,11 +642,11 @@ Turning on replanning_mode in the dialog makes waypoint_replanner replan the spe
 | Minimum Turning Radius in curves (Rmin) | 6 m | Lower bound of the curve radius; smaller radii are treated as this value |
 | Minimum Velocity in curves (Vmin) | 4 km/h | Lowest speed in curves |
 | Accel limit, Decel limit | 0.5, 0.3 m/s² | Limits of acceleration and deceleration when changing speed |
-| Velocity Offset | 4 | Deceleration starts 4 waypoints before the curve |
+| Velocity Offset | 4 | Shifts the speed-limited range of each curve 4 waypoints earlier so that the vehicle slows down before entering the curve, allowing for its response delay |
 
 *Table 9. Speed replanning settings in the waypoint_loader dialog*
 
-The waypoint_replanner of Autoware.ai 1.14.0 finds the smallest radius of curvature $R$ (lower bound $R_{\min}$) in each curve segment and sets the speed limit of that segment linearly, so that it is $V_{\min}$ at $R_{\min}$ and $V_{\max}$ at $R_{th}$ [6].
+With replan curve mode on, the waypoint_replanner of Autoware.ai 1.14.0 finds, in each curve segment whose radius of curvature is at most $R_{th}$, the smallest radius of curvature $R$ (lower bound $R_{\min}$) and sets the speed limit of that segment linearly, so that it is $V_{\min}$ at $R_{\min}$ and $V_{\max}$ at $R_{th}$ [6].
 
 $$
 V(R) = V_{\max} - \frac{V_{\max} - V_{\min}}{R_{th} - R_{\min}}\left(R_{th} - R\right)
@@ -664,7 +665,7 @@ In a real vehicle, vel_pose_connect relays `/ndt_pose` and `/estimate_twist` fro
 
 *Figure 17. Simulation Mode settings of nmea2tfpose (left) and vel_pose_connect (right)*
 
-In Simulation Mode, vel_pose_connect switches to relaying `/sim_pose` and `/sim_velocity` instead of the NDT outputs [7]. Because the wf_simulator publishes `/current_pose` and `/current_velocity` directly, only the values of the simulator end up on these two topics. The Plane number of nmea2tfpose is the zone number of the Japanese plane rectangular coordinate system used to convert the latitude and longitude of GNSS into plane coordinates, with a default of 7; in Simulation Mode it changes to zone 0, whose origin is at latitude 0 and longitude 0 [5], [7].
+In Simulation Mode, vel_pose_connect switches to relaying `/sim_pose` and `/sim_velocity` instead of the NDT outputs [7]. Because the wf_simulator publishes `/current_pose` and `/current_velocity` directly, only the values of the simulator end up on these two topics. The Plane number of nmea2tfpose is the zone number of the Japanese plane rectangular coordinate system used to convert the latitude and longitude of GNSS into plane coordinates, with a default of 7 [5], [7]. Checking Simulation Mode disables this menu (the grayed-out 7 on the left of Figure 17) and switches to a setting for simulation that places the origin of the plane coordinates at latitude 0° and longitude 0° [8].
 
 ### 3.7 Running Path Planning, Path Following, and the Simulator
 
@@ -679,26 +680,26 @@ Check the following nodes in the Computing tab.
 | Mission Planning, lane_planner | lane_navi, lane_rule, lane_stop, lane_select | lane_navi converts a route on the vector map into waypoints, lane_rule and lane_stop apply stop line and traffic light rules, and lane_select chooses the lane to follow and the closest waypoint (Week 3) |
 | Motion Planning, waypoint_maker | waypoint_loader | Publishes the waypoint file of Section 3.5 |
 | Motion Planning, waypoint_planner | astar_avoid, velocity_set | Creates an avoidance path with A\* when there is an obstacle, and adjusts the speed in front of obstacles and stop lines |
-| Motion Planning, waypoint_follower | pure_pursuit, twist_filter | Computes the target speed and angular velocity and limits the lateral acceleration (Week 3) |
+| Motion Planning, waypoint_follower | pure_pursuit, twist_filter | Computes the target speed and angular velocity and limits the lateral acceleration (Week 3). The launch file of twist_filter also starts twist_gate, which selects the commands and sends them out as `/vehicle_cmd` [6] |
 | Motion Planning, waypoint_follower | wf_simulator | Simulates the motion of the vehicle from the vehicle commands (Section 3.1) |
 
 *Table 10. Nodes of the Computing tab run in the simulation*
 
-In the [app] of wf_simulator, leave Initialize Source at its default value, RVIZ. After all nodes are running, choose 2D Pose Estimate in RViz, click near the start of the path, and drag in the direction of travel to set the initial position and orientation of the vehicle. The wf_simulator then starts from that position and begins following the path.
+In the [app] of wf_simulator, Initialize Source sets where the initial position comes from: RVIZ (`/initialpose` from 2D Pose Estimate), NDT (`/ndt_pose`), GNSS (`/gnss_pose`), or ORIGIN (the map origin); leave it at its default value, RVIZ [4]. After all nodes are running, choose 2D Pose Estimate in RViz, click near the start of the path, and drag in the direction of travel to set the initial position and orientation of the vehicle. The wf_simulator then starts from that position and begins following the path.
 
 ### 3.8 Checking the Results
 
-![Figure 19. RViz during the simulation: the yellow path and the vehicle driving on it](../../images/Week12_12-3_p03.png)
+![Figure 19. RViz during the simulation: the yellow path labeled with the target speed of 40.0 km/h](../../images/Week12_12-3_p03.png)
 
-*Figure 19. RViz during the simulation: the yellow path and the vehicle driving on it*
+*Figure 19. RViz during the simulation: the yellow path labeled with the target speed of 40.0 km/h*
 
-In Figure 19, the thick yellow line is the path to follow, and the numbers beside it are the target speed of the waypoints, 40.0 km/h. The vehicle model drives along the path, and turning on Next Waypoint Mark (the next target waypoint), PP Trajectory Mark (the arc computed by pure pursuit), and Detection Range (the obstacle detection range) in the Displays list of RViz shows the control process as well.
+In Figure 19, the thick yellow line is the path to follow, and the numbers beside it are the target speed of the waypoints, 40.0 km/h. Turning on Vehicle Model, Next Waypoint Mark (the next target waypoint), PP Trajectory Mark (the arc computed by pure pursuit), and Detection Range (the obstacle detection range) in the Displays list of RViz shows the vehicle following the path together with the control process.
 
-![Figure 20. rqt_graph during the simulation (connections of nodes and topics)](../../images/Week12_12-3_p05.png)
+![Figure 20. The path planning, path following, and wf_simulator part of rqt_graph during the simulation](../../images/Week12_12-3_p05.png)
 
-*Figure 20. rqt_graph during the simulation (connections of nodes and topics)*
+*Figure 20. The path planning, path following, and wf_simulator part of rqt_graph during the simulation*
 
-Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual connections, as in Figure 20. The `/wf_simulator` in the middle receives `/vehicle_cmd` and `/initialpose` and publishes `/current_pose`, `/current_velocity`, `/localizer_pose`, and `/tf`, and `/pure_pursuit` on the right receives `/final_waypoints` and the current position and speed and publishes the next target marker (`/next_target_mark`) and the arc marker (`/trajectory_circle_mark`). When `/twist_filter` and `/twist_gate` at the upper left filter and select the commands and send them out as `/vehicle_cmd`, the loop is closed. If the simulation does not behave as intended, first look in this graph for a broken topic (for example, a node that does not receive `/current_pose`).
+Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual connections, as in Figure 20. The `/wf_simulator` in the middle receives `/vehicle_cmd` and `/initialpose` and publishes `/current_pose`, `/current_velocity`, `/localizer_pose`, and `/tf`, and `/pure_pursuit` on the right receives `/final_waypoints` and the current position and speed and publishes the next target marker (`/next_target_mark`) and the arc marker (`/trajectory_circle_mark`). When `/twist_filter` and `/twist_gate` at the upper left filter and select the commands and send them out as `/vehicle_cmd`, the loop is closed. On the left of the graph, omitted from the figure, `/vector_map_loader` publishes topics under `/vector_map_info/` such as lanes, stop lines, and signals to many nodes, `/waypoint_loader` publishes `/based/lane_waypoints_raw`, and `/pose_relay` and `/vel_relay` started by vel_pose_connect also appear. If the simulation does not behave as intended, first look in this graph for a broken topic (for example, a node that does not receive `/current_pose`).
 
 ---
 
@@ -708,7 +709,7 @@ Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual co
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | The kinematic model assumes that the tire slip angles of both wheels are zero at low speed. | **T.** The centripetal force $mV^2/R$ is proportional to the square of the speed and is small at low speed, so the required slip angles are also small. |
 | Steering the front and rear wheels by the same angle in the same direction makes the vehicle turn with the smallest radius. | **F.** Since $\tan\delta_f - \tan\delta_r = 0$, $\dot\psi = 0$, so the body does not rotate and translates diagonally. Opposite-phase steering is what reduces the radius. |
@@ -829,3 +830,4 @@ Opening the node graph with `rqt_graph` shows the flow of Figure 10 as actual co
 5. Autoware Foundation, "common: vehicle_sim_model, gnss," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/common
 6. Autoware Foundation, "core_planning: waypoint_maker," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_planning
 7. Autoware Foundation, "core_perception: autoware_connector, gnss_localizer," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/core_perception
+8. Autoware Foundation, "utilities: runtime_manager," GitHub repository, Autoware.ai. https://github.com/Autoware-AI/utilities

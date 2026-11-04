@@ -58,7 +58,7 @@
 
 ### 1.1 설치 순서와 준비 사항
 
-Autoware.ai는 ROS 1 위에서 동작하는 오픈 소스 자율주행 소프트웨어이며(2주차), 이 과목에서 쓰는 1.14.0 버전은 Ubuntu 18.04와 ROS Melodic 환경에서 소스 코드를 내려받아 직접 빌드한다. 설치는 다음 순서로 진행하며, 각 단계의 자세한 명령과 설명은 표에 적은 곳에 있다.
+Autoware.ai는 ROS 1 위에서 동작하는 오픈 소스 자율주행 소프트웨어이며(2주차), 1.14.0 버전은 Ubuntu 18.04와 ROS Melodic 환경에서 소스 코드를 내려받아 직접 빌드한다. 설치는 다음 순서로 진행하며, 각 단계의 자세한 명령과 설명은 표에 적은 곳에 있다.
 
 | 단계 | 내용 | 다루는 곳 |
 |:-----|:-----|:-----|
@@ -72,7 +72,7 @@ Autoware.ai는 ROS 1 위에서 동작하는 오픈 소스 자율주행 소프트
 
 *표 1. Autoware.ai를 쓰기까지의 설치 순서*
 
-Autoware.ai의 소스 빌드 문서는 Ubuntu 18.04에서 ROS Melodic, Qt 5.9.5 이상을 요구하고, GPU 가속을 쓰려면 CUDA 10.0을 선택적으로 요구한다 [1]. Autoware.ai에는 RViz 플러그인처럼 Qt 라이브러리로 화면을 그리는 패키지가 들어 있으므로 Qt가 필요하며, 이 과목에서는 장기 지원(LTS) 버전인 Qt 5.12.12를 따로 설치하여 쓴다.
+Autoware.ai의 소스 빌드 문서는 Ubuntu 18.04에서 ROS Melodic, Qt 5.9.5 이상을 요구하고, GPU 가속을 쓰려면 CUDA 10.0을 선택적으로 요구한다 [1]. Autoware.ai에는 RViz 플러그인처럼 Qt 라이브러리로 화면을 그리는 패키지가 들어 있으므로 Qt가 필요하며, 4주차 6.2절의 설치 안내는 장기 지원(LTS) 버전인 Qt 5.12.12를 따로 설치한다.
 
 > **용어 정의:** **Qt**는 C++로 그래픽 사용자 인터페이스(GUI) 프로그램을 만드는 크로스 플랫폼 프레임워크이다. ROS의 RViz와 rqt도 Qt로 만들어졌다. **qmake**는 Qt 프로젝트의 빌드 파일을 만드는 도구이고, **Qt Creator**는 Qt 개발용 통합 개발 환경(IDE)이다.
 
@@ -113,7 +113,7 @@ flowchart LR
 
 *그림 1. ROS 노드에서 Autoware 노드로 이어지는 개발 순서*
 
-이 정리본은 왼쪽의 1\~3단계, 곧 노드를 작성하고 빌드하여 동작을 확인하는 과정을 다룬다. 4단계의 메시지 송수신과 그 응용은 6주차와 7주차에서, Autoware와 연동되는 노드는 14주차에서 다룬다. Autoware의 노드도 ROS 노드이므로 이 과정에서 익히는 작업 공간, 패키지, 노드의 구조는 그대로 쓰인다.
+이 단원은 왼쪽의 1\~3단계, 곧 노드를 작성하고 빌드하여 동작을 확인하는 과정을 다룬다. 4단계의 메시지 송수신과 그 응용은 6주차와 7주차에서, Autoware와 연동되는 노드는 14주차에서 다룬다. Autoware의 노드도 ROS 노드이므로 이 과정에서 익히는 작업 공간, 패키지, 노드의 구조는 그대로 쓰인다.
 
 ---
 
@@ -145,7 +145,7 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
 ### 3.2 작업 공간의 세 공간과 환경 설정
 
-catkin 작업 공간은 역할이 다른 폴더, 곧 **공간(space)** 으로 이루어진다 [2]. `catkin_make`를 실행하면 맨 앞에 각 공간의 경로가 출력된다.
+catkin 작업 공간은 역할이 다른 폴더, 곧 **공간(space)** 으로 이루어진다 [3]. `catkin_make`를 실행하면 맨 앞에 각 공간의 경로가 출력된다.
 
 | 공간 | 폴더 | 내용 |
 |:-----|:-----|:-----|
@@ -156,7 +156,7 @@ catkin 작업 공간은 역할이 다른 폴더, 곧 **공간(space)** 으로 �
 
 *표 2. catkin 작업 공간을 이루는 공간*
 
-`devel/setup.bash`를 불러오면 이 작업 공간의 패키지가 환경 변수 `ROS_PACKAGE_PATH` 등에 더해져, `rosrun`과 `roslaunch`가 패키지를 찾을 수 있게 된다. 이 스크립트는 작업 공간을 만들 때 기준이 된 ROS 설치(`/opt/ros/melodic`)의 환경도 함께 불러오며, 작업 공간에 같은 이름의 패키지가 있으면 작업 공간의 것이 우선한다. 이렇게 기존 환경 위에 작업 공간을 덧씌우는 구조를 **오버레이(overlay)** 라 한다 [2].
+`devel/setup.bash`를 불러오면 이 작업 공간의 패키지가 환경 변수 `ROS_PACKAGE_PATH` 등에 더해져, `rosrun`과 `roslaunch`가 패키지를 찾을 수 있게 된다. 이 스크립트는 작업 공간을 만들 때 기준이 된 ROS 설치(`/opt/ros/melodic`)의 환경도 함께 불러오며, 작업 공간에 같은 이름의 패키지가 있으면 작업 공간의 것이 우선한다. 이렇게 기존 환경 위에 작업 공간을 덧씌우는 구조를 **오버레이(overlay)** 라 한다 [3].
 
 ### 3.3 패키지 만들기
 
@@ -232,7 +232,7 @@ catkin_ws/                      작업 공간
 </package>
 ```
 
-`format="2"`는 매니페스트 형식 2를 쓴다는 뜻이며, 각 의존성 태그의 의미는 다음과 같다 [3].
+`format="2"`는 매니페스트 형식 2를 쓴다는 뜻이며, 각 의존성 태그의 의미는 다음과 같다 [4].
 
 | 태그 | 의미 |
 |:-----|:-----|
@@ -266,10 +266,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-#빌드 실행 파일명 hello_dsc
+# 빌드 실행 파일명 hello_dsc
 add_executable(hello_dsc src/hello_dsc.cpp)
 
-#라이브러리를 실행 파일에 링크
+# 라이브러리를 실행 파일에 링크
 target_link_libraries(hello_dsc
   ${catkin_LIBRARIES}
 )
@@ -287,7 +287,7 @@ target_link_libraries(hello_dsc
 
 *표 4. 패키지 CMakeLists.txt의 주요 명령*
 
-명령의 순서에도 규칙이 있다. `catkin_package()`는 `add_executable`이나 `add_library`로 빌드 대상을 선언하기 전에 불러야 하고 [4], `target_link_libraries`는 그 대상을 만든 `add_executable` 뒤에 와야 한다. 생성된 파일에서는 `## Declare a C++ executable` 주석 아래에 `add_executable`을, `## Specify libraries to link a library or executable target against` 주석 아래에 `target_link_libraries`를 두면 이 순서가 지켜진다.
+명령의 순서에도 규칙이 있다. `catkin_package()`는 `add_executable`이나 `add_library`로 빌드 대상을 선언하기 전에 불러야 하고 [5], `target_link_libraries`는 그 대상을 만든 `add_executable` 뒤에 와야 한다. 생성된 파일에서는 `## Declare a C++ executable` 주석 아래에 `add_executable`을, `## Specify libraries to link a library or executable target against` 주석 아래에 `target_link_libraries`를 두면 이 순서가 지켜진다.
 
 ![그림 3. VS Code에서 CMakeLists.txt에 add_executable과 target_link_libraries를 추가한 모습](../../images/Week05_5-2_p08.png)
 
@@ -295,7 +295,7 @@ target_link_libraries(hello_dsc
 
 그림 3에서 140번째 줄에 `add_executable(hello_dsc src/hello_dsc.cpp)`가, 158\~160번째 줄에 `target_link_libraries(hello_dsc ${catkin_LIBRARIES})`가 추가되어 있다. 나머지 줄은 `#`으로 시작하는 주석이므로 빌드에 영향을 주지 않는다. 노드를 더 만들 때마다 이 두 명령을 노드마다 하나씩 더한다(6주차).
 
-> **[컴퓨터프로그래밍]** C++ 프로그램은 소스 파일마다 **컴파일(compile)** 하여 오브젝트 파일(`.o`)을 만든 뒤, 오브젝트 파일들과 라이브러리를 **링크(link)** 하여 실행 파일을 만든다. `add_executable`은 무엇을 컴파일하여 어떤 실행 파일을 만들지를, `target_link_libraries`는 링크할 때 어떤 라이브러리를 붙일지를 정한다. `ros::init` 같은 함수의 선언은 헤더에 있지만 실제 구현은 roscpp 라이브러리에 있으므로, 링크를 빼면 "undefined reference" 오류가 난다.
+> **[시스템프로그래밍]** C++ 프로그램은 소스 파일마다 **컴파일(compile)** 하여 오브젝트 파일(`.o`)을 만든 뒤, 오브젝트 파일들과 라이브러리를 **링크(link)** 하여 실행 파일을 만든다. `add_executable`은 무엇을 컴파일하여 어떤 실행 파일을 만들지를, `target_link_libraries`는 링크할 때 어떤 라이브러리를 붙일지를 정한다. `ros::init` 같은 함수의 선언은 헤더에 있지만 실제 구현은 roscpp 라이브러리에 있으므로, 링크를 빼면 "undefined reference" 오류가 난다.
 
 ### 3.6 VS Code에서 작업 공간 열기
 
@@ -327,7 +327,11 @@ Scanning dependencies of target hello_dsc
 /usr/lib/gcc/x86_64-linux-gnu/7/../../../x86_64-linux-gnu/Scrt1.o: In function `_start':
 (.text+0x20): undefined reference to `main'
 collect2: error: ld returned 1 exit status
+hello_ros/CMakeFiles/hello_dsc.dir/build.make:112: recipe for target '/home/mobility/catkin_ws/devel/lib/hello_ros/hello_dsc' failed
 make[2]: *** [/home/mobility/catkin_ws/devel/lib/hello_ros/hello_dsc] Error 1
+CMakeFiles/Makefile2:861: recipe for target 'hello_ros/CMakeFiles/hello_dsc.dir/all' failed
+make[1]: *** [hello_ros/CMakeFiles/hello_dsc.dir/all] Error 2
+Makefile:140: recipe for target 'all' failed
 make: *** [all] Error 2
 Invoking "make -j8 -l8" failed
 ```
@@ -335,9 +339,9 @@ Invoking "make -j8 -l8" failed
 출력은 크게 두 단계로 나뉜다.
 
 1. **CMake 설정 단계(`--`로 시작하는 줄):** catkin 0.7.29가 `src` 아래의 패키지를 찾아 의존 관계에 맞는 순서(topological order)로 늘어놓는다. 패키지가 `hello_ros` 하나이므로 그것만 처리하고, 빌드 파일을 `build` 폴더에 쓴다.
-2. **make 빌드 단계:** `make -j8 -l8`(작업 8개를 동시에 실행하되 시스템 부하가 8을 넘으면 새 작업을 미룬다)이 실행된다. 빈 `hello_dsc.cpp`의 컴파일(`Building CXX object`, 50%)은 성공하지만, 실행 파일을 만드는 링크(`Linking CXX executable`, 100%)에서 실패한다.
+2. **make 빌드 단계:** `make -j8 -l8`(작업 8개를 동시에 실행하되 시스템 부하가 8을 넘으면 새 작업을 미룬다)이 실행된다. 빈 `hello_dsc.cpp`의 컴파일(`Building CXX object`, 50%)은 성공하지만, 실행 파일을 만드는 링크(`Linking CXX executable`, 100%)에서 실패한다. 링크가 실패하면 그 대상을 빌드하던 하위 make(`make[2]`)부터 `make[1]`, 최상위 `make`까지 차례로 오류를 보고한다.
 
-오류의 원인은 `hello_dsc.cpp`에 `main` 함수가 없다는 것이다. 빈 파일도 올바른 C++ 소스이므로 컴파일은 되지만, 실행 파일에는 프로그램이 시작할 지점이 있어야 한다. 링커(`ld`, `collect2`는 GCC가 링커를 부르는 단계)는 C 실행 환경의 시작 코드 `Scrt1.o`의 `_start`가 부르는 `main`을 어디에서도 찾지 못해 "undefined reference to `main'"을 보고한다. 빌드가 실패하면 마지막 줄에 `Invoking "make -j8 -l8" failed`가 출력된다.
+오류의 원인은 `hello_dsc.cpp`에 `main` 함수가 없다는 것이다. 빈 파일도 올바른 C++ 소스이므로 컴파일은 되지만, 실행 파일에는 프로그램이 시작할 지점이 있어야 한다. 링커(`ld`)는 C 실행 환경의 시작 코드 `Scrt1.o`의 `_start`가 부르는 `main`을 어디에서도 찾지 못해 "undefined reference to `main'"을 보고하고, GCC가 링커를 실행할 때 거치는 보조 프로그램 `collect2`가 이 실패를 `ld returned 1 exit status`로 알린다. 빌드가 실패하면 마지막 줄에 `Invoking "make -j8 -l8" failed`가 출력된다.
 
 > **[시스템프로그래밍]** C와 C++ 프로그램의 실제 시작 지점은 `main`이 아니라 C 런타임의 시작 코드(`crt1.o`, 위치 독립 실행 파일이면 `Scrt1.o`)에 있는 `_start`이다. `_start`는 스택과 인자를 준비하고 C 라이브러리의 초기화 함수를 거쳐 `main`을 호출하며, `main`이 반환한 값을 프로그램의 종료 상태로 쓴다. 그래서 `main`이 없으면 컴파일이 아니라 링크에서 오류가 난다.
 
@@ -400,7 +404,7 @@ Install space: /home/mobility/catkin_ws/install
 [100%] Built target hello_dsc
 ```
 
-처음 다섯 줄은 3.2절의 각 공간의 경로이다. `make cmake_check_build_system`은 `CMakeLists.txt`가 바뀌었는지 확인하여 필요하면 CMake 설정을 다시 하는 단계이고, 마지막 줄 `[100%] Built target hello_dsc`는 실행 파일이 만들어졌다는 뜻이다. 실행 파일은 개발 공간의 `devel/lib/hello_ros/hello_dsc`에 생긴다.
+`catkin_make` 뒤의 다섯 줄은 작업 공간의 기준 경로(Base path)와 3.2절의 네 공간의 경로이다. `make cmake_check_build_system`은 `CMakeLists.txt`가 바뀌었는지 확인하여 필요하면 CMake 설정을 다시 하는 단계이고, 마지막 줄 `[100%] Built target hello_dsc`는 실행 파일이 만들어졌다는 뜻이다. 실행 파일은 개발 공간의 `devel/lib/hello_ros/hello_dsc`에 생긴다.
 
 ```mermaid
 flowchart LR
@@ -485,7 +489,7 @@ rosrun hello_ros hello_dsc hello_dsc_test:=my_topic       # 토픽 hello_dsc_tes
 ros::init(argc, argv, "hello_dsc");
 ```
 
-`ros::init`은 ROS를 초기화하고 이 노드의 이름을 정한다. 다른 ROS 기능을 쓰기 전에 반드시 먼저 불러야 한다 [5].
+`ros::init`은 ROS를 초기화하고 이 노드의 이름을 정한다. 다른 ROS 기능을 쓰기 전에 반드시 먼저 불러야 한다 [6].
 
 - **`argc`, `argv`:** 명령행 인자를 넘겨 5.2절의 리매핑 인자를 처리하게 한다. `ros::init`은 처리한 ROS 인자를 `argv`에서 지우므로, 그 뒤의 코드는 일반 인자만 보게 된다.
 - **`"hello_dsc"`:** 노드 이름이다. 네임스페이스 없는 기본 이름이어야 하며(`/`를 넣을 수 없다), 실행되면 `/hello_dsc`로 마스터에 등록된다. 노드 이름은 ROS 시스템 안에서 하나뿐이어야 하므로, 같은 이름의 노드가 새로 실행되면 먼저 실행 중이던 노드가 종료된다.
@@ -498,7 +502,7 @@ ros::init(argc, argv, "hello_dsc");
 ros::NodeHandle n;
 ```
 
-**노드 핸들(node handle)** 은 노드가 ROS 시스템과 통신하는 주된 창구이다. 퍼블리셔와 서브스크라이버를 만들고 매개변수를 읽는 일을 모두 노드 핸들을 통해 한다. 처음 만들어지는 노드 핸들이 노드를 완전히 시작시키고(마스터에 등록하는 등), 마지막 노드 핸들이 소멸할 때 노드가 종료된다 [5]. 그래서 이 줄은 "ROS 시스템 사용을 위한 핸들 선언"이며, 4.3절의 주의 상자처럼 마스터가 없을 때 노드가 기다리는 것도 이 시작 과정 때문이다.
+**노드 핸들(node handle)** 은 노드가 ROS 시스템과 통신하는 주된 창구이다. 퍼블리셔와 서브스크라이버를 만들고 매개변수를 읽는 일을 모두 노드 핸들을 통해 한다. 처음 만들어지는 노드 핸들이 노드를 완전히 시작시키고(마스터에 등록하는 등), 마지막 노드 핸들이 소멸할 때 노드가 종료된다 [6]. 그래서 이 줄은 "ROS 시스템 사용을 위한 핸들 선언"이며, 4.3절의 주의 상자처럼 마스터가 없을 때 노드가 기다리는 것도 이 시작 과정 때문이다.
 
 ### 5.5 반복 조건: ros::ok
 
@@ -509,7 +513,7 @@ while (ros::ok())
 }
 ```
 
-`ros::ok()`는 노드가 계속 동작해도 되는지를 돌려주며, 다음 중 하나가 일어나면 `false`가 된다 [6].
+`ros::ok()`는 노드가 계속 동작해도 되는지를 돌려주며, 다음 중 하나가 일어나면 `false`가 된다 [7].
 
 - 터미널에서 `Ctrl + C`를 눌러 SIGINT 시그널을 받았다.
 - 같은 이름의 다른 노드가 실행되어 이 노드가 네트워크에서 밀려났다.
@@ -543,7 +547,7 @@ msg.data = ss.str();
 ROS_INFO("%s", msg.data.c_str());
 ```
 
-`ROS_INFO`는 ROS의 로그 출력 기능(rosconsole)이 제공하는 매크로로, C의 `printf`와 같은 형식 문자열을 쓴다 [7]. `%s`는 C 문자열 자리이므로 `std::string`인 `msg.data`를 `c_str()`로 C 문자열(`const char*`)로 바꾸어 넘긴다. `ROS_INFO`가 출력한 메시지는 터미널에 4.3절의 형식으로 표시될 뿐 아니라 로그 토픽 `/rosout`으로도 발행되어, rqt 같은 도구에서 모아 볼 수 있다.
+`ROS_INFO`는 ROS의 로그 출력 기능(rosconsole)이 제공하는 매크로로, C의 `printf`와 같은 형식 문자열을 쓴다 [8]. `%s`는 C 문자열 자리이므로 `std::string`인 `msg.data`를 `c_str()`로 C 문자열(`const char*`)로 바꾸어 넘긴다. `ROS_INFO`가 출력한 메시지는 터미널에 4.3절의 형식으로 표시될 뿐 아니라 로그 토픽 `/rosout`으로도 발행되어, rqt 같은 도구에서 모아 볼 수 있다.
 
 | 매크로 | 심각도 | 쓰임 |
 |:-----|:-----|:-----|
@@ -563,11 +567,11 @@ ROS_INFO("%s", msg.data.c_str());
 usleep(1000);
 ```
 
-`usleep(n)`은 호출한 스레드를 적어도 $n$ 마이크로초(µs) 동안 멈춘다 [8]. 1 ms는 1000 µs, 1 s는 1000000 µs이므로 `usleep(1000)`은 1 ms, `usleep(1000000)`은 1초를 쉰다. 이 줄이 없으면 반복문이 쉬지 않고 돌아 CPU 코어 하나를 계속 차지하고 터미널에 출력이 쏟아진다.
+`usleep(n)`은 호출한 스레드를 적어도 $n$ 마이크로초(µs) 동안 멈춘다 [9]. 1 ms는 1000 µs, 1 s는 1000000 µs이므로 `usleep(1000)`은 1 ms, `usleep(1000000)`은 1초를 쉰다. 이 줄이 없으면 반복문이 쉬지 않고 돌아 CPU 코어 하나를 계속 차지하고 터미널에 출력이 쏟아진다.
 
-`usleep`은 POSIX 운영체제의 함수로 헤더 `<unistd.h>`에 선언되어 있으므로 5.1절처럼 이 헤더를 포함한다. 이 줄이 없어도 `ros/ros.h`가 안쪽에서 포함하는 다른 헤더를 통해 선언을 얻어 빌드되는 경우가 있지만, 이는 ROS 헤더의 구현에 기대는 것이므로 직접 포함하는 편이 안전하다. 또한 실제로 멈추는 시간은 시스템의 다른 작업과 타이머의 정밀도 때문에 요청한 값보다 조금 길어질 수 있다 [8].
+`usleep`은 POSIX 운영체제의 함수로 헤더 `<unistd.h>`에 선언되어 있으므로 5.1절처럼 이 헤더를 포함한다. 이 줄이 없어도 `ros/ros.h`가 안쪽에서 포함하는 다른 헤더를 통해 선언을 얻어 빌드되는 경우가 있지만, 이는 ROS 헤더의 구현에 기대는 것이므로 직접 포함하는 편이 안전하다. 또한 실제로 멈추는 시간은 시스템의 다른 작업과 타이머의 정밀도 때문에 요청한 값보다 조금 길어질 수 있다 [9].
 
-> **참고:** `usleep`은 POSIX.1-2001에서 쓰지 않을 것을 권하는 함수로 지정되었고 POSIX.1-2008 규격에서는 빠졌다 [8]. 리눅스에서는 여전히 쓸 수 있지만, 표준 C++에서는 `std::this_thread::sleep_for(std::chrono::milliseconds(1))`를, ROS 노드에서는 6.4절의 `ros::Rate`를 쓰는 것이 일반적이다.
+> **참고:** `usleep`은 POSIX.1-2001에서 쓰지 않을 것을 권하는 함수로 지정되었고 POSIX.1-2008 규격에서는 빠졌다 [9]. 리눅스에서는 여전히 쓸 수 있지만, 표준 C++에서는 `std::this_thread::sleep_for(std::chrono::milliseconds(1))`를, ROS 노드에서는 6.4절의 `ros::Rate`를 쓰는 것이 일반적이다.
 
 ---
 
@@ -610,7 +614,7 @@ int main(int argc, char **argv)
 
         ROS_INFO("%s", msg.data.c_str());
 
-        // 퍼블리쉬
+        // 퍼블리시
         // hello_dsc_test라는 토픽 이름으로 데이터 획득 가능
         hello_dsc_pub.publish(msg);
 
@@ -627,15 +631,15 @@ int main(int argc, char **argv)
 5절에서 설명한 줄을 빼면 다음 다섯 곳이 새로 더해졌다.
 
 - **`int count = 0;`:** 몇 번째 메시지인지 세는 정수 변수이다. 반복문 밖에서 한 번만 0으로 초기화한다.
-- **`ros::Publisher hello_dsc_pub = n.advertise<std_msgs::String>("hello_dsc_test",1000);`:** 이 노드가 토픽 `hello_dsc_test`에 `std_msgs/String` 형식의 메시지를 발행하겠다고 마스터에 알리고(1주차의 XMLRPC 등록), 그 토픽으로 메시지를 보낼 **퍼블리셔(publisher)** 객체를 돌려받는다. 마스터는 이 토픽을 구독하려는 노드에 퍼블리셔의 주소를 알려 주고, 두 노드는 그 뒤 직접 연결하여 메시지를 주고받는다 [5].
+- **`ros::Publisher hello_dsc_pub = n.advertise<std_msgs::String>("hello_dsc_test",1000);`:** 이 노드가 토픽 `hello_dsc_test`에 `std_msgs/String` 형식의 메시지를 발행하겠다고 마스터에 알리고(1주차의 XMLRPC 등록), 그 토픽으로 메시지를 보낼 **퍼블리셔(publisher)** 객체를 돌려받는다. 마스터는 이 토픽을 구독하려는 노드에 퍼블리셔의 주소를 알려 주고, 두 노드는 그 뒤 직접 연결하여 메시지를 주고받는다 [6].
   - **`<std_msgs::String>`:** 템플릿 인자로 메시지 형식을 정한다. 이 퍼블리셔로는 이 형식의 메시지만 보내야 한다.
   - **`"hello_dsc_test"`:** 토픽 이름이다. `/`로 시작하지 않는 이름은 노드의 네임스페이스를 기준으로 풀리므로, 이 예제에서는 `/hello_dsc_test`가 된다.
-  - **`1000`:** 발행용 메시지 큐의 크기이다. 메시지를 보내는 속도보다 발행하는 속도가 빠르면 보내지 못한 메시지를 최대 1000개까지 쌓아 두고, 넘치면 가장 오래된 것부터 버린다 [5].
+  - **`1000`:** 발행용 메시지 큐의 크기이다. 메시지를 보내는 속도보다 발행하는 속도가 빠르면 보내지 못한 메시지를 최대 1000개까지 쌓아 두고, 넘치면 가장 오래된 것부터 버린다 [6].
 - **`ss << "hello world " << count;`:** 문자열 뒤에 `count`의 값을 붙여 `"hello world 0"`, `"hello world 1"`, ...처럼 메시지마다 다른 내용을 만든다.
 - **`hello_dsc_pub.publish(msg);`:** 메시지를 토픽에 발행한다. 그 순간 이 토픽을 구독하고 있는 모든 노드에 메시지가 전달되며, 구독하는 노드가 없으면 메시지는 아무에게도 전달되지 않고 오류도 나지 않는다. 주석의 뜻처럼 다른 노드는 `hello_dsc_test`라는 토픽 이름만 알면 이 데이터를 받을 수 있다.
 - **`count++;`:** 다음 메시지를 위해 1을 더한다.
 
-`advertise`가 돌려준 퍼블리셔 객체를 변수에 저장해 두는 데에도 이유가 있다. 퍼블리셔 객체의 복사본이 모두 사라지면 토픽의 발행 등록이 자동으로 취소되므로 [5], 발행하는 동안에는 객체가 살아 있어야 한다.
+`advertise`가 돌려준 퍼블리셔 객체를 변수에 저장해 두는 데에도 이유가 있다. 퍼블리셔 객체의 복사본이 모두 사라지면 토픽의 발행 등록이 자동으로 취소되므로 [6], 발행하는 동안에는 객체가 살아 있어야 한다.
 
 ```mermaid
 flowchart LR
@@ -669,7 +673,7 @@ data: "hello world 1524"
 
 `usleep(1000)`은 반복문의 몸체가 끝난 뒤에 1 ms를 더 쉬므로, 한 번 반복하는 시간은 "몸체를 실행하는 시간 + 1 ms 이상"이 된다. 몸체에 0.8 ms가 걸리면 주기는 약 1.8 ms가 되어 초당 약 $1 / 0.0018 \approx 556$번 발행되고, 몸체의 시간이 바뀔 때마다 주기도 함께 흔들린다. 4.3절의 출력에서 시각 차이가 1 ms가 아니라 1.8\~3 ms였던 것이 이 때문이다.
 
-ROS는 원하는 주기를 유지하도록 돕는 `ros::Rate`를 제공한다. ROS의 공식 예제는 퍼블리셔를 다음과 같은 형태로 작성한다 [5].
+ROS는 원하는 주기를 유지하도록 돕는 `ros::Rate`를 제공한다. ROS의 공식 예제는 퍼블리셔를 다음과 같은 형태로 작성한다 [6].
 
 ```cpp
 ros::Rate loop_rate(10);          // 10 Hz, 곧 0.1초 주기를 목표로 한다
@@ -691,7 +695,7 @@ while (ros::ok())
 }
 ```
 
-`ros::Rate loop_rate(10)`은 목표 빈도를 10 Hz로 정하고, `loop_rate.sleep()`은 직전에 `sleep()`을 부른 뒤로 지난 시간을 재어 0.1초에서 그 시간을 뺀 만큼만 쉰다 [9]. 몸체에 0.03초가 걸렸으면 0.07초를 쉬므로, 몸체의 실행 시간이 주기보다 짧은 한 반복 주기는 0.1초로 유지된다. `ros::spinOnce()`는 이 노드에 도착한 메시지의 콜백 함수를 처리하는 함수로 6주차에서 다룬다. 메시지를 받지 않는 노드에서는 할 일이 없지만, 나중에 구독을 더해도 콜백이 실행되도록 넣어 두는 것이 관례이다.
+`ros::Rate loop_rate(10)`은 목표 빈도를 10 Hz로 정하고, `loop_rate.sleep()`은 직전에 `sleep()`을 부른 뒤로 지난 시간을 재어 0.1초에서 그 시간을 뺀 만큼만 쉰다 [10]. 몸체에 0.03초가 걸렸으면 0.07초를 쉬므로, 몸체의 실행 시간이 주기보다 짧은 한 반복 주기는 0.1초로 유지된다. `ros::spinOnce()`는 이 노드에 도착한 메시지의 콜백 함수를 처리하는 함수로 6주차에서 다룬다. 메시지를 받지 않는 노드에서는 할 일이 없지만, 나중에 구독을 더해도 콜백이 실행되도록 넣어 두는 것이 관례이다.
 
 | 항목 | `usleep(n)` | `ros::Rate` |
 |:-----|:-----|:-----|
@@ -851,11 +855,12 @@ while (ros::ok())
 ## 참고 문헌
 
 1. Autoware Foundation, "Source Build," Autoware.ai documentation. https://github.com/autowarefoundation/autoware_ai_documentation/wiki/Source-Build
-2. ROS Wiki, "catkin/workspaces." https://wiki.ros.org/catkin/workspaces
-3. D. Thomas and J. O'Quin, "REP 140: Package Manifest Format Two Specification," ROS Enhancement Proposals, 2013. https://www.ros.org/reps/rep-0140.html
-4. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
-5. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
-6. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
-7. ROS Wiki, "rosconsole." https://wiki.ros.org/rosconsole
-8. M. Kerrisk, "usleep(3)," Linux manual page. https://man7.org/linux/man-pages/man3/usleep.3.html
-9. ROS Wiki, "roscpp/Overview/Time." https://wiki.ros.org/roscpp/Overview/Time
+2. ROS Wiki, "Creating a workspace for catkin." https://wiki.ros.org/catkin/Tutorials/create_a_workspace
+3. ROS Wiki, "catkin/workspaces." https://wiki.ros.org/catkin/workspaces
+4. D. Thomas and J. O'Quin, "REP 140: Package Manifest Format Two Specification," ROS Enhancement Proposals, 2013. https://www.ros.org/reps/rep-0140.html
+5. ROS Wiki, "catkin/CMakeLists.txt." https://wiki.ros.org/catkin/CMakeLists.txt
+6. ROS Wiki, "Writing a Simple Publisher and Subscriber (C++)." https://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28c%2B%2B%29
+7. ROS Wiki, "roscpp/Overview/Initialization and Shutdown." https://wiki.ros.org/roscpp/Overview/Initialization%20and%20Shutdown
+8. ROS Wiki, "rosconsole." https://wiki.ros.org/rosconsole
+9. M. Kerrisk, "usleep(3)," Linux manual page. https://man7.org/linux/man-pages/man3/usleep.3.html
+10. ROS Wiki, "roscpp/Overview/Time." https://wiki.ros.org/roscpp/Overview/Time

@@ -65,20 +65,20 @@
 
 ### 1.1 Order of Development
 
-Weeks 5 and 6 covered writing and building nodes, passing messages between nodes, and applications with several topics and several nodes. This note covers the next step, topic transmission using multiple threads.
+Weeks 5 and 6 covered writing and building nodes, passing messages between nodes, and applications with several topics and several nodes. The next step is topic transmission using multiple threads.
 
 | Step | ROS node development | Covered in |
 |:-----|:-----|:-----|
 | 1-3 | Writing, building, and checking a ROS node | Week 5 |
 | 4 | Message passing between nodes | Week 6 |
 | 5 | Applications of message passing between nodes | Week 6 |
-| 6 | **Topic transmission using multiple threads** | This note |
+| 6 | **Topic transmission using multiple threads** | Week 7 |
 
-*Table 1. Order of ROS node development and the step covered in this note*
+*Table 1. Order of ROS node development and the week covering each step*
 
 ### 1.2 Goal: Two Topics with Different Periods
 
-The sender node `hello_dsc` of Week 6 published `Lidar_test` and `safety_test` together in one `while` loop and rested for 1 second with `usleep(1000000)` at the end. The two topics are therefore always published at the same period (1 Hz). In a real robot, however, each kind of data needs its own period. For example, a rotating LiDAR spins about ten times per second to produce point clouds, while the safety state or the control commands of a vehicle may need to be checked and sent more often. The first goal of this note is for one node to send two topics at different periods.
+The sender node `hello_dsc` of Week 6 published `Lidar_test` and `safety_test` together in one `while` loop and rested for 1 second with `usleep(1000000)` at the end. The two topics are therefore always published at the same period (1 Hz). In a real robot, however, each kind of data needs its own period. For example, a rotating LiDAR spins about ten times per second to produce point clouds, while the safety state or the control commands of a vehicle may need to be checked and sent more often. The first goal is for one node to send two topics at different periods.
 
 ```mermaid
 flowchart LR
@@ -88,7 +88,7 @@ flowchart LR
 
 *Figure 1. Structure in which one node sends two topics at different periods*
 
-With one loop and a fixed wait, every task is done at the same period in each iteration. There are several ways to solve this problem (Section 5), and this note first uses **multithreading**, which gives each task its own flow of execution. For this, `hello_dsc.cpp` is modified to allow multiple threads.
+With one loop and a fixed wait, every task is done at the same period in each iteration. There are several ways to solve this problem (Section 5), and Sections 3-4 first use **multithreading**, which gives each task its own flow of execution. For this, `hello_dsc.cpp` is modified to allow multiple threads.
 
 ### 1.3 Processes and Threads
 
@@ -150,7 +150,7 @@ Saying that several threads run "together" has two meanings [1].
 - **Concurrency:** Running several tasks in turn so that all of them make progress. When two queues take turns at one coffee machine, as at the top of Figure 4, only one person gets coffee at any moment, but both queues shrink. Even with a single CPU core, concurrency arises if the operating system switches between threads quickly.
 - **Parallelism:** Actually running several tasks at the same instant. With two coffee machines, as at the bottom of Figure 4, two people get coffee at the same time. This is possible when there are several CPU cores.
 
-The threads of the nodes in this note spend most of their time resting in `usleep`, so even with one core, concurrency alone lets each thread keep its period. Parallelism is needed to finish computation-heavy work faster by dividing it among several cores.
+The threads of the nodes in Sections 3-4 spend most of their time resting in `usleep`, so even with one core, concurrency alone lets each thread keep its period. Parallelism is needed to finish computation-heavy work faster by dividing it among several cores.
 
 ### 1.6 Designing the Thread Structure
 
@@ -177,7 +177,7 @@ In this structure, node 1 (`hello_dsc`) sends three topics to node 2 (`controlle
 
 ### 2.1 What pthread Is
 
-**POSIX threads (pthread)** form the standard API for parallel processing commonly used on all Unix-like POSIX systems, including Linux. They were standardized as IEEE Std 1003.1c in 1995 and are now part of the POSIX specification (IEEE Std 1003.1) [2]. Windows is not a POSIX system, but pthread can be used there by installing a library that implements it. Other thread APIs may also be used; on Linux, the C++11 standard library's `std::thread` and Boost's `boost::thread`, which ROS uses internally, are also implemented on top of pthread. This note uses pthread.
+**POSIX threads (pthread)** form the standard API for parallel processing commonly used on all Unix-like POSIX systems, including Linux. They were standardized as IEEE Std 1003.1c in 1995 and are now part of the POSIX specification (IEEE Std 1003.1) [2]. Windows is not a POSIX system, but pthread can be used there by installing a library that implements it. Other thread APIs may also be used; on Linux, the C++11 standard library's `std::thread` and Boost's `boost::thread`, which ROS uses internally, are also implemented on top of pthread. The examples from Section 3 on use pthread.
 
 ### 2.2 Order of Use and Main Functions
 
@@ -197,7 +197,7 @@ pthread is used in the following order.
 
 *Table 2. Main functions of pthread*
 
-All four functions return 0 on success and a nonzero error number on failure (`pthread_exit` does not return) [3].
+`pthread_create`, `pthread_detach`, and `pthread_join` return 0 on success and a nonzero error number on failure, and `pthread_exit` does not return to its caller [3].
 
 ### 2.3 Form of a Thread Function
 
@@ -211,7 +211,7 @@ static void *thread_1(void *unused)
 }
 ```
 
-- **Parameter `void *`:** Receives the fourth argument (`arg`) of `pthread_create` unchanged. A pointer of unspecified type is used so that data of any type can be passed by address. The examples in this note exchange data through global variables, so they pass `nullptr` and name the parameter `unused`.
+- **Parameter `void *`:** Receives the fourth argument (`arg`) of `pthread_create` unchanged. A pointer of unspecified type is used so that data of any type can be passed by address. The examples in Sections 3, 4, and 6 exchange data through global variables, so they pass `nullptr` and name the parameter `unused`.
 - **Return type `void *`:** Used to return a thread's result, which can be received through the second argument of `pthread_join`. If there is no result, `nullptr` is returned.
 - **`static`:** Makes the function name visible only within this source file. It is a habitual declaration that avoids clashes with the same name in other files and has nothing to do with thread behavior.
 
@@ -500,7 +500,7 @@ After building with `catkin_make` and running `roscore` and `rosrun hello_ros he
 
 ### 3.6 Shared Data and Mutexes
 
-`thread_num_test` is written by thread 1 and read by thread 2. When two or more threads access the same memory location, at least one of them writing, without synchronization that orders the two accesses, this is called a **data race**. The C++ standard leaves the behavior of a program with a data race undefined [7].
+`thread_num_test` is written by thread 1 and read by thread 2. When two or more threads access the same memory location, at least one of them writing and at least one of them not atomic, without synchronization that orders the two accesses, this is called a **data race**. The C++ standard leaves the behavior of a program with a data race undefined [7].
 
 `thread_num_test++` is one line, but in machine code it is three steps: "read the value from memory, add 1, write it to memory". If two threads increase the same variable at the same time, one increment can be lost, as follows.
 
@@ -731,7 +731,7 @@ flowchart LR
 
 *Figure 9. Node graph extended with compute_test_2*
 
-In this structure, `hello_dsc` publishes three topics and at the same time subscribes to `compute_test_2`. While the two threads publish, keeping their own periods with `usleep`, `ros::spin()` in the `main` thread processes the callbacks of `compute_test_2`. The `ros::spin()` that "had no callbacks to process" in Section 3.4 takes on a real role here. If the callback function stores the received value in a global variable and a publishing thread reads that value, the global variable must be protected by the methods of Section 3.6.
+In this structure, `hello_dsc` publishes three topics and at the same time subscribes to `compute_test_2`. While the two threads publish, keeping their own periods with `usleep`, `ros::spin()` in the `main` thread processes the callbacks of `compute_test_2`. The `ros::spin()` that had no callbacks to process in Section 3.4 takes on a real role here. If the callback function stores the received value in a global variable and a publishing thread reads that value, the global variable must be protected by the methods of Section 3.6.
 
 ---
 
@@ -811,7 +811,7 @@ ros::waitForShutdown();          // main waits until the node shuts down
 
 | Method | Accuracy of the period | Protection of shared data | When one task is late | Characteristics |
 |:-----|:-----|:-----|:-----|:-----|
-| pthread with `usleep` (this note) | The period grows by the body time | Needed | Other threads are not affected | A general threading technique independent of ROS, whose behavior is visible directly in the code |
+| pthread with `usleep` (Sections 3-4) | The period grows by the body time | Needed | Other threads are not affected | A general threading technique independent of ROS, whose behavior is visible directly in the code |
 | A single thread with `ros::Rate` | Accurate, resting after subtracting the body time | Not needed | All tasks are delayed together | The simplest; suitable when the periods are integer multiples |
 | `ros::Timer` with `ros::spin` | Scheduled in ROS time | Not needed | Other callbacks in the same thread wait | The conventional ROS method; also follows the time of bag playback |
 | `ros::Timer` with a multithreaded spinner | Scheduled in ROS time | Needed | Callbacks in other threads run on time | Suitable for nodes with many or heavy callbacks |

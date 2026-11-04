@@ -162,7 +162,7 @@ topics:      /nmea_sentence   11980 msgs    : nmea_msgs/Sentence
 
 이 정보로 데이터의 성격을 알 수 있다.
 
-- **기록 시간:** 2015년 3월 24일에 479초(7분 59초) 동안 기록하였다. 괄호 안의 수는 1970-01-01 00:00 (UTC)부터 센 초 단위의 시각(Unix 시각)이고, 앞의 날짜는 이를 일본 표준시(UTC+9)로 나타낸 것이다.
+- **기록 시간:** 2015년 3월 24일에 479초(7분 59초) 동안 기록하였다. 괄호 안의 수는 1970-01-01 00:00 (UTC)부터 센 초 단위의 시각(Unix 시각)이고, 앞의 날짜와 시각은 이를 bag 정보를 출력한 컴퓨터의 시간대로 나타낸 것이다. 위 출력은 UTC+9 기준이므로 협정 세계시로는 00:40:50부터 00:48:49까지이며, 기록 장소인 일본의 표준시도 UTC+9이므로 현지 시각으로는 오전 9시 40분부터 9시 48분까지 기록한 데이터이다.
 - **토픽:** GNSS 수신기의 NMEA 문장 `/nmea_sentence`와 LiDAR의 포인트 클라우드 `/points_raw` 두 가지만 있다. 메시지 수를 더하면 11980 + 4788 = 16768로 전체 메시지 수와 같다.
 - **LiDAR의 주기:** 4788 / 479 ≈ 10.0이므로 LiDAR는 1초에 약 10번 스캔을 만든다.
 - **스캔 하나의 크기:** 7.9 GB를 4788개 스캔으로 나누면 스캔 하나가 약 1.65 MB이다. NMEA 문장은 짧은 텍스트이므로 bag의 크기는 거의 모두 LiDAR 데이터가 차지한다. 이렇게 큰 데이터를 매 스캔 처리하려면 점의 수를 줄이는 다운샘플링이 필요하다(4.5절).
@@ -191,7 +191,7 @@ autoware.ai/src/autoware/documentation/autoware_quickstart_examples/launch/rosba
 | 버튼 | launch 파일 | 실행하는 기능 |
 |:-----|:-----|:-----|
 | Map | `my_map.launch` | 포인트 클라우드 지도, 벡터 지도, 지도 좌표계의 TF를 불러온다 |
-| Sensing | `my_sensing.launch` | 센서 드라이버와 센서 데이터를 처리하는 노드를 실행한다 |
+| Sensing | `my_sensing.launch` | LiDAR(Velodyne HDL-32E)의 드라이버 노드를 실행한다 |
 | Localization | `my_localization.launch` | 차량과 LiDAR 사이의 TF를 설정하고, 차량의 위치를 구하는 노드(NDT 매칭 등)를 실행한다 |
 | Detection | `my_detection.launch` | 주변 물체를 검출하는 노드를 실행한다 |
 | Mission Planning | `my_mission_planning.launch` | 웨이포인트와 차선 정보로 목적지까지의 전역 경로를 만드는 노드(lane_navi, lane_rule, lane_stop 등)를 실행한다 |
@@ -217,7 +217,7 @@ autoware.ai/src/autoware/documentation/autoware_quickstart_examples/launch/rosba
 
 ### 2.1 포인트 클라우드의 표현
 
-포인트 클라우드는 점 $\mathbf{p}_i = (x_i, y_i, z_i)$의 집합 $P = \{\mathbf{p}_1, \dots, \mathbf{p}_N\}$이다. LiDAR의 점에는 좌표 말고도 레이저가 되돌아온 세기(intensity)나 그 점을 측정한 레이저의 번호(ring) 같은 값이 붙을 수 있다. 점의 순서에는 의미가 없으므로 포인트 클라우드는 수학적으로 순서 없는 집합이다. 오픈 소스 라이브러리 **PCL(Point Cloud Library)** 은 포인트 클라우드의 저장, 필터링, 정합 같은 알고리즘을 모아 둔 C++ 라이브러리이며, Autoware의 지도 작성과 위치 인식은 PCL을 바탕으로 한다 [1].
+포인트 클라우드는 점 $\mathbf{p}_i = (x_i, y_i, z_i)$의 집합 $P = \lbrace\mathbf{p}_1, \dots, \mathbf{p}_N\rbrace$이다. LiDAR의 점에는 좌표 말고도 레이저가 되돌아온 세기(intensity)나 그 점을 측정한 레이저의 번호(ring) 같은 값이 붙을 수 있다. 점의 순서에는 의미가 없으므로 포인트 클라우드는 수학적으로 순서 없는 집합이다. 오픈 소스 라이브러리 **PCL(Point Cloud Library)** 은 포인트 클라우드의 저장, 필터링, 정합 같은 알고리즘을 모아 둔 C++ 라이브러리이며, Autoware의 지도 작성과 위치 인식은 PCL을 바탕으로 한다 [1].
 
 ROS에서는 포인트 클라우드를 `sensor_msgs/PointCloud2` 메시지로 주고받는다 [2]. 이 메시지는 점들을 바이트 배열 하나에 이어 붙여 담고, 각 점의 바이트 안에서 어느 위치에 어떤 값이 있는지를 따로 기술한다.
 
@@ -387,7 +387,7 @@ flowchart LR
 
 ROSBAG Record 창의 split을 켜고 size에 MB 단위의 크기를 적으면, 파일이 그 크기에 이를 때마다 새 파일로 나누어 기록한다. LiDAR 데이터는 1.4절에서 본 것처럼 금방 수 GB가 되므로 긴 주행을 기록할 때 쓸모가 있다.
 
-기록한 파일은 Simulation 탭에서 재생한다. Ref 버튼으로 bag 파일을 고르고 Play를 누르면 재생이 시작되며, 이때 `/use_sim_time`이 자동으로 `true`가 된다. Pause는 재생을 멈추거나 다시 시작하고, Stop은 재생을 끝내며 `/use_sim_time`을 다시 `false`로 돌려놓는다.
+기록한 파일은 Simulation 탭에서 재생한다. Ref 버튼으로 bag 파일을 고르고 Play를 누르면 재생이 시작되며, 이때 `/use_sim_time`이 자동으로 `true`가 된다. Pause는 재생을 멈추거나 다시 시작하고, Stop은 재생을 끝내며 `/use_sim_time`을 다시 `false`로 돌려놓는다. bag 정보로 기록 내용을 알아볼 수도 있다. 예를 들어 카메라와 LiDAR를 함께 기록한 256초 길이의 bag(10.2 GB)에 `/image_raw` 3844개와 `/velodyne_points` 2561개가 들어 있다면, 카메라는 약 15 Hz(3844 / 256 ≈ 15.0), LiDAR는 약 10 Hz(2561 / 256 ≈ 10.0)로 기록된 것이다.
 
 ### 3.3 스캔 정합으로 지도 만들기
 
@@ -401,7 +401,7 @@ LiDAR는 한 번 회전할 때마다 자기 주변 수십 m의 모양만 측정�
 
 $$
 T_k = \arg\min_{T} \; E(T; \, S_k, M_{k-1}), \qquad
-M_k = M_{k-1} \cup \{ \, T_k \mathbf{s} \mid \mathbf{s} \in S_k \, \}
+M_k = M_{k-1} \cup \lbrace \, T_k \mathbf{s} \mid \mathbf{s} \in S_k \, \rbrace
 $$
 
 여기서 $S_k$는 $k$번째 스캔(LiDAR 좌표계), $M_{k-1}$은 그 전까지 만든 지도(지도 좌표계), $E$는 스캔을 변환 $T$로 옮겼을 때 지도와 어긋난 정도를 재는 비용 함수, $T_k = T^{\text{map}}_{\text{lidar}}$는 $k$번째 스캔을 측정할 때의 LiDAR 포즈이다. NDT에서는 $E$가 3주차 2.4절의 점수에 음의 부호를 붙인 것이다 [5]. 첫 스캔 $S_0$는 비교할 지도가 없으므로 그대로 지도가 되며, 따라서 지도 좌표계의 원점은 지도 작성을 시작한 순간의 차량 위치이다.
@@ -434,10 +434,10 @@ flowchart LR
 3차원 변환의 매개변수는 평행 이동 3개와 회전각 3개를 모은 $\mathbf{p} = (t_x, t_y, t_z, \phi, \theta, \psi)$이다. 스캔의 점 $\mathbf{x}$는 $T(\mathbf{p}, \mathbf{x}) = R(\phi, \theta, \psi)\mathbf{x} + \mathbf{t}$로 옮겨지고, 옮겨진 점이 들어간 지도 셀의 평균이 $\boldsymbol{\mu}$, 공분산이 $\Sigma$이면 $\mathbf{q} = T(\mathbf{p}, \mathbf{x}) - \boldsymbol{\mu}$이다. 3주차 2.5절의 3차원 점수 함수를 최소화할 때, 점 하나의 기울기 성분은 연쇄 법칙에 따라 다음과 같다.
 
 $$
-g_i = d_1 d_2 \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \exp\left( -\frac{d_2}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q} \right), \qquad i = 1, \dots, 6
+g_i = -d_1 d_2 \left( \mathbf{q}^{T} \Sigma^{-1} \frac{\partial \mathbf{q}}{\partial p_i} \right) \exp\left( -\frac{d_2}{2} \mathbf{q}^{T} \Sigma^{-1} \mathbf{q} \right), \qquad i = 1, \dots, 6
 $$
 
-식의 모양은 2차원과 같고, 달라지는 것은 $\mathbf{q}$를 매개변수로 미분한 $3 \times 6$ 행렬, 즉 **야코비 행렬(Jacobian)** $J = \partial \mathbf{q} / \partial \mathbf{p}$이다. 평행 이동에 대한 미분은 단위 행렬 $I_3$이다. 회전에 대한 미분은 일반적인 각에서는 길지만, 현재 추정 근처에서 작은 회전 증분을 매개변수로 삼으면 2.2절의 근사 $R \approx I + [\boldsymbol{\omega}]_{\times}$를 써서 간단히 구할 수 있다. 여기서 $\boldsymbol{\omega} = (\phi, \theta, \psi)$이고 $[\boldsymbol{\omega}]_{\times}$는 벡터 곱 $\boldsymbol{\omega} \times \mathbf{x}$를 행렬 곱으로 나타낸 반대칭 행렬이다.
+$d_1 < 0$이므로 계수 $-d_1 d_2$는 양수이고, $d_1 = -1$, $d_2 = 1$로 두면 3주차 2.4절의 2차원 기울기와 같은 식이 된다. 식의 모양은 2차원과 같고, 달라지는 것은 $\mathbf{q}$를 매개변수로 미분한 $3 \times 6$ 행렬, 즉 **야코비 행렬(Jacobian)** $J = \partial \mathbf{q} / \partial \mathbf{p}$이다. 평행 이동에 대한 미분은 단위 행렬 $I_3$이다. 회전에 대한 미분은 일반적인 각에서는 길지만, 현재 추정 근처에서 작은 회전 증분을 매개변수로 삼으면 2.2절의 근사 $R \approx I + [\boldsymbol{\omega}]_{\times}$를 써서 간단히 구할 수 있다. 여기서 $\boldsymbol{\omega} = (\phi, \theta, \psi)$이고 $[\boldsymbol{\omega}]_{\times}$는 벡터 곱 $\boldsymbol{\omega} \times \mathbf{x}$를 행렬 곱으로 나타낸 반대칭 행렬이다.
 
 $$
 R\mathbf{x} \approx \mathbf{x} + \boldsymbol{\omega} \times \mathbf{x} = \mathbf{x} - \mathbf{x} \times \boldsymbol{\omega}
@@ -549,7 +549,7 @@ Resolution, Step Size, Transformation Epsilon, Maximum Iterations는 3주차 2.5
 
 Computing 탭의 왼쪽은 위치 인식(Localization) 노드들이다. `gnss_localizer`에는 GNSS로 위치를 구하는 `fix2tfpose`와 `nmea2tfpose`, `lidar_localizer`에는 `ndt_mapping`, `approximate_ndt_mapping`, `ndt_matching`, `ndt_matching_monitor`, `icp_matching`이 있고, 그 아래에 여러 센서를 융합하는 `ekf_localizer`, 차량 속도를 변환하는 `twist_generator`, `autoware_connector` 등이 있다. 오른쪽은 경로 계획 노드들이며 10주차에서 다룬다.
 
-`ndt_mapping`을 실행하면 터미널에 스캔마다 다음과 같은 정보가 출력된다.
+`ndt_mapping`을 실행하면 터미널에 스캔마다 다음과 같은 정보가 출력된다. 마지막 줄은 함께 실행되는 `queue_counter` 노드가 출력한다.
 
 ```text
 Sequence number: 86688
@@ -585,7 +585,7 @@ shift: 0.0316652
 | (x, y, z, roll, pitch, yaw) | 아래 해석 참고 | 지도 좌표계에서 차량 기준점의 포즈 (m, rad) |
 | Transformation Matrix | 아래 해석 참고 | 정합으로 구한 LiDAR의 포즈 $T^{\text{map}}_{\text{lidar}}$ |
 | shift | 0.0316652 | 마지막으로 스캔을 더한 위치에서 움직인 수평 거리 (m) |
-| (Processed/Input) | (55 / 55) | 받은 스캔 55개를 모두 처리하였다 |
+| (Processed/Input) | (55 / 55) | `queue_counter`가 센 처리한 스캔(`/ndt_map` 발행 횟수)과 받은 스캔(`/points_raw`)의 수. 받은 55개를 모두 처리하였다 |
 
 *표 7. ndt_mapping 출력의 해석*
 
@@ -607,7 +607,7 @@ shift: 0.0316652
 
 ### 3.8 노드 구성과 지도 저장
 
-넓은 지역의 지도를 만들 때는 `ndt_mapping` 대신 `approximate_ndt_mapping`을 쓸 수 있다. 이 노드는 지도를 일정한 크기의 부분 지도로 나누어 만들고 차례로 파일에 저장하므로, 지도가 커져도 정합 대상과 메모리가 무한히 늘지 않는다. 이를 실행했을 때 rqt_graph로 본 노드 구성은 2주차 3.4절에서 다루었다. 요약하면 Velodyne 드라이버의 노드릿들이 `/velodyne_packets`를 거쳐 `/points_raw`를 발행하고, `approximate_ndt_mapping`은 `/points_raw`와 Runtime Manager가 보낸 설정 `/config/approximate_ndt_mapping`을 받아 `/ndt_map`을 발행하며, `queue_counter`는 처리를 기다리는 메시지 수를 세어 지도 작성이 입력을 따라가고 있는지 보여 준다.
+넓은 지역의 지도를 만들 때는 `ndt_mapping` 대신 `approximate_ndt_mapping`을 쓸 수 있다. 이 노드는 지도를 일정한 크기의 부분 지도로 나누어 만들고 차례로 파일에 저장하므로, 지도가 커져도 정합 대상과 메모리가 무한히 늘지 않는다. 이를 실행했을 때 rqt_graph로 본 노드 구성은 2주차 3.4절에서 다루었다. 요약하면 Velodyne 드라이버의 노드릿들이 `/velodyne_packets`를 거쳐 `/points_raw`를 발행하고, `approximate_ndt_mapping`은 `/points_raw`와 Runtime Manager가 보낸 설정 `/config/approximate_ndt_mapping`을 받아 `/ndt_map`을 발행하며, `queue_counter`는 받은 `/points_raw`와 발행된 `/ndt_map`의 수를 세어 지도 작성이 입력을 따라가고 있는지 보여 준다(3.7절의 (Processed/Input)).
 
 bag 재생이 끝나면 3.6절의 PCD OUTPUT 버튼으로 지도를 저장하고, 마지막 단계로 생성된 파일을 확인한다. 저장된 PCD 파일을 Map 탭의 Point Cloud에 지정하여 불러오면 RViz에서 지도를 볼 수 있고, PCL의 `pcl_viewer` 같은 도구로 직접 열어 볼 수도 있다. 저장할 때 Filter Resolution 0.2를 고르면, 같은 0.2 m 정육면체 안에 들어간 점들이 그 무게 중심 하나로 합쳐지므로 파일이 훨씬 작아지면서도 위치 인식에 필요한 모양은 남는다.
 

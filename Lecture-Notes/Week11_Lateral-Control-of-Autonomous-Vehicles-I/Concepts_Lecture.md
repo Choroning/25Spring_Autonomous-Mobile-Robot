@@ -38,6 +38,7 @@
   - [3.5 Steady-State Cornering Analysis](#35-steady-state-cornering-analysis)
   - [3.6 A Form with the Lateral Velocity as a State](#36-a-form-with-the-lateral-velocity-as-a-state)
   - [3.7 Vehicle Parameter Estimation](#37-vehicle-parameter-estimation)
+  - [3.8 The Kinematic Model at Low Speed](#38-the-kinematic-model-at-low-speed)
 - [Concept Applications](#concept-applications)
 - [Summary](#summary)
 - [Self-Check Questions](#self-check-questions)
@@ -66,7 +67,7 @@ flowchart LR
 
 *Figure 1. Processing flow from path planning to steering*
 
-Pure pursuit in Week 3 is also a lateral control method; it is a geometric method that sets the curvature only from the geometric relation between the target point and the vehicle. The controller treated in this unit and in Week 12 is a model-based method: it builds a model that describes the motion of the vehicle with equations (the bicycle model) and decides the steering angle based on that model. This unit examines the post-processing of the path and the structure of the controller, and then derives the dynamic model that the controller uses.
+Pure pursuit in Week 3 is also a lateral control method; it is a geometric method that sets the curvature only from the geometric relation between the target point and the vehicle. The controller treated in this unit and in Week 12 is a model-based method: it builds a model that describes the motion of the vehicle with equations (the bicycle model) and decides the steering angle based on that model. This unit examines the post-processing of the path and the structure of the controller, then derives the dynamic model that the controller uses and summarizes the kinematic model for low speeds.
 
 ### 1.2 Smoothing a Hybrid A\* Path
 
@@ -76,7 +77,7 @@ Hybrid A\* (Week 10) expands states with steering angles that the vehicle can ac
 
 *Figure 2. Hybrid A\* vehicle trajectory (blue rectangles), smoothed trajectory (green solid line), and obstacles (red dots)*
 
-The blue rectangles in Figure 2 are the outlines of the vehicle placed along the path found by Hybrid A\*, the green solid line is the smoothed path, and the red dots are obstacles. The vehicle starts near (10, 10) m on the left, passes in an S shape between the lower and upper clusters of obstacles, and arrives at the goal (Target) on the right. The smoothed path straightens the small kinks of the Hybrid A\* trajectory while keeping a clearance from the obstacles, and becomes a curve whose curvature changes gradually.
+The blue rectangles in Figure 2 are the outlines of the vehicle placed along the path found by Hybrid A\*, the green solid line is the smoothed path, and the red dots are obstacles. The vehicle starts near (10, 10) on the left, passes in an S shape between the lower and upper clusters of obstacles, and arrives at the goal (Target) on the right. The smoothed path straightens the small kinks of the Hybrid A\* trajectory while keeping a clearance from the obstacles, and becomes a curve whose curvature changes gradually.
 
 The work that proposed Hybrid A\* uses the search result as the initial value and smooths it by numerical optimization (the conjugate gradient method), moving the path points little by little to reduce the weighted sum of the following terms [1].
 
@@ -108,7 +109,7 @@ The smoothed path needs not only positions but also the target speed at each poi
 
 *Figure 3. Different radii of curvature R1, R2, R3 for different segments of a path*
 
-In Figure 3, the green dots are the path points placed from the start to the goal (Goal Point), and the dashed arrows are the radii of curvature $R_1$, $R_2$, $R_3$ of the segments. The more sharply a segment bends, the smaller its radius.
+In Figure 3, the green dots are the path points placed from the start to the goal (Goal Point), that is, the waypoints (Way Point), and the dashed arrows are the radii of curvature $R_1$, $R_2$, $R_3$ of the segments. The more sharply a segment bends, the smaller its radius.
 
 **Finding the radius of curvature.** The radius of the circle (circumscribed circle) through three neighboring path points $W_1$, $W_2$, $W_3$ is used as the radius of curvature at that location. With side lengths $a = \lvert W_2 W_3 \rvert$, $b = \lvert W_3 W_1 \rvert$, $c = \lvert W_1 W_2 \rvert$ and triangle area $S$, the radius is as follows. If the three points lie on a straight line, $S = 0$ and therefore $R = \infty$ (a straight segment).
 
@@ -159,7 +160,7 @@ In Figure 4, the green swerve paths split into several lateral positions over a 
 
 *Figure 5. A vehicle ahead (speed V2, acceleration A2) appearing on the path of the ego vehicle (speed V1, acceleration A1)*
 
-The yellow area in Figure 5 is the detection range of the sensors; $V_1$, $A_1$ are the speed and acceleration of the ego vehicle, and $V_2$, $A_2$ are the speed and acceleration of the vehicle ahead (the target). The speeds and accelerations of both vehicles are considered together in order to judge the time left before a collision. For example, if the gap to the vehicle ahead is 30 m and $V_1 = 20$ m/s and $V_2 = 10$ m/s are constant, the gap shrinks by 10 m per second and a collision occurs after about $30 / (20 - 10) = 3$ s, so avoidance must start before then.
+The yellow area in Figure 5 is the detection range of the sensors; $V_1$, $A_1$ are the speed and acceleration of the ego vehicle, and $V_2$, $A_2$ are the speed and acceleration of the vehicle ahead (the target). The red dashed boxes mark vehicles that have entered the driving path of the ego vehicle and become avoidance targets: the vehicle ahead and a vehicle cutting into the ego lane from the lower lane (upward arrow). The red mark behind the vehicle ahead is the expected collision point, and the yellow dashed box marks a vehicle that does not block the path. The speeds and accelerations of both vehicles are considered together in order to judge the time left before a collision. For example, if the gap to the vehicle ahead is 30 m and $V_1 = 20$ m/s and $V_2 = 10$ m/s are constant, the gap shrinks by 10 m per second and a collision occurs after about $30 / (20 - 10) = 3$ s, so avoidance must start before then.
 
 **Stage 2: avoidance.** A cost function is computed for each generated swerve path and nudge path, and the path with the smallest cost is chosen as the optimal path that avoids the obstacle ahead. A cost function usually adds weighted terms such as whether the path collides with an obstacle, how close it comes to obstacles, how far it departs from the lane center, and how large its curvature is (ride comfort).
 
@@ -175,7 +176,7 @@ In Figure 6, the red dashed lines are candidates that hit the vehicle ahead or t
 
 *Figure 7. Candidate return paths back to the original lane after passing the obstacle and the optimal return path (green solid line)*
 
-In Figure 7, the vehicle has passed the vehicle ahead and is in the upper lane. Candidates that drop sharply into the two lower lanes come close to or hit the vehicle in the lower lane, so their cost is large, and the green solid line that returns gently to the original lane is selected.
+In Figure 7, the vehicle has passed the vehicle ahead and is in the upper lane. The red dashed candidate that descends toward the vehicle in the lower lane hits that vehicle, and the other dashed candidates avoid collisions but have larger costs, so the green solid line that returns gently to the original lane is selected.
 
 ### 1.5 Concept and Structure of the Lateral Controller
 
@@ -185,7 +186,7 @@ The lateral controller treated in this unit and in Week 12 follows four design c
 |:-----|:-----|
 | Control the yaw rate directly | The rotation speed of the body becomes smooth, which improves ride comfort |
 | Connect two controllers in a cascade form | Path errors and vehicle motion are handled separately, which makes the controller robust to disturbances and model errors |
-| Estimate and use the sideslip angle | Tracking precision improves (target maximum path error of 15 cm on a straight road) |
+| Estimate and use the sideslip angle | Tracking precision improves (maximum path error of 15 cm on a straight road) |
 | Use both a kinematic model and a dynamic model | The controller can be used over the whole speed range from low to high speed |
 
 *Table 3. Design concepts of the lateral controller and their expected effects*
@@ -206,8 +207,8 @@ flowchart LR
     VEH --> GPS["DGPS<br>lateral offset, relative heading angle, curvature"]
     IVS --> SE["Sideslip angle estimator<br>(switching dynamic and kinematic models)"]
     GPS -->|"lateral offset"| E1
-    GPS -->|"relative heading angle, curvature"| DY
-    GPS -->|"relative heading angle, curvature"| CI
+    GPS -->|"relative heading angle"| DY
+    GPS -->|"lateral offset, relative heading angle, curvature"| CI
     SE -->|"estimated sideslip angle"| DY
     SE -->|"estimated yaw rate"| E2
     SE -->|"estimated sideslip angle, yaw rate"| CI
@@ -215,7 +216,7 @@ flowchart LR
 
 *Figure 8. Structure of the lateral controller*
 
-The flow in Figure 8 is as follows. The **desired yaw rate** is computed from the difference between the target lateral offset (usually 0, that is, on the path) and the actual lateral offset measured by DGPS, and the steering wheel angle command is computed from the difference between this value and the estimated yaw rate. The in-vehicle sensors measure the yaw rate, the vehicle speed, and the steering wheel angle, and DGPS (differential GPS, Week 13) measures the lateral offset from the path, the relative heading angle, and the curvature of the path. Because the sideslip angle is hard to measure directly, an estimator estimates it from the in-vehicle sensor values, switching between the dynamic model and the kinematic model depending on the speed. In the example of the block diagram, the estimator switches to the kinematic model when the speed drops below 15 km/h and to the dynamic model when it rises above 20 km/h. The reason for using two different thresholds (hysteresis) and the equations of each stage are derived in Week 12.
+The flow in Figure 8 is as follows. The **desired yaw rate** is computed from the difference between the target lateral offset (usually 0, that is, on the path) and the actual lateral offset measured by DGPS, and the steering wheel angle command is computed from the difference between this value and the estimated yaw rate. The computation of the desired yaw rate also uses the relative heading angle and the estimated sideslip angle, and the computation of the steering wheel angle command also uses the three DGPS values, the estimated sideslip angle, and the estimated yaw rate. The in-vehicle sensors measure the yaw rate, the vehicle speed, and the steering wheel angle, and DGPS (differential GPS, Week 13) measures the lateral offset from the path, the relative heading angle, and the curvature of the path. Because the sideslip angle is hard to measure directly, an estimator estimates it from the in-vehicle sensor values, switching between the dynamic model and the kinematic model depending on the speed. In the example of the block diagram, the estimator switches to the kinematic model when the speed drops below 15 km/h and to the dynamic model when it rises above 20 km/h. The reason for using two different thresholds (hysteresis) and the equations of each stage are derived in Week 12.
 
 ### 1.6 The Single-Track Model (Bicycle Model)
 
@@ -233,7 +234,7 @@ This simplification works well when the left and right wheels are steered by nea
 
 In Figure 10, P is the center of gravity, the $x$ axis points to the front of the body, and the $y$ axis points to the left of the body. The velocity $V$ of the center of gravity makes an angle $\beta$ with the $x$ axis, and the body rotates with yaw rate $r$. The front wheel is steered by $\delta$ with respect to the $x$ axis, and $l_f$ and $l_r$ are the distances from the center of gravity to the front and rear axles. At the front and rear wheel positions, the lateral velocities $l_f r$ and $l_r r$ caused by the rotation are added to the velocity $V$ of the center of gravity (Section 2.1), and as a result the angles $\beta_f$, $\beta_r$ appear between the direction a wheel faces and the direction it moves. The labels $2Y_f$, $2Y_r$ in the figure denote the lateral force of a whole axle, assuming that each of the two left and right tires produces a lateral force $Y_f$ or $Y_r$.
 
-> **Caution:** This note writes the equations for the combined left and right tires of one axle. That is, $Y_f$ and $Y_r$ are the lateral forces of the whole front and rear axles, and the cornering stiffnesses $C_f$, $C_r$ of Section 3.1 are also values for the whole axle. In references that use values for a single tire (such as $Y_f$ in the figure), a factor of 2 appears in the equations.
+> **Caution:** The equations in this unit are written for the combined left and right tires of one axle. That is, $Y_f$ and $Y_r$ are the lateral forces of the whole front and rear axles, and the cornering stiffnesses $C_f$, $C_r$ of Section 3.1 are also values for the whole axle. In references that use values for a single tire (such as $Y_f$ in the figure), a factor of 2 appears in the equations.
 
 The bicycle model can represent steering of the rear wheel as well as the front wheel. Vehicles that set the steering angle of each wheel separately are examples.
 
@@ -245,7 +246,7 @@ The bicycle model can represent steering of the rear wheel as well as the front 
 
 *Figure 12. Different steering angles for each wheel in four-wheel independent steering (4WIS)*
 
-Figure 11 shows a steering module used in a vehicle of the NASA Johnson Space Center (JSC) that turns a single wheel up to 180°. Figure 12 shows the **four-wheel independent steering (4WIS)** of TUMCREATE: during a turn, each wheel is turned by a different angle, such as 31° and 40° for the two front wheels and 17° and 27° for the two rear wheels, so that they share one center of rotation. When such a vehicle is represented by the bicycle model, the virtual wheels of the front and rear axles have the steering angles $\delta_f$ and $\delta_r$ (the kinematic model of Week 12). Even in an ordinary passenger car the angles of the left and right front wheels differ slightly during a turn, and this difference is treated in Week 12 by taking the width of the vehicle into account.
+Figure 11 shows a steering module used in a vehicle of the NASA Johnson Space Center (JSC) that turns a single wheel up to 180°. Figure 12 shows the **four-wheel independent steering (4WIS)** of TUMCREATE, in which each wheel can be turned by a different angle. In the figure, the two front wheels are turned to the same side by 31° (toe-in) and 40° (toe-out), and the two rear wheels are turned to the side opposite to the front wheels by 17° (toe-out) and 27° (toe-in); on each axle the inner wheel, closer to the center of rotation, is turned more (toe-in means that the front of a wheel points toward the centerline of the body, and toe-out means that it points outward). When such a vehicle is represented by the bicycle model, the virtual wheels of the front and rear axles have the steering angles $\delta_f$ and $\delta_r$ (the kinematic model of Section 3.8 and Week 12). Even in an ordinary passenger car the angles of the left and right front wheels differ slightly during a turn, and this difference is treated in Week 12 by taking the width of the vehicle into account.
 
 ### 1.7 Definition of the State Variables
 
@@ -287,7 +288,7 @@ The force produced by a tire is determined by the difference between the directi
 
 ### 2.2 Tire Slip Angle
 
-> **Definition:** The **tire slip angle** $\alpha$ is the angle between the direction a wheel faces and the direction of the velocity at the wheel position. This note uses as $\alpha$ the angle measured counterclockwise from the velocity direction to the direction the wheel faces. With this choice, a tire produces a lateral force in the $+y$ direction (to the left) when $\alpha > 0$.
+> **Definition:** The **tire slip angle** $\alpha$ is the angle between the direction a wheel faces and the direction of the velocity at the wheel position. Here $\alpha$ denotes the angle measured counterclockwise from the velocity direction to the direction the wheel faces. With this choice, a tire produces a lateral force in the $+y$ direction (to the left) when $\alpha > 0$.
 
 Let $\theta_f$ (front wheel) and $\theta_r$ (rear wheel) be the angles that the velocities at the wheel positions make with the body $x$ axis. The front wheel faces at $\delta$ and the rear wheel at 0 with respect to the $x$ axis, so the slip angles of the two wheels are as follows.
 
@@ -333,7 +334,7 @@ $$
 \tan\alpha_r = \frac{l_r r - V \sin\beta}{V \cos\beta} \quad \Longrightarrow \quad \alpha_r \approx -\beta + \frac{l_r r}{V}
 $$
 
-> **Note:** References differ in how they choose the sign of the slip angle. The $\beta_f$, $\beta_r$ in Figure 10 are measured from the direction the wheel faces to the velocity direction, so they differ from $\alpha_f$, $\alpha_r$ of this note only in sign ($\beta_f = -\alpha_f = \beta + l_f r / V - \delta$, $\beta_r = -\alpha_r = \beta - l_r r / V$). For this reason, the same lateral force is also written with a negative sign, as in $Y_f = -C_f \beta_f$ [2]. Mixing the two conventions in one derivation easily produces an expression that fits neither convention, such as $-\beta - l_r r / V$ for the rear wheel, so keep the convention chosen at the start all the way through.
+> **Note:** References differ in how they choose the sign of the slip angle. The $\beta_f$, $\beta_r$ in Figure 10 are measured from the direction the wheel faces to the velocity direction, so they differ from $\alpha_f$, $\alpha_r$ of Section 2.2 only in sign ($\beta_f = -\alpha_f = \beta + l_f r / V - \delta$, $\beta_r = -\alpha_r = \beta - l_r r / V$). For this reason, the same lateral force is also written with a negative sign, as in $Y_f = -C_f \beta_f$ [2]. The lecture material writes the front result as $\beta_f = \delta - \beta - l_f r / V$ following the convention of Section 2.2 but uses the convention of Figure 10, $Y_f = -C_f(\beta + l_f r / V - \delta)$, in the force relation of Section 3.1, which mixes the two conventions, and it writes the rear result as $\beta_r = -\beta - l_r r / V$, which is an error that fits neither convention. The correct rear result is $\alpha_r \approx -\beta + l_r r / V$ in the convention of Section 2.2 and $\beta_r \approx \beta - l_r r / V$ in the convention of Figure 10, and the force relation $Y_r = -C_r(\beta - l_r r / V)$ of the lecture material also agrees with this result.
 
 ### 2.5 Small-Angle Approximation and a Numerical Example
 
@@ -438,7 +439,7 @@ $$
 
 This equation is the **dynamic bicycle model**, which describes how the steering angle changes the sideslip angle and the yaw rate. Calling the two matrices $A$ and $B$ in order, $\dot{\mathbf{x}} = A\mathbf{x} + B\delta$. Because the matrix entries contain $1/V$ and $1/V^2$, the response of the same vehicle differs with speed.
 
-> **Caution:** In the $\dot r$ equation, the coefficient of $\beta$ is $C_r l_r - C_f l_f$ (a subtraction) and the numerator of the coefficient of $r$ is $C_f l_f^2 + C_r l_r^2$ (an addition). Swapping these two signs is a common mistake; if the coefficient of $r$ became positive, the model would be unstable, with the rotation growing by itself, which is physically wrong. Following the signs of $l_f Y_f$ and $-l_r Y_r$ through the derivation confirms the correct signs.
+> **Note:** The lecture material writes the $\dot r$ equation as $\dot r = \frac{C_r l_r + C_f l_f}{I}\beta - \frac{C_r l_r^2 - C_f l_f^2}{IV} r + \frac{C_f l_f}{I}\delta$, in which the signs of the $\beta$ coefficient and the $r$ coefficient are swapped. Expanding $l_f Y_f - l_r Y_r$ gives, as above, the $\beta$ coefficient $C_r l_r - C_f l_f$ (a subtraction) and the $r$ coefficient $-(C_f l_f^2 + C_r l_r^2)/(IV)$ (an addition in the numerator). The $r$ coefficient represents the damping of the yaw motion and must always be negative, but in the equation of the lecture material it becomes positive for a vehicle with $C_f l_f^2 > C_r l_r^2$, which is physically wrong. The matrix in the lateral-velocity form that the lecture material also presents (Section 3.6) uses the correct signs.
 
 ### 3.4 Assumptions of the Dynamic Model
 
@@ -459,7 +460,7 @@ $$
 r_{ss} = \frac{V}{l\,(1 + KV^2)}\,\delta, \qquad K = \frac{m\,(C_r l_r - C_f l_f)}{l^2 C_f C_r}
 $$
 
-$K$ is called the **stability factor**. If $K = 0$, then $r_{ss} = V\delta / l$, which equals the yaw rate of the kinematic model without tire slip (Week 12). If $K > 0$, the yaw rate for the same steering is smaller than the kinematic value, and its ratio to the kinematic value, $1/(1 + KV^2)$, shrinks as speed increases; this is called **understeer**. If $K < 0$, the yaw rate becomes larger, which is **oversteer**, and the vehicle becomes unstable at and above the speed where $1 + KV^2 = 0$.
+$K$ is called the **stability factor**. If $K = 0$, then $r_{ss} = V\delta / l$, which equals the small-steering-angle yaw rate of the kinematic model without tire slip (Section 3.8). If $K > 0$, the yaw rate for the same steering is smaller than the kinematic value, and its ratio to the kinematic value, $1/(1 + KV^2)$, shrinks as speed increases; this is called **understeer**. If $K < 0$, the yaw rate becomes larger, which is **oversteer**, and the vehicle becomes unstable at and above the speed where $1 + KV^2 = 0$.
 
 **Worked example.** Using the parameters estimated in Section 3.7, $m = 1999.1$ kg, $I = 2573.4$ kg m², $l_f = 0.5412$ m, $l_r = 2.3038$ m, $C_f = 136180$ N/rad, $C_r = 50544$ N/rad, compute the steady-state cornering for $\delta = 0.02$ rad.
 
@@ -505,7 +506,7 @@ Using the model of Section 3.3 on a real vehicle requires the values of $m$, $I$
 *Figure 13. Checking the errors of the vehicle sensors by straight driving and curved driving*
 
 - **Straight driving:** When the vehicle drives straight without steering, the yaw rate, the lateral acceleration, and the steering angle should all be 0. In the left graph of Figure 13, the yaw rate (blue) and the lateral acceleration (green) show only noise around 0, but the steering angle (red) stays at a constant nonzero value. This value is the zero error (offset) of the sensor, so it is subtracted from the measurements as a correction.
-- **Curved driving:** When the vehicle drives at speed $V$ on a curved road of known radius $R$, the yaw rate should be $\omega = V/R$. For example, turning on a curve of radius 50 m at $V = 10$ m/s gives $\omega = 0.2$ rad/s (11.46°/s). The right graph of Figure 13 compares the measured yaw rate (blue) with the yaw rate computed by this formula, and the sections where the two disagree, like those marked with red circles, reveal the errors of the sensor.
+- **Curved driving:** When the vehicle drives at speed $V$ on a curved road of known radius $R$, the yaw rate should be $\omega = V/R$. For example, turning on a curve of radius 50 m at $V = 10$ m/s gives $\omega = 0.2$ rad/s (11.46°/s). The right graph of Figure 13 compares the measured yaw rate (blue) with the yaw rate computed by this formula (green). In the curved-driving sections marked with red circles, the measured value fluctuates around the computed value and overlaps it, which shows that the yaw rate sensor has no large error; if the two values kept disagreeing, the sensor would be judged to have an error.
 
 **Step 2: lateral maneuver tests.** Vehicle state information is collected with several steering patterns so that the model can reproduce a variety of motions.
 
@@ -513,7 +514,7 @@ Using the model of Section 3.3 on a real vehicle requires the values of $m$, $I$
 
 *Figure 14. Steering patterns of the left maneuver test, the right maneuver test, and the slalom maneuver test*
 
-In the left and right maneuver tests, the vehicle drives straight and then turns the steering wheel to one side to change direction as in a lane change, and in the slalom test the steering wheel is turned left and right repeatedly to drive in an S shape. Because both step-like and periodic inputs are applied, both the magnitude and the speed of the response can be observed.
+In the left and right maneuver tests, the vehicle drives straight, turns the steering wheel to one side and back to the center, and then drives straight again in the new direction, and in the slalom test the steering wheel is turned left and right repeatedly to drive in an S shape. Because both step-like and periodic inputs are applied, both the magnitude and the speed of the response can be observed.
 
 **Step 3: model-based estimation.** The model of Section 3.6 is built in Simulink, and the parameters are fitted with the parameter estimation tool of Simulink.
 
@@ -521,7 +522,7 @@ In the left and right maneuver tests, the vehicle drives straight and then turns
 
 *Figure 15. Lateral dynamics Simulink model and the measured and model responses of the slalom, left-turn, and right-turn tests*
 
-The Simulink model at the upper left of Figure 15 takes as inputs the vehicle speed (passed through a gain that converts km/h to m/s) and the steering input (passed through a gain that converts the steering wheel angle to the wheel angle). The input constants and estimated variables grouped by the red box are $C_f$, $l_f$, $C_r$, $l_r$, the mass, and the moment of inertia, with the initial values $C_f = C_r = 70000$ N/rad, $l_f = 1.15$ m, $l_r = 1.57$ m, $m = 2000$ kg, and $I = 3340$ kg m². The model integrates $\dot v = A_{vv} v + A_{vr} r + B_v \delta$ and $\dot r = A_{rv} v + A_{rr} r + B_r \delta$ and outputs the yaw rate and the lateral acceleration. The estimation tool repeatedly adjusts the parameters to minimize a cost such as the sum of squared differences between the measured and model responses. The remaining graphs overlay the measurements and the model outputs of the yaw rate (top) and the lateral acceleration (bottom) in the slalom, left-turn, and right-turn tests, and the two curves almost coincide.
+The Simulink model at the upper left of Figure 15 takes as inputs the vehicle speed (passed through a gain that converts km/h to m/s) and the steering input. A constant that corrects the zero error found in Step 1 is added to the steering input, which then passes through a gain that converts degrees to radians and a steering-ratio gain (Steer 2 Wheel) that converts the steering wheel angle to the wheel angle. The input constants and estimated variables grouped by the red boxes are $C_f$, $l_f$, $C_r$, $l_r$, the mass, the moment of inertia, and the steering-ratio gain, with the initial values $C_f = C_r = 70000$ N/rad, $l_f = 1.15$ m, $l_r = 1.57$ m, $m = 2000$ kg, and $I = 3340$ kg m². The model integrates $\dot v = A_{vv} v + A_{vr} r + B_v \delta$ and $\dot r = A_{rv} v + A_{rr} r + B_r \delta$ and outputs the yaw rate and the lateral acceleration. The estimation tool repeatedly adjusts the parameters to minimize a cost such as the sum of squared differences between the measured and model responses. The remaining graphs overlay the measurements and the model outputs of the yaw rate (top) and the lateral acceleration (bottom) in the slalom, left-turn, and right-turn tests, and the two curves almost coincide. In the slalom test the yaw rate oscillates by about ±12°/s and the lateral acceleration by about ±5 m/s², and the left-turn and right-turn tests show step-like responses of about 7°/s and 3 m/s², and about −6°/s and −2.3 m/s², respectively.
 
 **Step 4: estimation results.** The estimated parameters are as follows.
 
@@ -540,11 +541,36 @@ The Simulink model at the upper left of Figure 15 takes as inputs the vehicle sp
 
 *Figure 16. Yaw rate and sideslip angle estimates of an observer built with the estimated parameters (top: simulation, bottom: real vehicle driving)*
 
-Figure 16 shows how well a state observer built with the estimated parameters estimates the yaw rate and the sideslip angle. The upper two graphs are simulations in which the reference input (blue) and the observer output (red dashed) almost coincide, with RMS errors of 0.0016939°/s for the yaw rate and 0.024147° for the sideslip angle. The lower two graphs are the measured and estimated yaw rates and the estimated sideslip angle in real vehicle driving. The principle of the state observer is treated in Week 12.
+Figure 16 shows how well a state observer built with the estimated parameters estimates the yaw rate and the sideslip angle. The upper two graphs are simulations in which the reference input (blue) and the observer output (red dashed) almost coincide, with RMS errors of 0.0016939°/s for the yaw rate and 0.024147° for the sideslip angle. The lower two graphs are the measured and estimated yaw rates (the two curves almost coincide) and the estimated sideslip angle in real vehicle driving. The principle of the state observer is treated in Week 12.
 
 > **Caution:** The estimates are the **equivalent parameters** of the model that best reproduces the measured responses. The values $l_f = 0.54$ m and $l_r = 2.30$ m in Table 8 differ greatly from the initial values (1.15 m, 1.57 m), and the wheelbase also changes to 2.845 m, because the parameters also absorb effects that the model neglects, such as roll, load transfer, and the compliance of the steering system. Therefore the estimates should not be interpreted as the actual position of the center of gravity, and they should be used only within the same model structure.
 
-Because the dynamic model of Section 3.3 cannot be used at low speed, the controller also uses a kinematic model that neglects tire slip at low speed. The derivation of the kinematic model and the switching between the two models are treated in Week 12.
+Because the dynamic model of Section 3.3 cannot be used at low speed, the controller also uses a kinematic model that neglects tire slip at low speed (Section 3.8). The switching between the two models is treated in Week 12.
+
+### 3.8 The Kinematic Model at Low Speed
+
+At low speed the lateral force $mV^2/R$ needed for cornering is small, so the tire slip angles can be regarded as zero. The velocities at the front and rear wheel positions then point in the directions the wheels face, which gives the **kinematic bicycle model**, describing the motion only by geometric relations without forces [3]. Let A be the front wheel, B the rear wheel, C the center of gravity, and $\delta_f$, $\delta_r$ the steering angles of the front and rear wheels (the $\delta$ of the previous sections is $\delta_f$ with $\delta_r = 0$). $\psi$ is the **heading angle** of the body seen in the global frame $(X, Y)$, O is the **instantaneous rolling center** where the line through A perpendicular to the front wheel velocity meets the line through B perpendicular to the rear wheel velocity, and $R = \lvert OC \rvert$ is the turning radius of the center of gravity.
+
+Applying the law of sines (the ratio of each side of a triangle to the sine of its opposite angle is constant) to the triangles OCA and OCB and rearranging gives the following two equations.
+
+$$
+\frac{\sin(\delta_f - \beta)}{l_f} = \frac{\sin\left(\frac{\pi}{2} - \delta_f\right)}{R} \;\Longrightarrow\; \tan\delta_f\cos\beta - \sin\beta = \frac{l_f}{R} \qquad \text{(Eq. 1)}
+$$
+
+$$
+\frac{\sin(\beta - \delta_r)}{l_r} = \frac{\sin\left(\frac{\pi}{2} + \delta_r\right)}{R} \;\Longrightarrow\; \sin\beta - \tan\delta_r\cos\beta = \frac{l_r}{R} \qquad \text{(Eq. 2)}
+$$
+
+Adding (Eq. 1) and (Eq. 2) gives $(\tan\delta_f - \tan\delta_r)\cos\beta = (l_f + l_r)/R$ (Eq. 3). At low speed, if the turning radius changes slowly, the whole body rotates about O, so the yaw rate is $\dot\psi = V/R$, and substituting (Eq. 3) expresses the yaw rate in terms of the steering angles. Multiplying (Eq. 2) by $l_f$ and (Eq. 1) by $l_r$ and subtracting eliminates $R$ and determines the sideslip angle. The velocity of the center of gravity points in the direction $\psi + \beta$ in the global frame, so the model is as follows.
+
+$$
+\begin{aligned}
+\dot X &= V\cos(\psi + \beta), \qquad \dot Y = V\sin(\psi + \beta) \\
+\dot\psi &= \frac{V\cos\beta}{l_f + l_r}\left(\tan\delta_f - \tan\delta_r\right), \qquad \beta = \tan^{-1}\left(\frac{l_f\tan\delta_r + l_r\tan\delta_f}{l_f + l_r}\right)
+\end{aligned}
+$$
+
+This model has no term divided by $V$, so it can be used even at the low speed just before stopping. If only the front wheel is steered ($\delta_r = 0$) and the steering angle is small, $\dot\psi \approx V\delta_f / l$, which is the case $K = 0$ of Section 3.5. The angles of each triangle, a worked example, and the extension that takes the vehicle width into account are treated in Section 1 of Week 12.
 
 ---
 
@@ -554,7 +580,7 @@ Because the dynamic model of Section 3.3 cannot be used at low speed, the contro
 
 **True/False Check:**
 
-| Statement | Judgment and reason |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | If the radius of curvature becomes 4 times larger, the maximum speed set by the lateral acceleration limit also becomes 4 times larger. | **F.** Since $V = \sqrt{0.3 g R}$, the maximum speed is proportional to the square root of the radius and doubles. |
 | A swerve is a short path for urgent avoidance of an obstacle, and a nudge is a long path that shifts gently or returns. | **T.** Joining the two pieces expresses both an urgent avoidance and a gentle return. |
@@ -582,6 +608,7 @@ Because the dynamic model of Section 3.3 cannot be used at low speed, the contro
 | Equations of motion | Rearranging $mV(\dot\beta + r) = Y_f + Y_r$ and $I\dot r = l_f Y_f - l_r Y_r$ gives a second-order linear state equation in $\beta$ and $r$. |
 | Steady-state cornering | $r_{ss} = V\delta / (l(1 + KV^2))$, and a stability factor $K > 0$ means understeer. |
 | Parameter estimation | Corrects sensor errors and fits the model output to the responses of several maneuver tests to obtain equivalent values of $m$, $I$, $l_f$, $l_r$, $C_f$, and $C_r$. |
+| Kinematic model | At low speed the slip angles are taken as zero, and the law of sines gives $\dot\psi = V\cos\beta(\tan\delta_f - \tan\delta_r)/(l_f + l_r)$ and the sideslip angle; with no term divided by $V$, the model can be used at low speed. |
 
 ---
 

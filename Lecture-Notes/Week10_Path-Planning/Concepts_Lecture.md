@@ -229,7 +229,7 @@ The important points of the procedure are as follows.
 
 - **The goal test is done at extraction.** When the goal first enters the open list, a cheaper path may still remain. Only when the goal is extracted from the open list is its cost guaranteed to be minimal (Section 3.6).
 - **Do not skip updates.** Even for a node already in the open list, $G$ and the parent must be corrected when a shorter way is found. Skipping this step yields paths that are not shortest (the caution in Section 3.5).
-- **Tie-breaking.** When several nodes have the same $F$, the order of extraction must be decided. The examples in this note extract the node with the smaller $H$ (closer to the goal) first, and if $H$ is also equal, the node that entered first. Different tie-breaking rules give the same path cost, but the expansion order and the shape of the path may differ.
+- **Tie-breaking.** When several nodes have the same $F$, the order of extraction must be decided. The examples in Sections 3.4 and 3.5 extract the node with the smaller $H$ (closer to the goal) first, and if $H$ is also equal, the node that entered first. Different tie-breaking rules give the same path cost, but the expansion order and the shape of the path may differ.
 
 ### 3.3 Visualizing the Search Region
 
@@ -406,7 +406,7 @@ The final state and path are as follows.
 
 The path is H5 → H4 → I3 → H2 → G2 → F2 → E2, with cost $10 + 14 + 14 + 10 + 10 + 10 = 68$. The way around the left end of the wall, H5 → G4 → F4 → E4 → D4 → C3 → C2 → D1 → E2, costs 96, so going around the right is shorter.
 
-> **Caution:** The step that updates the cost of a cell already in the open list is easy to skip. For example, D5 is first opened diagonally from E4 in step 6 with $G = 34 + 14 = 48$ and $F = 82$, but when E5 ($G = 30$) is expanded in step 8, D5 can be reached by a straight move at $30 + 10 = 40$, so it must be corrected to $G = 40$ and $F = 74$. In the same way, J5 decreases from 28 to 20 in step 11. Skipping the update makes the cost of paths through that cell appear larger than it is, so when the shortest path passes through that cell, the search misses it.
+> **Caution:** The step that updates the cost of a cell already in the open list is easy to skip. For example, D5 is first opened diagonally from E4 in step 6 with $G = 34 + 14 = 48$ and $F = 82$, but when E5 ($G = 30$) is expanded in step 8, D5 can be reached by a straight move at $30 + 10 = 40$, so it must be corrected to $G = 40$ and $F = 74$. In the same way, J5 decreases from 28 to 20 in step 11. Skipping the update makes the cost of paths through that cell appear larger than it is, so when the shortest path passes through that cell, the search misses it. If the search is carried out to the end without the update, D5 remains at 48+34=82 and J5 at 28+62=90 in the final state.
 
 > **Caution:** The moves H4 → I3 and I3 → H2 in this path cut diagonally past the corner of the obstacle H3. If diagonal moves that cut across obstacle corners are forbidden (the rule that both side cells must be free for a diagonal move), the path becomes H5 → I4 → I3 → I2 → H2 → G2 → F2 → E2 with cost 74. A real vehicle has width, so the search is run on a map in which obstacles are inflated by half the vehicle width, so that paths grazing corners do not arise.
 
@@ -435,7 +435,7 @@ Typical heuristics for each movement model are as follows. Straight moves cost 1
 
 > **Note:** If the diagonal cost $10\sqrt{2} \approx 14.14$ is rounded to the integer 14 as in Example 2, the Euclidean distance $10\sqrt{d_x^2 + d_y^2}$ slightly exceeds the actual cost when moving purely diagonally, so strictly speaking it is not admissible. When costs are approximated by integers, it is safer to use the octile distance matching that approximation.
 
-Among admissible heuristics, the closer to the actual cost (the larger the value), the fewer nodes are expanded. Solving the two examples with several methods and comparing the number of expanded nodes and the cost of the path found gives the following (tie-breaking as in Section 3.2).
+Among admissible heuristics, the closer to the actual cost (the larger the value), the fewer nodes tend to be expanded. If the smaller heuristic is consistent and the other heuristic is larger at every non-goal node, every node expanded by A\* with the larger heuristic is also expanded by A\* with the smaller one [4]. Solving the two examples with several methods and comparing the number of expanded nodes and the cost of the path found gives the following (tie-breaking as in Section 3.2).
 
 | Method | Expansion order key | Example 1 expansions | Example 1 path cost | Example 2 expansions | Example 2 path cost |
 |:-----|:-----|:-----|:-----|:-----|:-----|
@@ -559,7 +559,7 @@ Figure 18 is the result of repeating this process to build a path to the goal wa
 Let us compute the candidate costs of one step directly with the following values. All values are chosen for illustration.
 
 - **Vehicle:** Position $(0, 0)$, heading $\theta = 0°$ (to the right), wheelbase $L = 2.7$ m.
-- **Candidates:** Five nodes reached by moving an arc length $s = 3$ m with steering angles $\delta \in \{20°, 10°, 0°, -10°, -20°\}$ (positive to the left).
+- **Candidates:** Five nodes reached by moving an arc length $s = 3$ m with steering angles $\delta \in \lbrace20°, 10°, 0°, -10°, -20°\rbrace$ (positive to the left).
 - **Cost factors:** $K_{\delta}$ is 1.0, 1.1, and 1.2 for $\vert\delta\vert = 0°, 10°, 20°$, respectively. $\alpha_h = 1$, $\beta_h = 0.5$, $\gamma_h = 1$, and $K_{\text{scale}} = 20$.
 - **Environment:** Goal $(30, 6)$, waypoint $(12, 3)$, and a circular obstacle of radius 1 m at $(9, 0)$. If the straight line drawn from a candidate node in its heading meets the obstacle circle, the obstacle is regarded as an obstacle the vehicle could collide with if it drove straight on (Table 9), and $d_{\text{obs}}$ is the distance from the candidate node to the obstacle center.
 
@@ -675,7 +675,7 @@ This implementation uses as candidates arcs that turn along the circle of the mi
 |:-----|:-----|
 | A path found by grid A\* on a parking lot map was given directly to the vehicle, and the vehicle strayed far from the path at every turning cell. | **The path ignores the non-holonomic constraint.** A grid A\* path turns 90° or 45° at a single cell, but the vehicle cannot turn tighter than its minimum turning radius. Hybrid A\*, which generates candidates with motion primitives, should be used, or the path should be smoothed. |
 | Finding a route to the destination with Dijkstra's algorithm on a large city map takes a long time. | **The search does not know the direction of the goal.** Dijkstra's algorithm spreads evenly in all directions. Switching to A\* with an admissible heuristic such as the straight-line distance finds the same shortest path with fewer node expansions. |
-| Using the Manhattan distance as the heuristic on an eight-directional grid sometimes produces paths that are not shortest. | **The heuristic is not admissible.** It estimates one diagonal step (cost 14) as 20, so it can overestimate the remaining cost. The octile distance must be used to guarantee the shortest path. |
+| Using the Manhattan distance as the heuristic on an eight-directional grid sometimes produces paths that are not shortest. | **The heuristic is not admissible.** It estimates one diagonal step (cost 14) as 20, so it can overestimate the remaining cost. An admissible heuristic such as the octile distance guarantees the shortest path. |
 | A path built by Hybrid A\* passes too close to obstacles. | **The weight of the obstacle term is small.** Increasing $\gamma_h$ or $K_{\text{scale}}$ raises the cost of candidates close to obstacles so that paths with more clearance are chosen. If it is made too large, however, the vehicle may fail to pass narrow passages and take large detours. |
 | A Hybrid A\* path wobbles slightly left and right even on straight sections. | **The curve penalty $K_{\delta}$ is small.** If the cost difference between steered and straight moves is small, steered candidates are chosen because of tiny differences in the heuristic. Increasing $K_{\delta}$ for curves gives priority to going straight. |
 
@@ -683,7 +683,7 @@ This implementation uses as candidates arcs that turn along the circle of the mi
 
 **True/False Check:**
 
-| Statement | Judgment and rationale |
+| Statement | Judgment and Reason |
 |:-----|:-----|
 | Setting $H = 0$ in A\* makes it the same as Dijkstra's algorithm. | **T.** The priority becomes $F = G$, so nodes are expanded in order of distance from the start. |
 | A\* still guarantees the shortest path if it ends the search the moment the goal node is first placed in the open list. | **F.** A path cheaper than the one at insertion may remain, so the search must end when the goal is extracted from the open list. |
