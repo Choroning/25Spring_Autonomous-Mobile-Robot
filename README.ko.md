@@ -3,7 +3,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/Choroning/25Spring_Autonomous-Mobile-Robot)
 ![Languages](https://img.shields.io/github/languages/top/Choroning/25Spring_Autonomous-Mobile-Robot)
 
-이 레포지토리는 이동로봇운행시스템 과목의 강의 노트와 수업 결과물을 정리한 아카이브입니다.
+이 레포지토리는 이동로봇운행시스템 과목의 강의 노트를 정리한 아카이브입니다.
 
 *작성자: 박철원 (고려대학교(세종), 컴퓨터소프트웨어학과) - 2025년 기준 2학년*
 <br><br>

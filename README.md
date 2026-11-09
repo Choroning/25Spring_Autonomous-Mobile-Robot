@@ -3,7 +3,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/Choroning/25Spring_Autonomous-Mobile-Robot)
 ![Languages](https://img.shields.io/github/languages/top/Choroning/25Spring_Autonomous-Mobile-Robot)
 
-This repository archives lecture notes and coursework for the Autonomous Mobile Robot course.
+This repository archives lecture notes for the Autonomous Mobile Robot course.
 
 *Author: Cheolwon Park (Korea University Sejong, CSE) - Year 2 (Sophomore) as of 2025*
 <br><br>
