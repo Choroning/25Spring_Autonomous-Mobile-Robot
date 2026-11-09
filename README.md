@@ -3,7 +3,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/Choroning/25Spring_Autonomous-Mobile-Robot)
 ![Languages](https://img.shields.io/github/languages/top/Choroning/25Spring_Autonomous-Mobile-Robot)
 
-This repository archives bilingual lecture notes and coursework for the Autonomous Mobile Robot course.
+This repository archives lecture notes and coursework for the Autonomous Mobile Robot course.
 
 *Author: Cheolwon Park (Korea University Sejong, CSE) - Year 2 (Sophomore) as of 2025*
 <br><br>
@@ -25,8 +25,8 @@ This repository archives bilingual lecture notes and coursework for the Autonomo
 - `Lecture-Notes/` holds a lecture note for each week (`Week01`, `Week02`, and so on) that covers that week's lecture materials, and Weeks 5-7 also hold the ROS node example code used in the lectures.
 - Every lecture note comes as an English (`.md`) and Korean (`.ko.md`) pair.
 
-> **🤖 AI Agent Usage**
-> [Claude Code](https://claude.ai/download) was used to organize and translate the notes and to restructure the repository.
+> **🤖 Use of Generative AI Tools**
+> This repository uses [Claude Code](https://claude.ai/download) for documentation.
 
 <br><a name="course-information"></a>
 ## 📚 Course Information
