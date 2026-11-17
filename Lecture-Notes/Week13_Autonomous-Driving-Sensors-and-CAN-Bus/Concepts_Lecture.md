@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain how GNSS computes a position from pseudoranges and the sources of position error that arise in the satellites, the atmosphere, and on the ground
@@ -267,7 +267,9 @@ x = d \cos\theta \cos\varphi, \qquad y = d \cos\theta \sin\varphi, \qquad z = d 
 
 For example, with $d = 20$ m, $\theta = 5°$, and $\varphi = 30°$, the values $\cos 5° \approx 0.9962$, $\sin 5° \approx 0.0872$, $\cos 30° \approx 0.8660$, and $\sin 30° = 0.5$ give $x = 20 \times 0.9962 \times 0.8660 \approx 17.25$ m, $y = 20 \times 0.9962 \times 0.5 \approx 9.96$ m, and $z = 20 \times 0.0872 \approx 1.74$ m. Hundreds of thousands of such points collected every second form the **point cloud** used for map building and NDT matching in Weeks 2 and 9.
 
-> **Definition:** A **3D LiDAR** measures the whole space by stacking several laser layers vertically or by steering the beam in two directions with mirrors. The rotating LiDAR in Figure 7 arranges several lasers vertically and spins its body through 360°, while the study that is the source of Figure 8 steers the beam with a MEMS mirror [8]. A **2D LiDAR** sweeps only one plane with a single laser layer and obtains a range profile in that plane.
+> **Definition:** A **3D LiDAR** measures the whole space by stacking several laser layers vertically or by steering the beam in two directions with mirrors. The rotating LiDAR in Figure 7 arranges several lasers vertically and spins its body through 360°, while the study that is the source of Figure 8 steers the beam with a MEMS mirror [8].
+
+> **Definition:** A **2D LiDAR** sweeps only one plane with a single laser layer and obtains a range profile in that plane.
 
 The characteristics of LiDAR are as follows.
 

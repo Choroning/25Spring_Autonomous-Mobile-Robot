@@ -2,10 +2,10 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
-> 1. Define the vehicle path planning problem, and distinguish the meaning of non-holonomic constraints and the roles of global and local path planning
+> 1. Define the vehicle path planning problem, and distinguish the meaning of nonholonomic constraints and the roles of global and local path planning
 > 2. Treat a grid map as a graph and explain the differences among Dijkstra's algorithm, greedy best-first search, and the A\* algorithm in terms of their priority functions
 > 3. Trace the open list, closed list, and cost updates of A\* step by step on grids with four-directional and diagonal movement
 > 4. Define the admissibility and consistency of heuristics, and choose a heuristic that fits the movement model
@@ -18,7 +18,7 @@
 
 - [1. Vehicle Path Planning](#1-vehicle-path-planning)
   - [1.1 The Path Planning Problem](#11-the-path-planning-problem)
-  - [1.2 Non-Holonomic Constraints](#12-non-holonomic-constraints)
+  - [1.2 Nonholonomic Constraints](#12-nonholonomic-constraints)
   - [1.3 Global and Local Path Planning](#13-global-and-local-path-planning)
 - [2. Basics of Graph Search](#2-basics-of-graph-search)
   - [2.1 Grid Maps and Graphs](#21-grid-maps-and-graphs)
@@ -53,7 +53,7 @@
 
 ### 1.1 The Path Planning Problem
 
-> **Definition:** **Vehicle path planning** is the problem of generating a driving path from the vehicle's current position to a given goal, taking into account passenger ride comfort and the motions the vehicle can actually make (non-holonomic constraints).
+> **Definition:** **Vehicle path planning** is the problem of generating a driving path from the vehicle's current position to a given goal, taking into account passenger ride comfort and the motions the vehicle can actually make (nonholonomic constraints).
 
 Path planning sits between localization (Week 9) and vehicle control (Weeks 11-12). Its inputs are the vehicle position found by localization, the goal set by the user, and obstacle information from the perception stage, and its output is the path for the vehicle controller to follow (and the control commands derived from it). Path planning is divided into **global path planning**, which builds the overall route, and **local path planning**, which avoids obstacles.
 
@@ -69,11 +69,13 @@ flowchart LR
 
 *Figure 1. Inputs, structure, and output of path planning*
 
-### 1.2 Non-Holonomic Constraints
+### 1.2 Nonholonomic Constraints
 
 The collection of variables describing the state of a robot or vehicle is called its **configuration**, and the configuration of a vehicle driving on a plane is its position and orientation $\mathbf{q} = (x, y, \theta)$. Constraints on the configuration fall into two kinds [1].
 
-> **Definition:** A **holonomic constraint** is a constraint that can be written as an equation $f(\mathbf{q}) = 0$ on the configuration itself, and it reduces the set of reachable configurations (for example, a train on rails). A **non-holonomic constraint** is a constraint on the velocity $\dot{\mathbf{q}}$ that cannot be integrated into a constraint on the configuration; it does not reduce the reachable configurations but restricts the directions in which the system can move at any instant.
+> **Definition:** A **holonomic constraint** is a constraint that can be written as an equation $f(\mathbf{q}) = 0$ on the configuration itself, and it reduces the set of reachable configurations (for example, a train on rails).
+
+> **Definition:** A **nonholonomic constraint** is a constraint on the velocity $\dot{\mathbf{q}}$ that cannot be integrated into a constraint on the configuration; it does not reduce the reachable configurations but restricts the directions in which the system can move at any instant.
 
 If the rear wheels of a car are assumed to roll without slipping sideways, the velocity of the rear-axle center always points along the heading $\theta$ of the body. That is, the sideways component of the body's velocity is zero.
 
@@ -414,7 +416,9 @@ The path is H5 → H4 → I3 → H2 → G2 → F2 → E2, with cost $10 + 14 + 1
 
 For A\* to guarantee the shortest path, the heuristic must satisfy the following conditions [4].
 
-> **Definition:** Let $h^{\ast}(n)$ be the actual minimum cost from node $n$ to the goal. A heuristic is **admissible** if $h(n) \le h^{\ast}(n)$ for every $n$; that is, it never overestimates the remaining cost. It is **consistent** if $h(n) \le c(n, m) + h(m)$ for every edge $(n, m)$ and $h(\text{goal}) = 0$.
+> **Definition:** Let $h^{\ast}(n)$ be the actual minimum cost from node $n$ to the goal. A heuristic is **admissible** if $h(n) \le h^{\ast}(n)$ for every $n$; that is, it never overestimates the remaining cost.
+
+> **Definition:** A heuristic is **consistent** if $h(n) \le c(n, m) + h(m)$ for every edge $(n, m)$ and $h(\text{goal}) = 0$.
 
 > **[Artificial Intelligence]** In state-space search, heuristics are often built as the optimal cost of a relaxed problem that removes some constraints of the original problem. The distance ignoring obstacles is the shortest distance of the relaxed problem that assumes there are no obstacles, so it cannot exceed the cost of the original problem and is admissible.
 
@@ -673,7 +677,7 @@ This implementation uses as candidates arcs that turn along the circle of the mi
 
 | Situation | Analysis |
 |:-----|:-----|
-| A path found by grid A\* on a parking lot map was given directly to the vehicle, and the vehicle strayed far from the path at every turning cell. | **The path ignores the non-holonomic constraint.** A grid A\* path turns 90° or 45° at a single cell, but the vehicle cannot turn tighter than its minimum turning radius. Hybrid A\*, which generates candidates with motion primitives, should be used, or the path should be smoothed. |
+| A path found by grid A\* on a parking lot map was given directly to the vehicle, and the vehicle strayed far from the path at every turning cell. | **The path ignores the nonholonomic constraint.** A grid A\* path turns 90° or 45° at a single cell, but the vehicle cannot turn tighter than its minimum turning radius. Hybrid A\*, which generates candidates with motion primitives, should be used, or the path should be smoothed. |
 | Finding a route to the destination with Dijkstra's algorithm on a large city map takes a long time. | **The search does not know the direction of the goal.** Dijkstra's algorithm spreads evenly in all directions. Switching to A\* with an admissible heuristic such as the straight-line distance finds the same shortest path with fewer node expansions. |
 | Using the Manhattan distance as the heuristic on an eight-directional grid sometimes produces paths that are not shortest. | **The heuristic is not admissible.** It estimates one diagonal step (cost 14) as 20, so it can overestimate the remaining cost. An admissible heuristic such as the octile distance guarantees the shortest path. |
 | A path built by Hybrid A\* passes too close to obstacles. | **The weight of the obstacle term is small.** Increasing $\gamma_h$ or $K_{\text{scale}}$ raises the cost of candidates close to obstacles so that paths with more clearance are chosen. If it is made too large, however, the vehicle may fail to pass narrow passages and take large detours. |
@@ -689,7 +693,7 @@ This implementation uses as candidates arcs that turn along the circle of the mi
 | A\* still guarantees the shortest path if it ends the search the moment the goal node is first placed in the open list. | **F.** A path cheaper than the one at insertion may remain, so the search must end when the goal is extracted from the open list. |
 | Among admissible heuristics, the closer one is to the actual cost, the fewer expansions A\* tends to make. | **T.** In Table 8, the octile distance (18) expanded fewer cells than the smaller Chebyshev distance (20). |
 | Hybrid A\* always guarantees the shortest path, like grid A\*. | **F.** Keeping only one continuous state per grid cell can miss paths, and the $H(n)$ of Section 4.3 is not admissible either. Instead, it gives drivable paths. |
-| A vehicle with non-holonomic constraints has a reduced range of reachable positions and orientations. | **F.** A non-holonomic constraint only restricts the directions of motion at each instant; combining forward motion, reverse motion, and steering reaches the desired configuration, as in parallel parking. |
+| A vehicle with nonholonomic constraints has a reduced range of reachable positions and orientations. | **F.** A nonholonomic constraint only restricts the directions of motion at each instant; combining forward motion, reverse motion, and steering reaches the desired configuration, as in parallel parking. |
 
 ---
 
@@ -699,8 +703,8 @@ This implementation uses as candidates arcs that turn along the circle of the mi
 
 | Concept | Key Summary |
 |:--------|:------------|
-| Vehicle path planning | The problem of generating a driving path from the current position to the goal, considering ride comfort and the vehicle's motion (non-holonomic constraints). |
-| Non-holonomic constraint | The velocity constraint $\dot{x}\sin\theta - \dot{y}\cos\theta = 0$ that the rear wheels do not slip sideways, which produces the minimum turning radius $R_{\min} = L / \tan\delta_{\max}$. |
+| Vehicle path planning | The problem of generating a driving path from the current position to the goal, considering ride comfort and the vehicle's motion (nonholonomic constraints). |
+| Nonholonomic constraint | The velocity constraint $\dot{x}\sin\theta - \dot{y}\cos\theta = 0$ that the rear wheels do not slip sideways, which produces the minimum turning radius $R_{\min} = L / \tan\delta_{\max}$. |
 | Global and local path planning | Global path planning finds the optimal route to the goal using maps, and local path planning builds short paths that avoid obstacles while driving using sensor information. |
 | Dijkstra's algorithm | Finds the shortest path by finalizing nodes in order of distance $G$ from the start, but does not know the direction of the goal and spreads in all directions. |
 | Greedy best-first search | Expands by the heuristic $H$ alone and is fast, but falls into dead ends or produces paths that are not shortest. |

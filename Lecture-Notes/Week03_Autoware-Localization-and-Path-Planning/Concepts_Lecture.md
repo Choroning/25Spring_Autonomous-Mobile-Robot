@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Define the localization problem and explain with equations how NDT registration aligns a scan to a map using per-cell normal distributions, a score function, and Newton's method
@@ -105,7 +105,9 @@ flowchart LR
 
 ### 2.1 The Localization Problem
 
-> **Definition:** **Localization** is estimating the current pose of a vehicle or robot within a given map. A **pose** combines position and orientation: in 3D it has six values, the position $(x, y, z)$ and the orientation (roll, pitch, yaw), and on a plane it has three values $(x, y, \theta)$.
+> **Definition:** **Localization** is estimating the current pose of a vehicle or robot within a given map.
+
+> **Definition:** A **pose** combines position and orientation: in 3D it has six values, the position $(x, y, z)$ and the orientation (roll, pitch, yaw), and on a plane it has three values $(x, y, \theta)$.
 
 Roll, pitch, and yaw are the rotation angles about the vehicle's longitudinal, lateral, and vertical axes. For a vehicle driving on a plane, yaw, which gives the heading, matters most.
 
@@ -119,7 +121,15 @@ The left side of Figure 2 is a map of gray walls and white corridors, and the ri
 
 ### 2.2 Scan Matching
 
-> **Definition:** A **scan** is the set of points a LiDAR measures in one revolution, and a **point cloud** is such a set of points with 3D coordinates. **Registration** is finding the coordinate transformation (rotation and translation) that makes two point clouds overlap best, and registering a scan to a map is called **scan matching**.
+> **Definition:** A **scan** is the set of points a LiDAR measures in one revolution.
+
+> **Definition:** A **point cloud** is a set of points with 3D coordinates, such as a scan.
+
+Localization amounts to overlaying the scan just measured on the point cloud of the map, so the operation that aligns two point sets lies at its center.
+
+> **Definition:** **Registration** is finding the coordinate transformation (rotation and translation) that makes two point clouds overlap best.
+
+> **Definition:** Registering a scan to a map is called **scan matching**.
 
 ![Figure 3. Estimating the position and moving direction of the vehicle by registering scan data to map data with NDT](../../images/Week03_3-12_p02.png)
 
@@ -332,9 +342,15 @@ flowchart LR
 
 *Table 5. Nodes that make up NDT matching localization*
 
-> **Definition:** **PCD (point cloud data)** is the point cloud file format used by PCL. An **NMEA sentence** is the standard text format in which a GNSS receiver outputs information such as latitude, longitude, and time. **Downsampling** reduces the number of points in data, and a **voxel grid filter** divides space into voxels of a fixed size (the leaf size) and replaces the points in each voxel by one representative point (their centroid) to reduce the number of points.
+> **Definition:** **PCD (point cloud data)** is the point cloud file format used by PCL.
+
+> **Definition:** An **NMEA sentence** is the standard text format in which a GNSS receiver outputs information such as latitude, longitude, and time.
+
+> **Definition:** **Downsampling** reduces the number of points in data.
 
 Downsampling is needed for two reasons. First, the cost of registration is proportional to the number of scan points, so fewer points let each scan be processed faster. Second, a LiDAR measures nearby areas densely and distant areas sparsely, so reducing each voxel to one point spreads the points evenly over space and keeps nearby objects from dominating the score.
+
+> **Definition:** A **voxel grid filter** divides space into voxels of a fixed size (the leaf size) and replaces the points in each voxel by one representative point (their centroid) to reduce the number of points.
 
 `current_pose` carries the position $(x, y, z)$ and the orientation (roll, pitch, yaw), and all later path planning and path following nodes subscribe to this topic. The initial position is either specified by the user in RViz (`initialpose`) or taken from the GNSS position (`gnss_pose`). As seen in Section 2.4, NDT converges only near the initial estimate, so an initial position close to the true value is needed once at the start.
 
@@ -421,7 +437,9 @@ Once localization tells where the vehicle is now, the next step is deciding wher
 
 For flexible changes of the velocity profile and later uses such as obstacle avoidance and lane changes, the vector map method is recommended.
 
-> **Definition:** A **vector map** represents the road with geometric elements such as points and lines and also holds semantic information such as lanes, stop lines, crosswalks, and traffic lights, together with the connections between elements. Whereas a point cloud map holds the surfaces of surrounding objects as measured, a vector map holds which lane the vehicle should follow and how it should drive. A **waypoint** is one point of a path and holds a position, an orientation, and the target velocity at that point.
+> **Definition:** A **vector map** represents the road with geometric elements such as points and lines and also holds semantic information such as lanes, stop lines, crosswalks, and traffic lights, together with the connections between elements. Whereas a point cloud map holds the surfaces of surrounding objects as measured, a vector map holds which lane the vehicle should follow and how it should drive.
+
+> **Definition:** A **waypoint** is one point of a path and holds a position, an orientation, and the target velocity at that point.
 
 ![Figure 10. Creating a waypoint path from a vector map and the localization result](../../images/Week03_3-12_p08.png)
 
@@ -582,7 +600,9 @@ flowchart LR
 
 **Pure pursuit** is a path following method that takes as the target point a point on the path a fixed distance ahead of the vehicle and sets the curvature so that the vehicle drives along the arc that reaches that point [6]. The target point is chosen anew every cycle, so the vehicle keeps chasing a point that runs ahead of it on the path. The name comes from the pursuit strategy of aiming straight at a target moving ahead (pure pursuit).
 
-> **Definition:** The **curvature** $\kappa$ measures how much a path bends; a circle of radius $R$ has curvature $\kappa = 1/R$. The **lookahead distance** $l$ is the distance from the vehicle to the target point.
+> **Definition:** The **curvature** $\kappa$ measures how much a path bends; a circle of radius $R$ has curvature $\kappa = 1/R$.
+
+> **Definition:** The **lookahead distance** $l$ is the distance from the vehicle to the target point.
 
 Use the frame attached to the vehicle: the origin is the vehicle's reference point (usually the center of the rear axle), the $x$ axis is the heading, and the $y$ axis points left. If the target point has coordinates $(x_t, y_t)$, then $x_t^2 + y_t^2 = l^2$. Find the circle that is tangent to the current heading (the $x$ axis) and passes through both the origin and the target point.
 
@@ -755,7 +775,9 @@ The satellite map on the left of Figure 20 shows in green the driving route from
 
 The later ROS and Autoware practice uses Ubuntu 18.04 LTS (code name Bionic Beaver). Each ROS 1 distribution is built for a specific Ubuntu version, and the ROS Melodic and Autoware.ai 1.14.0 used in the practice target Ubuntu 18.04 (see Week 4).
 
-> **Definition:** **LTS (long term support)** marks a long-term support release; Ubuntu LTS releases receive standard security updates for five years [8]. An **ISO image** is a single file that holds the contents of an installation disc.
+> **Definition:** **LTS (long term support)** marks a long-term support release; Ubuntu LTS releases receive standard security updates for five years [8].
+
+> **Definition:** An **ISO image** is a single file that holds the contents of an installation disc.
 
 > **Caution:** Standard support for Ubuntu 18.04 ended in 2023 [8], and support for ROS Melodic also ended in 2023 [9]. This environment reproduces the versions used in this course (ROS Melodic, Autoware.ai 1.14.0), and it lacks the security updates needed for long-term use on machines directly connected to the internet.
 
@@ -1016,21 +1038,21 @@ After the installation, update the packages and install the development environm
 
 10. **Tasks of the real vehicle application:** State the three remaining tasks in the conclusions of the real vehicle case, and explain why each is needed using the content of this unit.
 
-   <details>
-   <summary>Answer</summary>
+    <details>
+    <summary>Answer</summary>
 
-   They are tests after building a large-scale map, precise obstacle detection through camera fusion, and a high-performance PC for loading large maps in real time. NDT mapping can accumulate errors over a wide area, so it must be tested whether localization holds on a large map; LiDAR clustering alone hardly tells the type of an object, so fusion with cameras is needed. Also, as the map grows, points_map_loader loads more cells while registration must still finish for every 10 Hz scan, so more computing performance is needed.
+    They are tests after building a large-scale map, precise obstacle detection through camera fusion, and a high-performance PC for loading large maps in real time. NDT mapping can accumulate errors over a wide area, so it must be tested whether localization holds on a large map; LiDAR clustering alone hardly tells the type of an object, so fusion with cameras is needed. Also, as the map grows, points_map_loader loads more cells while registration must still finish for every 10 Hz scan, so more computing performance is needed.
 
-   </details>
+    </details>
 
 11. **Installing Ubuntu:** You want to install a development environment for a real vehicle directly on a laptop that has Windows installed. Explain why you must not choose Erase disk and install Ubuntu as the installation type and what to choose instead, and explain why you install in English.
 
-   <details>
-   <summary>Answer</summary>
+    <details>
+    <summary>Answer</summary>
 
-   On a real PC, Erase disk and install Ubuntu erases Windows and all data on the disk. To keep Windows, choose the Install Ubuntu alongside option or set up the partitions manually with Something else. Installing in English creates the default folders under the home folder with English names, which makes handling paths in the terminal easy, and lets you search error messages in English.
+    On a real PC, Erase disk and install Ubuntu erases Windows and all data on the disk. To keep Windows, choose the Install Ubuntu alongside option or set up the partitions manually with Something else. Installing in English creates the default folders under the home folder with English names, which makes handling paths in the terminal easy, and lets you search error messages in English.
 
-   </details>
+    </details>
 
 ---
 

@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain, as a layered structure, that Autoware is open-source autonomous driving software running on ROS, and describe its recognition, judgment, and operation functions and its user interfaces
@@ -164,7 +164,9 @@ This information alone is enough to compute properties of the sensors.
 - The sentence topic of the GNSS receiver, `/nmea_sentence`, was published at $11980 / 479.17 \approx 25.0$, that is, about 25 Hz.
 - NMEA sentences are short strings of tens of bytes, so most of the file size is point clouds. `rosbag info` shows sizes in units of 1024, so 7.9 GB is $7.9 \times 1024^3 \approx 8.48 \times 10^9$ bytes [6]. The size of one point cloud is therefore $8.48 \times 10^9 / 4788 \approx 1.77 \times 10^6$ bytes, that is, about 1.77 MB. The fact that eight minutes of recording needs 7.9 GB shows that ample storage must be prepared when recording LiDAR data.
 
-> **Definition:** An **NMEA sentence** is a string of the NMEA 0183 standard that GNSS receivers use to output position, time, and satellite information; it begins with `$`, as in `$GPGGA,...`, and separates fields with commas. A **point cloud** is a set of 3D points $(x, y, z)$ measured by a LiDAR, exchanged in ROS as `sensor_msgs/PointCloud2` messages.
+> **Definition:** An **NMEA sentence** is a string of the NMEA 0183 standard that GNSS receivers use to output position, time, and satellite information; it begins with `$`, as in `$GPGGA,...`, and separates fields with commas.
+
+> **Definition:** A **point cloud** is a set of 3D points $(x, y, z)$ measured by a LiDAR, exchanged in ROS as `sensor_msgs/PointCloud2` messages.
 
 ### 1.5 Reading Node Graphs
 
@@ -192,7 +194,9 @@ Figure 5 is the node graph of the detection packages in `ros/src/computing/perce
 
 *Table 4. Three flows of the detection node graph*
 
-> **Definition:** A **DPM (deformable part model)** detects objects by representing an object as its overall shape and the arrangement of several parts (for example, a person's head, arms, and legs), allowing the positions of the parts to deform to some extent [7]. **Euclidean clustering** groups points whose mutual distances are below a set threshold into the same cluster, dividing the point cloud on the road into objects such as vehicles and pedestrians.
+> **Definition:** A **DPM (deformable part model)** detects objects by representing an object as its overall shape and the arrangement of several parts (for example, a person's head, arms, and legs), allowing the positions of the parts to deform to some extent [7].
+
+> **Definition:** **Euclidean clustering** groups points whose mutual distances are below a set threshold into the same cluster, dividing the point cloud on the road into objects such as vehicles and pedestrians.
 
 A camera recognizes the kind of an object well but cannot measure distance directly, while a LiDAR measures distance accurately but has difficulty recognizing the kind of object. So **sensor fusion**, which combines the results of the two sensors, is used. `range_fusion` and `obj_fusion` play this role. The map is used in traffic light recognition for the same reason. Instead of searching the whole image for small traffic lights, knowing in advance from the map where a traffic light will be means only a narrow region needs to be examined, which is fast and produces few false detections.
 
@@ -212,7 +216,9 @@ Figure 6 is the node graph of three localization methods.
 
 `ndt_matching` obtains the vehicle position by fitting the LiDAR point cloud to a prebuilt 3D map (Section 3.6), and it uses the GNSS position or a position specified in RViz as the initial position from which to start fitting. `ndt_mapping`, conversely, builds the map `points_map` by stitching point clouds together when there is no map (Section 3.4). Information from wheel odometry (`odometer`) and the inertial measurement unit (`imu`) also enters through `tf` to help position estimation.
 
-> **Definition:** **Odometry** estimates position by measuring the vehicle's own motion, such as the number of wheel revolutions, and accumulating the distance and direction traveled. It is accurate over short times, but its error keeps accumulating. An **IMU (inertial measurement unit)** is a sensor that measures acceleration and angular velocity.
+> **Definition:** **Odometry** estimates position by measuring the vehicle's own motion, such as the number of wheel revolutions, and accumulating the distance and direction traveled. It is accurate over short times, but its error keeps accumulating.
+
+> **Definition:** An **IMU (inertial measurement unit)** is a sensor that measures acceleration and angular velocity.
 
 ### 1.7 Node Configuration for Path Planning and Maps
 
@@ -699,7 +705,9 @@ The left side of Figure 19 is the RViz view during mapping, in which the surroun
 
 Autoware's mapping node `ndt_mapping` receives the Velodyne LiDAR scan data `/points_raw` and publishes the map built so far, `/ndt_map`. The current position computed while building the map is published as `/current_pose`, so mapping and localization happen at the same time. The completed map is reduced with a **VoxelGrid filter** and saved as a **PCD (point cloud data)** file.
 
-> **Definition:** A **voxel grid filter** divides space into cubic cells (voxels) whose side has a set length (leaf size, for example 0.2 m) and replaces the points in each cell with their single centroid. It greatly reduces the number of points while keeping the shape of their distribution. **PCD** is the point cloud file format defined by the Point Cloud Library (PCL).
+> **Definition:** A **voxel grid filter** divides space into cubic cells (voxels) whose side has a set length (leaf size, for example 0.2 m) and replaces the points in each cell with their single centroid. It greatly reduces the number of points while keeping the shape of their distribution.
+
+> **Definition:** **PCD** is the point cloud file format defined by the Point Cloud Library (PCL).
 
 The recommended mapping procedure is as follows.
 

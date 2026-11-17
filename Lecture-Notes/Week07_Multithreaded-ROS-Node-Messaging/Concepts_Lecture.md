@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain the difference between processes and threads, the execution flows of single-threaded and multithreaded programs, and the difference between concurrency and parallelism
@@ -92,7 +92,9 @@ With one loop and a fixed wait, every task is done at the same period in each it
 
 ### 1.3 Processes and Threads
 
-> **Definition:** A **process** is a program in execution. The operating system gives each process an independent memory space (code, data, heap, stack) and resources. A **thread** is a unit of the several flows executing within a process, and it is the basic unit that the CPU executes [1].
+> **Definition:** A **process** is a program in execution. The operating system gives each process an independent memory space (code, data, heap, stack) and resources.
+
+> **Definition:** A **thread** is a unit of the several flows executing within a process, and it is the basic unit that the CPU executes [1].
 
 In ROS, one node is one process. The nodes built so far did their work with one flow of execution starting at `main`, that is, with one thread. When several threads are created in one process, each thread runs independently with its own stack, register values, and program counter (the location of the next instruction to execute), while sharing the resources of the process such as the code, global variables, heap, and open files [1].
 

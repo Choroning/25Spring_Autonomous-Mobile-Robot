@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain how the package manager APT updates and installs software through repositories, package lists, and `sudo` privileges, and perform the initial setup right after installing Ubuntu
@@ -93,7 +93,11 @@ Copy and paste in the terminal add Shift because Ctrl + C already sends an inter
 
 ### 1.2 Updating the Package List and Upgrading
 
-> **Definition:** A **package** bundles a program and its configuration files in a form convenient to install, and a **package manager** is the program that downloads, installs, updates, and removes packages. Ubuntu's package manager is **APT**, and a server from which packages are downloaded is called a **repository**. **`sudo`** runs the following command with administrator (root) privileges and asks for the login password the first time. Nothing is shown on the screen while the password is typed.
+> **Definition:** A **package** bundles a program and its configuration files in a form convenient to install.
+
+> **Definition:** A **package manager** is the program that downloads, installs, updates, and removes packages.
+
+> **Definition:** **APT** is Ubuntu's package manager.
 
 Right after installing Ubuntu, open a terminal and run the following two commands.
 
@@ -101,6 +105,10 @@ Right after installing Ubuntu, open a terminal and run the following two command
 sudo apt-get update     # refresh the list of available packages and versions
 sudo apt-get upgrade    # raise installed packages to the newest versions found in the refreshed list
 ```
+
+> **Definition:** **`sudo`** runs the following command with administrator (root) privileges and asks for the login password the first time. Nothing is shown on the screen while the password is typed.
+
+> **Definition:** A server from which packages are downloaded is called a **repository**.
 
 `apt-get update` does not change any software. It only fetches the package lists (which versions of which packages exist) anew from the repositories written in `/etc/apt/sources.list` and the files under `/etc/apt/sources.list.d/`, to check whether newer versions exist. It is `apt-get upgrade` that actually replaces packages with newer versions. If the list is stale, `upgrade` does not know about new versions either, so the two commands are always run in this order. `apt` is a refinement of `apt-get` that is more convenient for people to use, and the installations in this unit treat the two as equivalent.
 
@@ -375,7 +383,9 @@ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc   # append a line to the 
 source ~/.bashrc                                          # apply it to the current terminal right away
 ```
 
-> **Definition:** An **environment variable** is a name-value pair shared by a shell and the programs run from it. `/opt/ros/melodic/setup.bash` is a script that sets environment variables such as `ROS_DISTRO`, `ROS_PACKAGE_PATH`, `PATH`, `PYTHONPATH`, and `CMAKE_PREFIX_PATH` for ROS. **`source`** runs a script in the current shell instead of a new one, so the environment variables the script changes remain in the current shell.
+> **Definition:** An **environment variable** is a name-value pair shared by a shell and the programs run from it. `/opt/ros/melodic/setup.bash` is a script that sets environment variables such as `ROS_DISTRO`, `ROS_PACKAGE_PATH`, `PATH`, `PYTHONPATH`, and `CMAKE_PREFIX_PATH` for ROS.
+
+> **Definition:** **`source`** runs a script in the current shell instead of a new one, so the environment variables the script changes remain in the current shell.
 
 `~/.bashrc` is a configuration file that runs automatically every time a new terminal opens, so with the `source` line in it there is no need to type the line in each terminal. `>>` appends to the end of a file while `>` overwrites it, so using `>` here would erase everything already in `.bashrc`. Check that the setting has taken effect as follows.
 
@@ -487,7 +497,17 @@ flowchart TB
 
 *Figure 9. Communication between the master and two nodes*
 
-> **Definition:** A **topic** is a named channel over which messages travel. A node that sends messages to a topic is a **publisher**, and a node that receives them is a **subscriber**. A **message** is data with a fixed format (the names and types of its fields). A **service** is one-to-one communication in which a request receives exactly one response.
+> **Definition:** A **topic** is a named channel over which messages travel.
+
+> **Definition:** A node that sends messages to a topic is a **publisher**.
+
+> **Definition:** A node that receives messages from a topic is a **subscriber**.
+
+A publisher and a subscriber need not know about each other. As long as they use the same topic name, the master gives the subscriber the address of the publisher and the connection is made, and one topic may have several publishers and several subscribers.
+
+> **Definition:** A **message** is data with a fixed format (the names and types of its fields).
+
+> **Definition:** A **service** is one-to-one communication in which a request receives exactly one response.
 
 As with `ROS_HOSTNAME:3456` in Figure 9, each node accepts connections at its own host name and port number. Therefore, if the `ROS_HOSTNAME` set in Section 5 is wrong, the node is registered with the master but other nodes cannot connect to it.
 

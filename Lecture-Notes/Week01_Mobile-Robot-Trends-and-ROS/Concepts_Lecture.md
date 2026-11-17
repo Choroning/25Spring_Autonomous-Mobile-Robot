@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Classify mobile robots by locomotion (legs, wheels, combined wheels and legs, flight) and explain the features of real examples and recent trends
@@ -107,7 +107,9 @@ Each locomotion type has clear strengths and weaknesses. Wheels are the most eff
 
 *Table 3. Strengths and weaknesses of each locomotion type*
 
-> **Definition:** A constraint that limits the directions in which a robot can move instantaneously is called a **nonholonomic constraint**. For example, a car or a two-wheeled differential-drive robot cannot move sideways on the spot unless its wheels slip sideways. In contrast, a robot with mecanum wheels or omni wheels can move directly in any direction and is called **holonomic** [1]. The nonholonomic constraint of a car returns in the path planning of Week 10.
+> **Definition:** A constraint that limits the directions in which a robot can move instantaneously is called a **nonholonomic constraint**. For example, a car or a two-wheeled differential-drive robot cannot move sideways on the spot unless its wheels slip sideways. The nonholonomic constraint of a car returns in the path planning of Week 10.
+
+> **Definition:** A robot with mecanum wheels or omni wheels can move directly in any direction and is called **holonomic** [1].
 
 ### 1.3 Legged Robots
 
@@ -275,7 +277,9 @@ flowchart LR
 
 In Figure 13, the rectangles are nodes, the labels on solid arrows are topics and message types, and the dotted lines are a service and registration with the master. The `/points_raw` topic published by the LiDAR driver node is subscribed by both the localization node and the visualization node, and the driver node does not need to know who subscribes. Because nodes are loosely coupled in this way, replacing or adding one node does not require changing the others.
 
-> **Definition:** **catkin** is the official build system of ROS 1, which extends CMake to build many packages at once. The folder built with catkin is called a **workspace**, and it consists of a `src` folder for sources, a `build` folder for intermediate build files, and a `devel` folder for build results and environment setup scripts. How to create and build packages is covered in Weeks 2 and 5.
+> **Definition:** **catkin** is the official build system of ROS 1, which extends CMake to build many packages at once.
+
+> **Definition:** The folder built with catkin is called a **workspace**, and it consists of a `src` folder for sources, a `build` folder for intermediate build files, and a `devel` folder for build results and environment setup scripts. How to create and build packages is covered in Weeks 2 and 5.
 
 ### 2.3 Communication Features
 
@@ -320,7 +324,15 @@ On top of its communication infrastructure, ROS provides libraries for functions
 
 *Table 6. Robot capability libraries provided by ROS*
 
-> **Definition:** A **pose** combines a position and an orientation. A pose in 3D space is expressed as a position $(x, y, z)$ and rotations about three axes. **SLAM (simultaneous localization and mapping)** is the technique of building a map of an unknown environment while estimating one's own position within that map at the same time. **Forward kinematics** computes the pose of the end of an arm from its joint angles, and **inverse kinematics** computes the joint angles that produce a desired pose of the end of the arm.
+> **Definition:** A **pose** combines a position and an orientation. A pose in 3D space is expressed as a position $(x, y, z)$ and rotations about three axes.
+
+> **Definition:** **SLAM (simultaneous localization and mapping)** is the technique of building a map of an unknown environment while estimating one's own position within that map at the same time.
+
+The basic computation of a manipulation library for robot arms is the conversion between joint angles and the pose of the end of the arm, and it comes in two kinds according to which of the two is computed from the other.
+
+> **Definition:** **Forward kinematics** computes the pose of the end of an arm from its joint angles.
+
+> **Definition:** **Inverse kinematics** computes the joint angles that produce a desired pose of the end of the arm.
 
 ![Figure 14. TF coordinate frames attached to each link of a humanoid robot, and the RViz navigation view](../../images/Week01_01-2_p07.png)
 

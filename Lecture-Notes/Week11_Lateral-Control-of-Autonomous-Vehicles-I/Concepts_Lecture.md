@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain why a Hybrid A\* path is smoothed, and compute the maximum speed that respects ride comfort from the radius of curvature obtained from waypoints
@@ -146,7 +146,9 @@ Because the maximum speed is proportional to the square root of the radius, mult
 
 While driving on a road, obstacles that block the path appear, such as a vehicle ahead or road facilities. The path that avoids them is built from two kinds of path pieces.
 
-> **Definition:** A **swerve** is a path that moves sideways by a large amount within a short distance to avoid an obstacle urgently. A **nudge** is a smooth path over a long distance that shifts slightly sideways or returns gently to the original path.
+> **Definition:** A **swerve** is a path that moves sideways by a large amount within a short distance to avoid an obstacle urgently.
+
+> **Definition:** A **nudge** is a smooth path over a long distance that shifts slightly sideways or returns gently to the original path.
 
 ![Figure 4. Swerve paths (green) branching out from the vehicle and nudge paths (blue) continuing from their ends](../../images/Week11_11-1_p05.png)
 
@@ -191,7 +193,11 @@ The lateral controller treated in this unit and in Week 12 follows four design c
 
 *Table 3. Design concepts of the lateral controller and their expected effects*
 
-> **Definition:** **Yaw** is the rotation of the body about its vertical axis, and the **yaw rate** is the angular velocity of that rotation (rad/s). The **sideslip angle** is the angle between the direction the vehicle faces (the longitudinal axis of the body) and the direction in which the center of gravity actually moves.
+> **Definition:** **Yaw** is the rotation of the body about its vertical axis.
+
+> **Definition:** The **yaw rate** is the angular velocity of the yaw rotation (rad/s).
+
+> **Definition:** The **sideslip angle** is the angle between the direction the vehicle faces (the longitudinal axis of the body) and the direction in which the center of gravity actually moves.
 
 The overall structure of the controller is as follows.
 
@@ -366,7 +372,9 @@ When the angles are within a few degrees, the error of the approximation is negl
 
 In the range of small slip angles, the lateral force of a tire is nearly proportional to the slip angle. This proportionality constant is called the **cornering stiffness** [3].
 
-> **Definition:** The **cornering stiffness** $C$ is the slope $`C = \partial Y / \partial \alpha \,\vert_{\alpha = 0}`$ at which the lateral force increases with the slip angle near zero slip angle, and its unit is N/rad. The model that expresses the lateral force as $Y = C\alpha$ with this slope is called the **linear tire model**.
+> **Definition:** The **cornering stiffness** $C$ is the slope $`C = \partial Y / \partial \alpha \,\vert_{\alpha = 0}`$ at which the lateral force increases with the slip angle near zero slip angle, and its unit is N/rad.
+
+> **Definition:** The model that expresses the lateral force as $Y = C\alpha$ with the cornering stiffness $C$ is called the **linear tire model**.
 
 Substituting the slip angles of Sections 2.3 and 2.4 gives the lateral forces of the front and rear axles.
 

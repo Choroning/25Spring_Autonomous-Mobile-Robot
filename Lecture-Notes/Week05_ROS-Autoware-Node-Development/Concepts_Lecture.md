@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-04
+> **Last Updated:** 2026-11-17
 
 > **Learning Objectives:**
 > 1. Explain the procedure for installing Qt 5.12.12, fetching the Autoware.ai 1.14.0 sources, building them with colcon, and running them, together with the role of each command
@@ -74,7 +74,11 @@ Autoware.ai is open-source autonomous driving software that runs on top of ROS 1
 
 The Autoware.ai source build documentation requires ROS Melodic and Qt 5.9.5 or later on Ubuntu 18.04, and optionally CUDA 10.0 for GPU acceleration [1]. Qt is needed because Autoware.ai contains packages, such as RViz plugins, that draw their screens with the Qt library, and the installation guide of Week 4, Section 6.2, installs Qt 5.12.12, a long-term support (LTS) release, separately.
 
-> **Definition:** **Qt** is a cross-platform framework for building graphical user interface (GUI) programs in C++. ROS's RViz and rqt are also built with Qt. **qmake** is a tool that generates build files for Qt projects, and **Qt Creator** is the integrated development environment (IDE) for Qt development.
+> **Definition:** **Qt** is a cross-platform framework for building graphical user interface (GUI) programs in C++. ROS's RViz and rqt are also built with Qt.
+
+> **Definition:** **qmake** is a tool that generates build files for Qt projects.
+
+> **Definition:** **Qt Creator** is the integrated development environment (IDE) for Qt development.
 
 ### 1.2 Summary of the Installation Procedure
 
