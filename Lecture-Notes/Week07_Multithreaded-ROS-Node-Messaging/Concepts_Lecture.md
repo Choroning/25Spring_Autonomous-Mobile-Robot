@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-17
+> **Last Updated:** 2026-11-18
 
 > **Learning Objectives:**
 > 1. Explain the difference between processes and threads, the execution flows of single-threaded and multithreaded programs, and the difference between concurrency and parallelism
@@ -24,7 +24,7 @@
   - [1.5 Concurrency and Parallelism](#15-concurrency-and-parallelism)
   - [1.6 Designing the Thread Structure](#16-designing-the-thread-structure)
 - [2. POSIX Threads](#2-posix-threads)
-  - [2.1 What pthread Is](#21-what-pthread-is)
+  - [2.1 Overview of pthread](#21-overview-of-pthread)
   - [2.2 Order of Use and Main Functions](#22-order-of-use-and-main-functions)
   - [2.3 Form of a Thread Function](#23-form-of-a-thread-function)
   - [2.4 Detaching and Joining](#24-detaching-and-joining)
@@ -177,7 +177,7 @@ In this structure, node 1 (`hello_dsc`) sends three topics to node 2 (`controlle
 
 ## 2. POSIX Threads
 
-### 2.1 What pthread Is
+### 2.1 Overview of pthread
 
 **POSIX threads (pthread)** form the standard API for parallel processing commonly used on all Unix-like POSIX systems, including Linux. They were standardized as IEEE Std 1003.1c in 1995 and are now part of the POSIX specification (IEEE Std 1003.1) [2]. Windows is not a POSIX system, but pthread can be used there by installing a library that implements it. Other thread APIs may also be used; on Linux, the C++11 standard library's `std::thread` and Boost's `boost::thread`, which ROS uses internally, are also implemented on top of pthread. The examples from Section 3 on use pthread.
 

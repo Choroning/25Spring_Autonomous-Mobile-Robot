@@ -24,7 +24,7 @@
   - [1.6 Aerial Robots and Space Robots](#16-aerial-robots-and-space-robots)
   - [1.7 Technology Trends Seen in the Examples](#17-technology-trends-seen-in-the-examples)
 - [2. Concepts and Features of ROS](#2-concepts-and-features-of-ros)
-  - [2.1 What ROS Is](#21-what-ros-is)
+  - [2.1 The Concept of ROS](#21-the-concept-of-ros)
   - [2.2 Basic Concepts of ROS](#22-basic-concepts-of-ros)
   - [2.3 Communication Features](#23-communication-features)
   - [2.4 Robot Capability Libraries](#24-robot-capability-libraries)
@@ -208,7 +208,7 @@ The functions that make up this autonomy, namely perception, localization, path 
 
 ## 2. Concepts and Features of ROS
 
-### 2.1 What ROS Is
+### 2.1 The Concept of ROS
 
 **ROS (Robot Operating System)** is a flexible framework for writing robot software, a collection of tools, libraries, and conventions that aim to simplify the task of creating complex and robust robot behavior across a wide variety of robotic platforms. Although its name contains "operating system," it is not an operating system like Windows or Linux; it is a **meta-operating system** that runs on top of an operating system such as Linux (mainly Ubuntu) and provides the robot with services similar to those of an operating system [13]. The services ROS provides are hardware abstraction, low-level device control, implementation of commonly used functionality, message passing between processes, and package management. ROS started at Stanford University in 2007 and its development was continued by Willow Garage [14]; it has grown as open source since its first distribution, Box Turtle, in 2010 (Section 2.6). In this unit, ROS means ROS 1.
 
