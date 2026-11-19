@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-17
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. 차량 경로 계획 문제를 정의하고, 비홀로노믹 제약의 의미와 전역 경로 계획과 지역 경로 계획의 역할을 구분할 수 있다
@@ -662,8 +662,6 @@ flowchart LR
 | `reverse_weight` | 2.00 | 전진과 후진이 바뀌는 이동의 비용에 곱하는 벌점 |
 | `distance_heuristic_weight` | 1.0 | 목표까지의 유클리드 거리 휴리스틱에 곱하는 가중치($\alpha_h$에 해당) |
 | `use_potential_heuristic`, `potential_weight` | true, 10.0 | costmap의 장애물 비용에 가중치를 곱하여 비용에 더한다(장애물 항 $h_3$과 같은 역할) |
-| `robot_length`, `robot_width` | 4.5 m, 1.75 m | 충돌 검사에 쓰는 차량의 크기 |
-| `time_limit` | 5000 ms | 이 시간 안에 경로를 찾지 못하면 탐색을 멈춘다 |
 
 *표 12. Autoware.ai `astar_search`의 주요 매개변수*
 

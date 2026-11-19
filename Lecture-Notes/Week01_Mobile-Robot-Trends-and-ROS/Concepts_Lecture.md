@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-18
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Classify mobile robots by locomotion (legs, wheels, combined wheels and legs, flight) and explain the features of real examples and recent trends
@@ -400,31 +400,11 @@ When choosing a distribution, consider the following.
 2. **Long-term support (LTS):** From Indigo on, the distributions released in even years (Indigo, Kinetic, Melodic, Noetic) pair with Ubuntu LTS releases and are long-term support distributions supported for five years. Jade and Lunar, released in the odd years between them, have short support periods of two years.
 3. **Requirements of the software to be used:** Autoware.ai 1.14.0, used in this course, is based on ROS Melodic, so this course uses Ubuntu 18.04 and ROS Melodic (Week 4).
 
-> **Note:** The end of support of Melodic was first planned for May 2023 and was then set to June 27, 2023 [17], [18]. Noetic is the last distribution of ROS 1, and its support ended in May 2025. ROS development has since moved to **ROS 2**, which replaces the communication layer with DDS and lets nodes discover one another without a master, and Autoware has also been redeveloped on ROS 2. The concepts of node, topic, message, service, and package remain the same in ROS 2, however, so concepts learned with ROS 1 also apply to ROS 2.
+> **Note:** Noetic is the last distribution of ROS 1, and its support ended in May 2025. ROS development has since moved to **ROS 2**, which replaces the communication layer with DDS and lets nodes discover one another without a master, and Autoware has also been redeveloped on ROS 2. The concepts of node, topic, message, service, and package remain the same in ROS 2, however, so concepts learned with ROS 1 also apply to ROS 2.
 
 ### 2.7 Installation and Environment Setup
 
-ROS Melodic is installed on Ubuntu 18.04 with `apt` after registering the ROS repository. The key steps of the official installation document are as follows [19].
-
-```bash
-# 1. Register the ROS package repository and add the repository's signing key
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt install curl    # install curl first if it is not installed
-curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-
-# 2. Update the package list and install desktop-full, which includes ROS, rqt, RViz, Gazebo, and more
-sudo apt update
-sudo apt install ros-melodic-desktop-full
-
-# 3. Register in .bashrc so that the ROS environment variables are set in every new terminal
-echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-source ~/.bashrc
-
-# 4. Initialize rosdep, which installs package dependencies automatically
-sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
-sudo rosdep init
-rosdep update
-```
+ROS Melodic is installed on Ubuntu 18.04 in the following order: register the ROS package repository and its signing key, install with `apt` the `ros-melodic-desktop-full` bundle, which includes ROS, rqt, RViz, Gazebo, and more, register `/opt/ros/melodic/setup.bash` in `.bashrc`, and initialize rosdep, which installs package dependencies automatically [19]. The commands for each step and the common errors are covered in Week 4, Section 3.
 
 After installation, create a catkin workspace in which to create and build one's own packages [20].
 
@@ -436,7 +416,7 @@ source devel/setup.bash      # set environment variables so that ROS can find th
 echo $ROS_PACKAGE_PATH       # success if it prints something like /home/<user>/catkin_ws/src:/opt/ros/melodic/share
 ```
 
-The reason for sourcing `setup.bash` is to set environment variables such as the path where ROS commands look for packages (`ROS_PACKAGE_PATH`) and the address of the master (`ROS_MASTER_URI`) in the current shell. This setting applies to each terminal separately, so it must be repeated whenever a new terminal is opened, or registered in `.bashrc`. The whole installation process and the network environment variables are covered in detail in Week 4.
+The reason for sourcing `setup.bash` is to set environment variables such as the path where ROS commands look for packages (`ROS_PACKAGE_PATH`) and the address of the master (`ROS_MASTER_URI`) in the current shell. This setting applies to each terminal separately, so it must be repeated whenever a new terminal is opened, or registered in `.bashrc`. The network environment variables are covered in Week 4, Section 5.
 
 > **Caution:** The ROS wiki has a separate installation document for each distribution (for example, `kinetic/Installation/Ubuntu` for Kinetic and `melodic/Installation/Ubuntu` for Melodic). Kinetic is for Ubuntu 16.04, so on Ubuntu 18.04 the Melodic installation document must be followed. The `melodic` part of the installation commands must match the name of the distribution being installed, and installing a distribution that does not pair with the operating system fails to find the packages.
 

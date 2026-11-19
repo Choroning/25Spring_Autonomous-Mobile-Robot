@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-17
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Define the vehicle path planning problem, and distinguish the meaning of nonholonomic constraints and the roles of global and local path planning
@@ -662,8 +662,6 @@ The main parameters and default values of the Hybrid A\* implementation shared b
 | `reverse_weight` | 2.00 | Penalty multiplied onto the cost of moves that switch between forward and reverse |
 | `distance_heuristic_weight` | 1.0 | Weight multiplied onto the Euclidean distance heuristic to the goal (corresponding to $`\alpha_h`$) |
 | `use_potential_heuristic`, `potential_weight` | true, 10.0 | Adds the costmap's obstacle cost multiplied by a weight to the cost (the same role as the obstacle term $`h_3`$) |
-| `robot_length`, `robot_width` | 4.5 m, 1.75 m | Vehicle size used for collision checking |
-| `time_limit` | 5000 ms | The search stops if no path is found within this time |
 
 *Table 12. Main parameters of `astar_search` in Autoware.ai*
 

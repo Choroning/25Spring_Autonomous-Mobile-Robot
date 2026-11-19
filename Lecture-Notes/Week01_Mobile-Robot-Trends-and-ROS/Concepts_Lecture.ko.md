@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-18
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. 이동 로봇을 이동 방식(다리, 바퀴, 바퀴와 다리의 결합, 비행)에 따라 분류하고 실제 사례의 특징과 최근 동향을 설명할 수 있다
@@ -400,31 +400,11 @@ ROS는 일정한 시기마다 패키지 묶음을 **배포판(distribution)** �
 2. **장기 지원(LTS):** Indigo부터는 짝수 해에 나온 배포판(Indigo, Kinetic, Melodic, Noetic)이 Ubuntu LTS와 짝을 이루어 5년 동안 지원되는 장기 지원 배포판이다. 그 사이 홀수 해에 나온 Jade와 Lunar는 지원 기간이 2년으로 짧다.
 3. **사용할 소프트웨어의 요구:** 이 과목에서 쓰는 Autoware.ai 1.14.0은 ROS Melodic을 기준으로 하므로, 이 과목은 Ubuntu 18.04와 ROS Melodic을 쓴다(4주차).
 
-> **참고:** Melodic의 지원 종료는 처음에 2023년 5월로 예정되었다가 2023년 6월 27일로 정해졌다 [17], [18]. Noetic은 ROS 1의 마지막 배포판이며 2025년 5월에 지원이 끝났다. 이후 ROS 개발은 통신 계층을 DDS로 바꾸고 마스터 없이 노드가 서로를 찾는 **ROS 2**로 옮겨 갔고, Autoware도 ROS 2 기반으로 다시 개발되었다. 그러나 노드, 토픽, 메시지, 서비스, 패키지라는 개념은 ROS 2에서도 그대로이므로 ROS 1로 익힌 개념은 ROS 2에도 적용된다.
+> **참고:** Noetic은 ROS 1의 마지막 배포판이며 2025년 5월에 지원이 끝났다. 이후 ROS 개발은 통신 계층을 DDS로 바꾸고 마스터 없이 노드가 서로를 찾는 **ROS 2**로 옮겨 갔고, Autoware도 ROS 2 기반으로 다시 개발되었다. 그러나 노드, 토픽, 메시지, 서비스, 패키지라는 개념은 ROS 2에서도 그대로이므로 ROS 1로 익힌 개념은 ROS 2에도 적용된다.
 
 ### 2.7 설치와 환경 설정
 
-ROS Melodic은 Ubuntu 18.04에 ROS 저장소를 등록하고 `apt`로 설치한다. 공식 설치 문서의 핵심 단계는 다음과 같다 [19].
-
-```bash
-# 1. ROS 패키지 저장소를 등록하고 저장소의 서명 키를 추가한다
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt install curl    # curl이 설치되어 있지 않으면 먼저 설치한다
-curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-
-# 2. 패키지 목록을 갱신하고 ROS, rqt, RViz, Gazebo 등을 모두 포함한 desktop-full을 설치한다
-sudo apt update
-sudo apt install ros-melodic-desktop-full
-
-# 3. 새 터미널마다 ROS 환경 변수가 설정되도록 .bashrc에 등록한다
-echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-source ~/.bashrc
-
-# 4. 패키지의 의존성을 자동으로 설치하는 rosdep을 초기화한다
-sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
-sudo rosdep init
-rosdep update
-```
+ROS Melodic은 Ubuntu 18.04에 ROS 패키지 저장소와 그 서명 키를 등록하고, `apt`로 ROS, rqt, RViz, Gazebo 등을 모두 포함한 `ros-melodic-desktop-full`을 설치한 뒤, `/opt/ros/melodic/setup.bash`를 `.bashrc`에 등록하고 패키지의 의존성을 자동으로 설치하는 rosdep을 초기화하는 순서로 설치한다 [19]. 각 단계의 명령과 자주 생기는 오류는 4주차 3절에서 다룬다.
 
 설치가 끝나면 자신의 패키지를 만들고 빌드할 catkin 작업 공간을 만든다 [20].
 
@@ -436,7 +416,7 @@ source devel/setup.bash      # 작업 공간의 패키지를 ROS가 찾을 수 �
 echo $ROS_PACKAGE_PATH       # /home/<사용자>/catkin_ws/src:/opt/ros/melodic/share 처럼 출력되면 성공이다
 ```
 
-`setup.bash`를 `source`하는 이유는 ROS 명령이 패키지를 찾는 경로(`ROS_PACKAGE_PATH`), 마스터의 주소(`ROS_MASTER_URI`) 같은 환경 변수를 현재 셸에 설정하기 위해서이다. 이 설정은 터미널마다 따로 적용되므로, 새 터미널을 열 때마다 다시 하거나 `.bashrc`에 등록해 둔다. 설치의 전체 과정과 네트워크 환경 변수 설정은 4주차에서 자세히 다룬다.
+`setup.bash`를 `source`하는 이유는 ROS 명령이 패키지를 찾는 경로(`ROS_PACKAGE_PATH`), 마스터의 주소(`ROS_MASTER_URI`) 같은 환경 변수를 현재 셸에 설정하기 위해서이다. 이 설정은 터미널마다 따로 적용되므로, 새 터미널을 열 때마다 다시 하거나 `.bashrc`에 등록해 둔다. 네트워크 환경 변수 설정은 4주차 5절에서 다룬다.
 
 > **주의:** ROS 위키에는 배포판마다 설치 문서가 따로 있다(예: Kinetic은 `kinetic/Installation/Ubuntu`, Melodic은 `melodic/Installation/Ubuntu`). Kinetic은 Ubuntu 16.04용이므로, Ubuntu 18.04에서는 Melodic의 설치 문서를 따라야 한다. 설치 명령의 `melodic` 부분은 설치하려는 배포판 이름과 일치해야 하며, 운영체제와 짝이 맞지 않는 배포판을 설치하면 패키지를 찾지 못한다.
 

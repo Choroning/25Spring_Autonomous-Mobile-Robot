@@ -2,7 +2,7 @@
 
 [레포지토리 안내](../../README.ko.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **최종 수정일:** 2026-11-18
+> **최종 수정일:** 2026-11-19
 
 > **학습 목표:**
 > 1. 패키지 관리자 APT가 저장소, 패키지 목록, `sudo` 권한으로 소프트웨어를 갱신하고 설치하는 원리를 설명하고, Ubuntu 설치 직후의 초기 설정을 할 수 있다
@@ -277,23 +277,7 @@ sudo apt-get install eclipse-cdt     # Eclipse의 C/C++ 개발 도구(CDT) 설�
 
 *그림 7. Error Parsers의 체크 항목과 Behaviour의 자동 빌드 설정*
 
-**예제 실행.** File → New → C++ Project에서 Executable 아래의 Hello World C++ Project를 고르고 Toolchain으로 Linux GCC를 고르면 다음 코드가 만들어진다. 빌드(Ctrl + B)한 뒤 실행하면 Console 창에 `!!!Hello World!!!`가 출력된다.
-
-```cpp
-#include <iostream>
-using namespace std;
-
-int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-	return 0;
-}
-```
-
-- `#include <iostream>`: 표준 입출력 스트림(`cout` 등)을 선언한 헤더를 포함한다.
-- `using namespace std;`: `std::cout` 대신 `cout`처럼 표준 라이브러리의 이름을 짧게 쓸 수 있게 한다.
-- `int main()`: 프로그램이 시작하는 함수이다.
-- `cout << "!!!Hello World!!!" << endl;`: 문자열을 표준 출력에 쓰고, `endl`로 줄을 바꾸며 출력 버퍼를 비운다.
-- `return 0;`: 프로그램이 정상적으로 끝났음을 운영 체제에 알린다.
+**예제 실행.** File → New → C++ Project에서 Executable 아래의 Hello World C++ Project를 고르고 Toolchain으로 Linux GCC를 고르면 `!!!Hello World!!!`를 출력하는 C++ 예제 코드가 만들어진다. 빌드(Ctrl + B)한 뒤 실행하면 Console 창에 `!!!Hello World!!!`가 출력되어 컴파일러와 IDE가 제대로 설치되었음을 확인할 수 있다.
 
 ![그림 8. Eclipse에서 hello world 예제를 빌드하고 실행한 결과](../../images/Week04_4-1_p20.png)
 

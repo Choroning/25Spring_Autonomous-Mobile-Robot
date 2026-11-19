@@ -2,7 +2,7 @@
 
 [Repository Guide](../../README.md) | [English](Concepts_Lecture.md) | [한국어](Concepts_Lecture.ko.md)
 
-> **Last Updated:** 2026-11-18
+> **Last Updated:** 2026-11-19
 
 > **Learning Objectives:**
 > 1. Explain how the package manager APT updates and installs software through repositories, package lists, and `sudo` privileges, and perform the initial setup right after installing Ubuntu
@@ -277,23 +277,7 @@ sudo apt-get install eclipse-cdt     # install the C/C++ Development Tooling (CD
 
 *Figure 7. The checked items of Error Parsers and the automatic build setting in Behaviour*
 
-**Running the sample.** In File → New → C++ Project, choosing Hello World C++ Project under Executable and Linux GCC as the toolchain creates the following code. Building it (Ctrl + B) and running it prints `!!!Hello World!!!` in the Console view.
-
-```cpp
-#include <iostream>
-using namespace std;
-
-int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-	return 0;
-}
-```
-
-- `#include <iostream>`: Includes the header that declares the standard input and output streams (`cout` and others).
-- `using namespace std;`: Lets the names of the standard library be written briefly, as `cout` instead of `std::cout`.
-- `int main()`: The function where the program starts.
-- `cout << "!!!Hello World!!!" << endl;`: Writes the string to standard output, and `endl` ends the line and flushes the output buffer.
-- `return 0;`: Tells the operating system that the program ended normally.
+**Running the sample.** In File → New → C++ Project, choosing Hello World C++ Project under Executable and Linux GCC as the toolchain creates a C++ sample program that prints `!!!Hello World!!!`. Building it (Ctrl + B) and running it prints `!!!Hello World!!!` in the Console view, which confirms that the compiler and the IDE are installed correctly.
 
 ![Figure 8. The result of building and running the hello world sample in Eclipse](../../images/Week04_4-1_p20.png)
 
